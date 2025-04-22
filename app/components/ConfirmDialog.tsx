@@ -7,7 +7,7 @@ interface ConfirmDialogProps {
   onClose: () => void;
   onConfirm: () => void;
   title: string;
-  message: React.ReactNode; // Schimbat din string în ReactNode
+  message: React.ReactNode;
   confirmText?: string;
   cancelText?: string;
   isDestructive?: boolean;
@@ -81,7 +81,9 @@ export default function ConfirmDialog({
         </div>
         
         <div className="dialog-content">
-          <p className="dialog-message">{message}</p>
+          <div className="dialog-message" style={{ color: 'var(--color-text)' }}>
+            {message}
+          </div>
           
           <div className="dialog-actions">
             <button 

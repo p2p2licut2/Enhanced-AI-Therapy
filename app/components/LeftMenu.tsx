@@ -23,7 +23,7 @@ export default function LeftMenu() {
   const [showOptionsFor, setShowOptionsFor] = useState<string | null>(null);
   const [isRenaming, setIsRenaming] = useState(false);
   const [newTitle, setNewTitle] = useState('');
-  const [editingConversationId, setEditingConversationId] = useState<string | null>(null);
+  const [editingItemId, setEditingItemId] = useState<string | null>(null);
   const [conversationToDelete, setConversationToDelete] = useState<string | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const optionsRef = useRef<HTMLDivElement>(null);
@@ -32,7 +32,6 @@ export default function LeftMenu() {
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
-      // Verificare explicită dacă referința există și dacă target-ul este un Element
       if (optionsRef.current && e.target instanceof Node) {
         if (!optionsRef.current.contains(e.target)) {
           setShowOptionsFor(null);
@@ -73,13 +72,21 @@ export default function LeftMenu() {
 
   const handleOptionsClick = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-    conversationId: string
+    conversationId: string,
+    section: 'favorite' | 'recent'
   ) => {
     e.stopPropagation();
-    setShowOptionsFor(conversationId);
+    setShowOptionsFor(`${conversationId}-${section}`);
   };
 
-  const handleRename = (conversationId: string) => {
+  const getConversationIdFromComposite = (compositeId: string): string => {
+    if (compositeId.endsWith('-favorite') || compositeId.endsWith('-recent')) {
+      return compositeId.substring(0, compositeId.lastIndexOf('-'));
+    }
+    return compositeId; // Safety case
+  };
+
+  const handleRename = (conversationId: string, section: 'favorite' | 'recent') => {
     // Find the conversation to get its current title
     const conversation = [...favoriteConversations, ...recentConversations]
       .find(c => c.id === conversationId);
@@ -87,13 +94,13 @@ export default function LeftMenu() {
     if (conversation) {
       setNewTitle(conversation.title);
       setIsRenaming(true);
-      setEditingConversationId(conversationId);
+      setEditingItemId(`${conversationId}-${section}`);
       setShowOptionsFor(null);
     }
   };
 
   const handleDelete = (conversationId: string) => {
-    // Folosim dialogul personalizat în loc de window.confirm
+    // Use the custom dialog instead of window.confirm
     setConversationToDelete(conversationId);
     setShowDeleteConfirm(true);
     setShowOptionsFor(null);
@@ -108,16 +115,17 @@ export default function LeftMenu() {
 
   const handleRenameSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (editingConversationId && newTitle.trim()) {
-      renameConversation(editingConversationId, newTitle.trim());
+    if (editingItemId && newTitle.trim()) {
+      const conversationId = getConversationIdFromComposite(editingItemId);
+      renameConversation(conversationId, newTitle.trim());
       setIsRenaming(false);
-      setEditingConversationId(null);
+      setEditingItemId(null);
     }
   };
 
   const handleRenameCancel = () => {
     setIsRenaming(false);
-    setEditingConversationId(null);
+    setEditingItemId(null);
   };
 
   // Format date to readable string
@@ -127,14 +135,16 @@ export default function LeftMenu() {
 
   const renderConversationItem = (
     conversation: Conversation,
-    isCurrent: boolean = false
+    isCurrent: boolean = false,
+    section: 'favorite' | 'recent'
   ) => {
-    const isCurrentlyRenaming = isRenaming && editingConversationId === conversation.id;
+    const itemId = `${conversation.id}-${section}`;
+    const isCurrentlyRenaming = isRenaming && editingItemId === itemId;
     const showOptionButtons = isCurrent || hoveredConversationId === conversation.id;
 
     return (
       <div
-        key={conversation.id}
+        key={`${conversation.id}-${section}`}
         className={`conversation-item ${isCurrent ? 'current-conversation' : ''}`}
         onClick={() => handleConversationClick(conversation.id)}
         onMouseEnter={() => setHoveredConversationId(conversation.id)}
@@ -186,11 +196,11 @@ export default function LeftMenu() {
                 </svg>
               )}
 
-              {/* Arată butonul de opțiuni când hover sau când este conversația curentă */}
+              {/* Show options button when hovering or when it's the current conversation */}
               {showOptionButtons && (
                 <button
                   className="options-button"
-                  onClick={(e) => handleOptionsClick(e, conversation.id)}
+                  onClick={(e) => handleOptionsClick(e, conversation.id, section)}
                   aria-label="Options"
                 >
                   <svg
@@ -210,11 +220,11 @@ export default function LeftMenu() {
                 </button>
               )}
 
-              {showOptionsFor === conversation.id && (
+              {showOptionsFor === itemId && (
                 <div className="conversation-options" ref={optionsRef} onClick={e => e.stopPropagation()}>
                   <div
                     className="conversation-option"
-                    onClick={() => handleRename(conversation.id)}
+                    onClick={() => handleRename(conversation.id, section)}
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -348,7 +358,8 @@ export default function LeftMenu() {
             {favoriteConversations.map(conversation =>
               renderConversationItem(
                 conversation,
-                conversation.id === currentConversation?.id
+                conversation.id === currentConversation?.id,
+                'favorite'
               )
             )}
           </div>
@@ -380,7 +391,8 @@ export default function LeftMenu() {
             recentConversations.map(conversation =>
               renderConversationItem(
                 conversation,
-                conversation.id === currentConversation?.id      
+                conversation.id === currentConversation?.id,
+                'recent'
               )
             )
           ) : (

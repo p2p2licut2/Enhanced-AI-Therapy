@@ -1119,3 +1119,104 @@ textarea {
 .overflow-x-auto {
   -webkit-overflow-scrolling: touch;
 }
+
+/* ============================================================
+   INSTALL PROMPT STYLES
+   ============================================================ */
+
+.install-prompt {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: white;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+  z-index: 2000;
+  padding: 16px;
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+  animation: slideUp 0.3s ease-out;
+  max-width: 768px;
+  margin: 0 auto;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.install-prompt-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.install-prompt-text h3 {
+  margin: 0 0 8px 0;
+  font-size: 18px;
+  color: var(--color-heading);
+}
+
+.install-prompt-text p {
+  margin: 0;
+  font-size: 14px;
+  color: var(--color-text);
+}
+
+.install-prompt-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.ios-instructions {
+  font-size: 14px;
+  background-color: var(--color-background);
+  padding: 12px;
+  border-radius: 8px;
+  margin-right: 30px;
+}
+
+.share-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 4px;
+  color: var(--color-heading);
+}
+
+.install-button {
+  background-color: var(--color-heading);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.install-button:hover {
+  background-color: #B06E58;
+}
+
+.close-install-prompt {
+  background: none;
+  border: none;
+  color: var(--color-text);
+  opacity: 0.7;
+  cursor: pointer;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.2s ease;
+}
+
+.close-install-prompt:hover {
+  opacity: 1;
+}

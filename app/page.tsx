@@ -6,6 +6,7 @@ import Chat from './components/Chat';
 import Header from './components/Header';
 import LeftMenu from './components/LeftMenu';
 import TherapistSelector from './components/TherapistSelector';
+import InstallPrompt from './components/InstallPrompt';
 
 export default function Home() {
   const [mounted, setMounted] = useState(false);
@@ -15,7 +16,7 @@ export default function Home() {
     setMounted(true);
   }, []);
 
-  // NEW: Add this useEffect for viewport height
+  // Set viewport height
   useEffect(() => {
     // Function to set the value of --vh to 1% of the viewport height
     function setVH() {
@@ -51,6 +52,7 @@ export default function Home() {
           <Header />
           <Chat />
         </div>
+        <InstallPrompt />
       </main>
     </AppProvider>
   );
