@@ -92,6 +92,7 @@ interface AppContextType {
   recentConversations: Conversation[];
   renameConversation: (conversationId: string, newTitle: string) => void;
   deleteConversation: (conversationId: string) => void;
+  pendingConversationTitle: string | null;
 }
 
 // Create context with default values
@@ -108,12 +109,25 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [messages, setMessages] = useState<Message[]>([]);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isTherapistSelectorOpen, setIsTherapistSelectorOpen] = useState(false);
+  // Titlul pentru conversația neîncepută încă
+  const [pendingConversationTitle, setPendingConversationTitle] = useState<string | null>('Începe conversația...');
 
   // Load conversations from localStorage on initial load
   useEffect(() => {
     const savedConversations = localStorage.getItem('conversations');
     if (savedConversations) {
-      setConversations(JSON.parse(savedConversations));
+      // Încărcăm doar conversațiile care au cel puțin un mesaj
+      const parsedConversations = JSON.parse(savedConversations);
+      const validConversations = parsedConversations.filter(
+        (conv: Conversation) => conv.messages && conv.messages.length > 0
+      );
+      
+      // Dacă am eliminat conversații, actualizăm localStorage
+      if (validConversations.length !== parsedConversations.length) {
+        localStorage.setItem('conversations', JSON.stringify(validConversations));
+      }
+      
+      setConversations(validConversations);
     }
     
     // Check if there was a current conversation
@@ -132,8 +146,12 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   useEffect(() => {
     if (currentConversationId) {
       localStorage.setItem('currentConversationId', currentConversationId);
+      // Când avem o conversație curentă, nu avem nevoie de titlu în așteptare
+      setPendingConversationTitle(null);
     } else {
       localStorage.removeItem('currentConversationId');
+      // Resetăm titlul în așteptare când nu mai avem conversație curentă
+      setPendingConversationTitle('Începe conversația...');
     }
   }, [currentConversationId]);
 
@@ -182,7 +200,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const addMessage = (message: Message) => {
     setMessages(prev => [...prev, message]);
     
-    // If this is a new conversation (no ID yet), create it
+    // Dacă nu există o conversație curentă și mesajul este de la utilizator
     if (!currentConversationId && message.role === 'user') {
       const newConversation: Conversation = {
         id: uuidv4(),
@@ -196,8 +214,10 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       
       setConversations(prev => [...prev, newConversation]);
       setCurrentConversationId(newConversation.id);
+      // Când se creează o conversație nouă, nu mai avem nevoie de titlu în așteptare
+      setPendingConversationTitle(null);
     } 
-    // Otherwise update the existing conversation
+    // Actualizăm conversația existentă
     else if (currentConversationId) {
       setConversations(prev => 
         prev.map(conv => 
@@ -215,26 +235,11 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
   // Create a new conversation
   const createNewConversation = (therapistId: TherapistId) => {
-    // 1. generează un ID nou
-    const convId = uuidv4();
-  
-    // 2. adaugă conversaţia încă FĂRĂ mesaje
-    const newConversation: Conversation = {
-      id: convId,
-      title: 'Începe conversatia...',      // placeholder până la primul mesaj
-      therapistId,
-      messages: [],
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
-      isFavorite: false,
-    };
-  
-    setConversations(prev => [...prev, newConversation]);
-  
-    // 3. setează contextul
+    // Doar setăm contextul pentru interacțiunea viitoare
+    setCurrentConversationId(null);
     setCurrentTherapistId(therapistId);
-    setCurrentConversationId(convId);
-    setMessages([]);                  // fereastra de chat e goală
+    setMessages([]);
+    setPendingConversationTitle('Începe conversația...');
     setIsMenuOpen(false);
     setIsTherapistSelectorOpen(false);
   };
@@ -245,6 +250,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     if (conversation) {
       setCurrentConversationId(conversationId);
       setCurrentTherapistId(conversation.therapistId);
+      setPendingConversationTitle(null); // Nu avem nevoie de titlu în așteptare pentru o conversație existentă
       setIsMenuOpen(false);
     }
   };
@@ -279,6 +285,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     if (currentConversationId === conversationId) {
       setCurrentConversationId(null);
       setMessages([]);
+      setPendingConversationTitle('Începe conversația...'); // Resetăm titlul în așteptare
     }
   };
 
@@ -303,7 +310,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         favoriteConversations,
         recentConversations,
         renameConversation,
-        deleteConversation
+        deleteConversation,
+        pendingConversationTitle
       }}
     >
       {children}

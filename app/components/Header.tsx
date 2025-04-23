@@ -5,8 +5,6 @@ import Image from 'next/image';
 import { useApp } from '@/app/contexts/AppContext';
 import TherapistProfileModal from './TherapistProfileModal';
 import ConfirmDialog from './ConfirmDialog';
-import useAutoScroll from '../hooks/useAutoScroll';
-import useSafeAsync, { useTimeout } from '../hooks/useSafeAsync';
 
 export default function Header() {
   const {
@@ -16,37 +14,50 @@ export default function Header() {
     currentConversation,
     isCurrentConversationFavorite,
     renameConversation,
-    deleteConversation
+    deleteConversation,
+    pendingConversationTitle
   } = useApp();
 
-  // Safety hooks - MUST COME BEFORE OTHER HOOKS
-  const { isMounted } = useSafeAsync();
-  const { setTimeout: safeSetTimeout } = useTimeout();
-
   // State
-  const [showOptions, setShowOptions] = useState<boolean>(false);
-  const [isRenaming, setIsRenaming] = useState<boolean>(false);
-  const [newTitle, setNewTitle] = useState<string>('');
-  const [showProfileModal, setShowProfileModal] = useState<boolean>(false);
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState<boolean>(false);
-  const [isTitleHovered, setIsTitleHovered] = useState<boolean>(false);
+  const [showOptions, setShowOptions] = useState(false);
+  const [isRenaming, setIsRenaming] = useState(false);
+  const [newTitle, setNewTitle] = useState('');
+  const [isAutoScrolling, setIsAutoScrolling] = useState(false);
+  const [manualScrollActive, setManualScrollActive] = useState(false);
+  const [showProfileModal, setShowProfileModal] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [isTitleHovered, setIsTitleHovered] = useState(false);
 
   // Refs
   const optionsRef = useRef<HTMLDivElement>(null);
+  const titleRef = useRef<HTMLDivElement>(null);
   const titleInputRef = useRef<HTMLInputElement>(null);
-  
-  // Custom hook for auto-scrolling
-  const {
-    elementRef: titleScrollRef,
-    isScrolling: isAutoScrolling,
-    setIsScrolling: setIsAutoScrolling,
-    manualScrollActive,
-    setManualScrollActive
-  } = useAutoScroll<HTMLDivElement>(isTitleHovered, {
-    speed: 1,
-    interval: 20,
-    pauseAtEnd: 2000
-  });
+  const titleScrollRef = useRef<HTMLDivElement>(null);
+  const autoScrollTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const resetScrollTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Efect pentru click-uri în afara meniului
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      // Verificăm dacă click-ul este în afara meniului și a titlului
+      if (showOptions && optionsRef.current && titleRef.current) {
+        // Dacă click-ul nu este nici în meniu, nici pe titlu, închidem meniul
+        if (!optionsRef.current.contains(e.target as Node) && 
+            !titleRef.current.contains(e.target as Node)) {
+          setShowOptions(false);
+        }
+      }
+    };
+
+    // Adăugăm listener doar când meniul este deschis
+    if (showOptions) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showOptions]);
 
   // Effect to handle the fade effect for the title scroll container
   useEffect(() => {
@@ -67,70 +78,131 @@ export default function Header() {
 
     el.addEventListener('scroll', updateFade);
     return () => el.removeEventListener('scroll', updateFade);
-  }, [currentConversation?.id]);
+  }, [currentConversation?.id, pendingConversationTitle]);
 
-  // Handle clicks outside menus and scroll container
+  // Auto-scrolling effect
   useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      // Type guard to ensure e.target is a Node
-      if (!(e.target instanceof Node)) return;
-      
-      if (optionsRef.current && !optionsRef.current.contains(e.target)) {
-        setShowOptions(false);
-      }
+    if (isAutoScrolling && titleScrollRef.current) {
+      const el = titleScrollRef.current;
 
-      // Handle clicks outside the title area
-      if (titleScrollRef.current && !titleScrollRef.current.contains(e.target)) {
-        // Reset scroll position ONLY if auto-scrolling was active, not for manual scroll
-        if (isAutoScrolling) {
-          setIsAutoScrolling(false);
-
-          if (titleScrollRef.current) {
-            titleScrollRef.current.scrollTo({
-              left: 0,
-              behavior: 'smooth'
-            });
-          }
+      // Only auto-scroll if the content is actually wider than the container
+      if (el.scrollWidth > el.clientWidth) {
+        // Clear any existing scroll timer
+        if (autoScrollTimerRef.current) {
+          clearInterval(autoScrollTimerRef.current);
         }
 
-        // Reset manual scroll flag when clicking elsewhere
-        setManualScrollActive(false);
+        // Save initial position to detect manual changes
+        let lastKnownScrollPosition = el.scrollLeft;
+
+        // Start a new scroll interval
+        const scrollSpeed = 1; // pixels per tick (adjust for desired speed)
+        const scrollInterval = 20; // milliseconds between ticks
+
+        let position = el.scrollLeft;
+        autoScrollTimerRef.current = setInterval(() => {
+          // Check if scroll position changed outside this interval
+          // This indicates user has scrolled manually
+          if (Math.abs(el.scrollLeft - lastKnownScrollPosition) > 1 && el.scrollLeft !== position) {
+            // User scrolled manually - stop auto-scrolling
+            if (autoScrollTimerRef.current) {
+              clearInterval(autoScrollTimerRef.current);
+              autoScrollTimerRef.current = null;
+            }
+            if (resetScrollTimerRef.current) {
+              clearTimeout(resetScrollTimerRef.current);
+              resetScrollTimerRef.current = null;
+            }
+            setIsAutoScrolling(false);
+            setManualScrollActive(true);
+            return;
+          }
+
+          // Increment position
+          position += scrollSpeed;
+          lastKnownScrollPosition = position;
+
+          // If we've reached the end, set the timer to reset
+          if (position >= el.scrollWidth - el.clientWidth) {
+            // Clear this interval
+            if (autoScrollTimerRef.current) {
+              clearInterval(autoScrollTimerRef.current);
+              autoScrollTimerRef.current = null;
+            }
+
+            // Set timer to reset to beginning after a pause
+            if (resetScrollTimerRef.current) {
+              clearTimeout(resetScrollTimerRef.current);
+            }
+
+            resetScrollTimerRef.current = setTimeout(() => {
+              // Smoothly scroll back to start
+              if (el && document.contains(el)) {
+                el.scrollTo({
+                  left: 0,
+                  behavior: 'smooth'
+                });
+              }
+
+              // Stop auto-scrolling
+              setIsAutoScrolling(false);
+            }, 2000); // 2 second pause at the end
+          } else {
+            // Apply the scroll position
+            el.scrollLeft = position;
+          }
+        }, scrollInterval);
+      }
+    }
+
+    return () => {
+      // Cleanup intervals and timers on unmount or when auto-scrolling stops
+      if (autoScrollTimerRef.current) {
+        clearInterval(autoScrollTimerRef.current);
+        autoScrollTimerRef.current = null;
+      }
+      if (resetScrollTimerRef.current) {
+        clearTimeout(resetScrollTimerRef.current);
+        resetScrollTimerRef.current = null;
       }
     };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [isAutoScrolling, setIsAutoScrolling, setManualScrollActive]);
+  }, [isAutoScrolling]);
 
   // Focus the input when renaming starts
   useEffect(() => {
     if (isRenaming && titleInputRef.current) {
-      // Use safe setTimeout to prevent errors if component unmounts
-      safeSetTimeout(() => {
-        if (titleInputRef.current && isMounted()) {
-          titleInputRef.current.focus();
-        }
-      }, 0);
+      titleInputRef.current.focus();
     }
-  }, [isRenaming, isMounted, safeSetTimeout]);
+  }, [isRenaming]);
 
   // Reset new title and scrolling state when conversation changes
   useEffect(() => {
     if (currentConversation) {
       setNewTitle(currentConversation.title);
+    } else if (pendingConversationTitle) {
+      setNewTitle(pendingConversationTitle);
     }
+    
     setIsRenaming(false);
     setShowOptions(false);
     setIsAutoScrolling(false);
     setManualScrollActive(false);
-    
+
+    // Reset auto-scroll timers
+    if (autoScrollTimerRef.current) {
+      clearInterval(autoScrollTimerRef.current);
+      autoScrollTimerRef.current = null;
+    }
+    if (resetScrollTimerRef.current) {
+      clearTimeout(resetScrollTimerRef.current);
+      resetScrollTimerRef.current = null;
+    }
+
     // Reset scroll position
     if (titleScrollRef.current) {
       titleScrollRef.current.scrollLeft = 0;
     }
-  }, [currentConversation, setIsAutoScrolling, setManualScrollActive]);
+  }, [currentConversation, pendingConversationTitle]);
 
   // Event handlers
   const handleMenuClick = () => {
@@ -143,34 +215,50 @@ export default function Header() {
     }
   };
 
-  const handleTitleClick = () => {
+  // Funcția separată pentru deschiderea/închiderea meniului de opțiuni
+  const handleTitleClick = (e: React.MouseEvent) => {
+    // Prevenim propagarea pentru a evita închiderea imediată
+    e.stopPropagation();
+    
+    // Verificăm dacă avem o conversație validă (nu afișăm meniul pentru titlul provizoriu)
     if (currentConversation) {
-      // Toggle the options menu
-      setShowOptions(!showOptions);
-
-      // Handle auto-scrolling state
-      if (manualScrollActive) {
-        // If user scrolled manually, reset this flag and start auto-scroll
-        setManualScrollActive(false);
-        setIsAutoScrolling(true);
-      } else {
-        // Otherwise toggle auto-scrolling as before
-        setIsAutoScrolling(!isAutoScrolling);
-      }
+      // Toggle-ul stării
+      setShowOptions(prev => !prev);
     }
   };
 
   const handleTitleMouseEnter = () => {
-    if (currentConversation && !isRenaming && !showOptions) {
+    if ((currentConversation || pendingConversationTitle) && !isRenaming && !showOptions) {
       setIsTitleHovered(true);
       setIsAutoScrolling(true);
     }
   };
 
   const handleTitleMouseLeave = () => {
-    if (currentConversation && !isRenaming) {
+    if ((currentConversation || pendingConversationTitle) && !isRenaming) {
       setIsTitleHovered(false);
+      
+      // Oprește auto-scrolling-ul
       setIsAutoScrolling(false);
+      
+      // Oprește toate intervalele și timer-ele
+      if (autoScrollTimerRef.current) {
+        clearInterval(autoScrollTimerRef.current);
+        autoScrollTimerRef.current = null;
+      }
+      
+      if (resetScrollTimerRef.current) {
+        clearTimeout(resetScrollTimerRef.current);
+        resetScrollTimerRef.current = null;
+      }
+      
+      // Resetează poziția de scroll
+      if (titleScrollRef.current) {
+        titleScrollRef.current.scrollTo({
+          left: 0,
+          behavior: 'smooth'
+        });
+      }
     }
   };
 
@@ -179,14 +267,16 @@ export default function Header() {
     setShowProfileModal(true);
   };
 
-  const handleRename = () => {
+  // Tratăm click-urile pe opțiunile din meniu pentru a preveni propagarea
+  const handleRename = (e: React.MouseEvent) => {
+    e.stopPropagation();
     setIsRenaming(true);
     setShowOptions(false);
     setIsAutoScrolling(false);
   };
 
-  const handleDelete = () => {
-    // Show the custom confirmation dialog instead of window.confirm
+  const handleDelete = (e: React.MouseEvent) => {
+    e.stopPropagation();
     setShowOptions(false);
     setShowDeleteConfirm(true);
   };
@@ -209,12 +299,14 @@ export default function Header() {
     setIsRenaming(false);
     if (currentConversation) {
       setNewTitle(currentConversation.title);
+    } else if (pendingConversationTitle) {
+      setNewTitle(pendingConversationTitle);
     }
   };
 
   return (
     <>
-      <header className="global-header" role="banner">
+      <div className="global-header">
         <div className="header-content">
           <div className="header-left flex items-center flex-1 min-w-0">
             <button
@@ -228,7 +320,6 @@ export default function Header() {
                 viewBox="0 0 24 24"
                 stroke="currentColor"
                 className="w-6 h-6"
-                aria-hidden="true"
               >
                 <path
                   strokeLinecap="round"
@@ -243,10 +334,6 @@ export default function Header() {
               className="header-icon cursor-pointer"
               onClick={handleTherapistClick}
               title="Vezi profilul terapeutului"
-              role="button"
-              tabIndex={0}
-              aria-label={`Vezi profilul lui ${currentTherapist.name}`}
-              onKeyDown={(e) => e.key === 'Enter' && handleTherapistClick()}
             >
               <Image
                 src={currentTherapist.avatarSrc}
@@ -262,59 +349,61 @@ export default function Header() {
                 className="header-title truncate cursor-pointer"
                 onClick={handleTherapistClick}
                 title="Vezi profilul terapeutului"
-                role="button"
-                tabIndex={0}
-                onKeyDown={(e) => e.key === 'Enter' && handleTherapistClick()}
               >
                 {currentTherapist.name} - {currentTherapist.title}
               </div>
 
-              {currentConversation && !isRenaming && (
+              {/* Afișăm titlul conversației curente sau titlul provizoriu */}
+              {(currentConversation || pendingConversationTitle) && !isRenaming && (
                 <div className="scroll-fade flex-1 min-w-0 pr-2">
+                  {/* Fix: Folosim două elemente diferite cu referințe separate */}
                   <div
-                    ref={titleScrollRef}
+                    ref={titleRef}
                     onClick={handleTitleClick}
-                    onMouseEnter={handleTitleMouseEnter}
-                    onMouseLeave={handleTitleMouseLeave}
-                    className={`overflow-x-auto whitespace-nowrap no-scrollbar cursor-pointer ${isAutoScrolling ? 'auto-scrolling' : ''}`}
-                    role="button"
-                    tabIndex={0}
-                    aria-label="Toggle conversation options"
-                    aria-expanded={showOptions}
-                    onKeyDown={(e) => e.key === 'Enter' && handleTitleClick()}
+                    className="overflow-x-auto whitespace-nowrap no-scrollbar cursor-pointer"
                   >
-                    {currentConversation.title}
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      className="w-3 h-3 ml-1 inline-block"
-                      aria-hidden="true"
+                    {/* Elementul interior care are referința pentru scroll */}
+                    <div
+                      ref={titleScrollRef}
+                      onMouseEnter={handleTitleMouseEnter}
+                      onMouseLeave={handleTitleMouseLeave}
+                      className={`inline-block ${isAutoScrolling ? 'auto-scrolling' : ''}`}
                     >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M19 9l-7 7-7-7"
-                      />
-                    </svg>
+                      {currentConversation ? currentConversation.title : pendingConversationTitle}
+                      {currentConversation && (
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                          className="w-3 h-3 ml-1 inline-block"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M19 9l-7 7-7-7"
+                          />
+                        </svg>
+                      )}
+                    </div>
                   </div>
                 </div>
               )}
 
               {currentConversation && isRenaming && (
-                <form onSubmit={handleRenameSubmit} className="rename-form">
-                  <label htmlFor="rename-input" className="sr-only">Redenumește conversația</label>
+                <form 
+                  onSubmit={handleRenameSubmit} 
+                  className="rename-form"
+                  onClick={(e) => e.stopPropagation()} // Prevenim propagarea
+                >
                   <input
-                    id="rename-input"
                     ref={titleInputRef}
                     type="text"
                     value={newTitle}
                     onChange={(e) => setNewTitle(e.target.value)}
                     className="rename-input flex-1 min-w-0 truncate"
                     placeholder="Introdu un nou titlu"
-                    aria-label="Titlu nou conversație"
                   />
                   <div className="rename-actions">
                     <button type="submit" className="rename-save-btn">
@@ -331,19 +420,16 @@ export default function Header() {
                 </form>
               )}
 
-              {showOptions && (
+              {/* Afișăm meniul de opțiuni doar pentru conversații reale */}
+              {showOptions && currentConversation && (
                 <div 
                   className="title-options" 
                   ref={optionsRef}
-                  role="menu"
-                  aria-label="Opțiuni conversație"
+                  onClick={(e) => e.stopPropagation()} // Prevenim propagarea
                 >
                   <div 
                     className="title-option" 
                     onClick={handleRename}
-                    role="menuitem"
-                    tabIndex={0}
-                    onKeyDown={(e) => e.key === 'Enter' && handleRename()}
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -351,7 +437,6 @@ export default function Header() {
                       viewBox="0 0 24 24"
                       stroke="currentColor"
                       className="w-4 h-4 mr-2"
-                      aria-hidden="true"
                     >
                       <path
                         strokeLinecap="round"
@@ -365,9 +450,6 @@ export default function Header() {
                   <div 
                     className="title-option title-option-delete" 
                     onClick={handleDelete}
-                    role="menuitem"
-                    tabIndex={0}
-                    onKeyDown={(e) => e.key === 'Enter' && handleDelete()}
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -375,7 +457,6 @@ export default function Header() {
                       viewBox="0 0 24 24"
                       stroke="currentColor"
                       className="w-4 h-4 mr-2"
-                      aria-hidden="true"
                     >
                       <path
                         strokeLinecap="round"
@@ -395,8 +476,7 @@ export default function Header() {
             <button
               className="favorite-button"
               onClick={handleFavoriteClick}
-              aria-label={isCurrentConversationFavorite ? "Elimină de la favorite" : "Adaugă la favorite"}
-              aria-pressed={isCurrentConversationFavorite}
+              aria-label={isCurrentConversationFavorite ? "Remove from favorites" : "Add to favorites"}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -405,7 +485,6 @@ export default function Header() {
                 stroke="currentColor"
                 className="w-6 h-6"
                 style={{ color: isCurrentConversationFavorite ? '#FFD700' : '#C17F65' }}
-                aria-hidden="true"
               >
                 <path
                   strokeLinecap="round"
@@ -417,7 +496,7 @@ export default function Header() {
             </button>
           )}
         </div>
-      </header>
+      </div>
 
       {/* Therapist Profile Modal */}
       <TherapistProfileModal
