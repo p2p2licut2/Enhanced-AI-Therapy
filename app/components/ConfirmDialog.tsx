@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef } from 'react';
+import FocusTrap from '../utils/FocusTrap';
 
 interface ConfirmDialogProps {
   isOpen: boolean;
@@ -24,6 +25,7 @@ export default function ConfirmDialog({
   isDestructive = false
 }: ConfirmDialogProps) {
   const dialogRef = useRef<HTMLDivElement>(null);
+  const confirmButtonRef = useRef<HTMLButtonElement>(null);
 
   // Close when clicking outside the dialog
   useEffect(() => {
@@ -43,32 +45,68 @@ export default function ConfirmDialog({
     if (isOpen) {
       document.addEventListener('mousedown', handleClickOutside);
       document.addEventListener('keydown', handleKeyDown);
+      
+      // Focus on the appropriate button when dialog opens
+      // For destructive dialogs, focus the cancel button by default
+      // For normal dialogs, focus the confirm button
+      setTimeout(() => {
+        if (confirmButtonRef.current && !isDestructive) {
+          confirmButtonRef.current.focus();
+        } else if (dialogRef.current) {
+          const cancelButton = dialogRef.current.querySelector('.cancel-button') as HTMLButtonElement;
+          if (cancelButton) {
+            cancelButton.focus();
+          }
+        }
+      }, 0);
+      
+      // Prevent scrolling on body
+      document.body.style.overflow = 'hidden';
     }
 
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
       document.removeEventListener('keydown', handleKeyDown);
+      
+      // Restore scrolling
+      document.body.style.overflow = '';
     };
-  }, [isOpen, onClose]);
+  }, [isOpen, onClose, isDestructive]);
 
   if (!isOpen) return null;
 
   return (
-    <>
+    <FocusTrap isActive={isOpen}>
       {/* Backdrop overlay */}
-      <div className="custom-overlay visible" onClick={onClose} />
+      <div 
+        className="custom-overlay visible" 
+        onClick={onClose} 
+        aria-hidden="true"
+      />
       
       {/* Dialog */}
-      <div className="confirm-dialog" ref={dialogRef}>
+      <div 
+        className="confirm-dialog" 
+        ref={dialogRef}
+        role="alertdialog"
+        aria-modal="true"
+        aria-labelledby="dialog-title"
+        aria-describedby="dialog-message"
+      >
         <div className="dialog-header">
-          <span>{title}</span>
-          <button className="modal-close" onClick={onClose} aria-label="Close dialog">
+          <span id="dialog-title">{title}</span>
+          <button 
+            className="modal-close" 
+            onClick={onClose} 
+            aria-label="Închide dialogul"
+          >
             <svg 
               xmlns="http://www.w3.org/2000/svg" 
               fill="none" 
               viewBox="0 0 24 24" 
               stroke="currentColor" 
               className="w-5 h-5"
+              aria-hidden="true"
             >
               <path 
                 strokeLinecap="round" 
@@ -81,7 +119,7 @@ export default function ConfirmDialog({
         </div>
         
         <div className="dialog-content">
-          <div className="dialog-message" style={{ color: 'var(--color-text)' }}>
+          <div id="dialog-message" className="dialog-message" style={{ color: 'var(--color-text)' }}>
             {message}
           </div>
           
@@ -94,6 +132,7 @@ export default function ConfirmDialog({
             </button>
             
             <button 
+              ref={confirmButtonRef}
               className={`dialog-button confirm-button ${isDestructive ? 'destructive-button' : ''}`} 
               onClick={() => {
                 onConfirm();
@@ -105,6 +144,6 @@ export default function ConfirmDialog({
           </div>
         </div>
       </div>
-    </>
+    </FocusTrap>
   );
 }

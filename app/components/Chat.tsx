@@ -1,7 +1,6 @@
-// app/components/Chat.tsx
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useApp } from '@/app/contexts/AppContext';
 import { Message } from '@/app/types';
 
@@ -15,12 +14,12 @@ export default function Chat() {
   } = useApp();
 
   // Local state
-  const [input, setInput] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [displayedText, setDisplayedText] = useState('');
-  const [isAnimating, setIsAnimating] = useState(false);
-  const [hasStartedConversation, setHasStartedConversation] = useState(false);
-  const [inputHeight, setInputHeight] = useState(0);
+  const [input, setInput] = useState<string>('');
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [displayedText, setDisplayedText] = useState<string>('');
+  const [isAnimating, setIsAnimating] = useState<boolean>(false);
+  const [hasStartedConversation, setHasStartedConversation] = useState<boolean>(false);
+  const [inputHeight, setInputHeight] = useState<number>(0);
 
   // Refs
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -28,6 +27,8 @@ export default function Chat() {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const inputContainerRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
+  const abortControllerRef = useRef<AbortController | null>(null);
+  const isMountedRef = useRef<boolean>(true);
 
   // Calculate input container height
   useEffect(() => {
@@ -63,55 +64,56 @@ export default function Chat() {
     }
   }, [messages]);
 
-  // Scroll to top function
-  const scrollToTop = () => {
-    if (chatWindowRef.current) {
-      chatWindowRef.current.scrollTo({
-        top: 0,
-        behavior: 'smooth'
-      });
-    }
-  };
-
-  // Scroll to bottom for assistant messages
+  // Set up mounted state tracking
   useEffect(() => {
-    if (messages.length > 0) {
-      const scrollToEnd = () => {
-        if (messagesEndRef.current) {
-          messagesEndRef.current.scrollIntoView({ 
-            behavior: 'smooth',
-            block: 'end'
-          });
-        }
-      };
+    isMountedRef.current = true;
+    
+    return () => {
+      isMountedRef.current = false;
       
-      // Small delay to ensure layout has settled
-      setTimeout(scrollToEnd, 100);
-    }
-  }, [messages, isLoading]);
-
-  // Animate assistant messages
-  const animateText = (text: string) => {
-    setIsAnimating(true);
-    let currentIndex = 0;
-
-    // Function to add characters gradually
-    const addCharacters = () => {
-      if (currentIndex <= text.length) {
-        setDisplayedText(text.substring(0, currentIndex));
-        currentIndex += 5; // Add 5 characters at a time for speed
-        setTimeout(addCharacters, 20);
-      } else {
-        setIsAnimating(false);
+      // Cancel any in-flight requests when component unmounts
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+        abortControllerRef.current = null;
       }
     };
+  }, []);
 
-    // Start animation
-    addCharacters();
-  };
+  // Scroll to bottom function - memoize with useCallback
+  const scrollToBottom = useCallback(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'end'
+      });
+    }
+  }, []);
+
+  // Scroll to bottom for new messages
+  useEffect(() => {
+    if (messages.length > 0) {
+      // Small delay to ensure layout has settled
+      const timeoutId = setTimeout(scrollToBottom, 100);
+      return () => clearTimeout(timeoutId);
+    }
+  }, [messages, isLoading, scrollToBottom]);
+
+  // Animate assistant messages - simplified for CSS animation
+  useEffect(() => {
+    if (isAnimating && messages.length > 0) {
+      // Set a timeout to mark animation as complete after a reasonable time
+      const timeoutId = setTimeout(() => {
+        if (isMountedRef.current) {
+          setIsAnimating(false);
+        }
+      }, 2000); // Adjust based on your animation duration
+      
+      return () => clearTimeout(timeoutId);
+    }
+  }, [isAnimating, messages]);
 
   // Handle form submission
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (!input.trim()) return;
@@ -136,6 +138,14 @@ export default function Chat() {
     addMessage(userMessage);
 
     try {
+      // Cancel any previous ongoing request
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+      
+      // Create a new AbortController for this request
+      abortControllerRef.current = new AbortController();
+
       // Prepare message data for API
       const messageData = [
         ...messages,
@@ -145,7 +155,7 @@ export default function Chat() {
         content: msg.content
       }));
 
-      // Call API
+      // Call API - don't pass the signal to avoid abort errors
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: {
@@ -154,12 +164,21 @@ export default function Chat() {
         body: JSON.stringify({
           messages: messageData,
           therapistId: currentTherapist.id
-        }),
+        })
       });
 
-      if (!response.ok) throw new Error('Failed to get response');
+      // Check if component is still mounted
+      if (!isMountedRef.current) return;
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || `Error: ${response.status}`);
+      }
 
       const data = await response.json();
+
+      // Check again if component is still mounted
+      if (!isMountedRef.current) return;
 
       // Add assistant response and animate
       const assistantMessage: Message = {
@@ -170,26 +189,52 @@ export default function Chat() {
 
       // Add the message and start animation
       addMessage(assistantMessage);
-      animateText(data.content);
+      setIsAnimating(true);
+      setDisplayedText(data.content);
+
+      // Scroll to the bottom
+      scrollToBottom();
 
     } catch (error) {
       console.error('Error:', error);
 
-      // Add error message
-      const errorMessage: Message = {
-        role: 'assistant',
-        content: 'Îmi pare rău, am întâmpinat o eroare. Te rog să încerci din nou.',
-        displayed: true
-      };
+      // Check if component is still mounted
+      if (!isMountedRef.current) return;
 
-      addMessage(errorMessage);
+      // Only add error message if the request wasn't aborted by user action
+      if (!(error instanceof DOMException && error.name === 'AbortError')) {
+        // More specific error messages
+        let errorMessage = 'Îmi pare rău, am întâmpinat o eroare. Te rog să încerci din nou.';
+        
+        if (error instanceof Error) {
+          if (error.message.includes('timeout')) {
+            errorMessage = 'Cererea a durat prea mult. Te rugăm să încerci din nou.';
+          } else if (error.message.includes('429')) {
+            errorMessage = 'Prea multe cereri. Te rugăm să aștepți puțin înainte de a încerca din nou.';
+          }
+        }
+
+        const errorResponse: Message = {
+          role: 'assistant',
+          content: errorMessage,
+          displayed: true
+        };
+
+        addMessage(errorResponse);
+      }
     } finally {
-      setIsLoading(false);
+      // Only update state if component is still mounted
+      if (isMountedRef.current) {
+        setIsLoading(false);
+      }
+      
+      // Clear the abort controller reference
+      abortControllerRef.current = null;
 
       // Ensure consistent input box height
-      if (textareaRef.current) {
+      if (textareaRef.current && isMountedRef.current) {
         setTimeout(() => {
-          if (textareaRef.current) {
+          if (textareaRef.current && isMountedRef.current) {
             textareaRef.current.style.height = '24px';
           }
         }, 0);
@@ -208,7 +253,12 @@ export default function Chat() {
   };
 
   return (
-    <div className="chat-window" ref={chatWindowRef}>
+    <div 
+      className="chat-window" 
+      ref={chatWindowRef}
+      aria-live="polite"
+      aria-atomic="true"
+    >
       {/* Messages */}
       <div
         className="messages-container"
@@ -217,47 +267,66 @@ export default function Chat() {
           height: `calc(100% - ${inputHeight}px)`,
           paddingBottom: '16px'
         }}
+        role="log"
+        aria-label="Chat messages"
       >
         {messages.length === 0 ? (
           // Welcome message when no messages exist
           <div className="welcome-container">
-            <div className="welcome-icon">
+            <div className="welcome-icon" aria-hidden="true">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-6 h-6 text-white">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
               </svg>
             </div>
-            <p className="welcome-title">Bine ai venit la sesiunea ta de terapie</p>
+            <h2 className="welcome-title">Bine ai venit la sesiunea ta de terapie</h2>
             <p className="welcome-text">
               Întreabă-mă despre dezvoltare personală, stabilirea obiectivelor sau orice provocări cu care te confrunți
             </p>
           </div>
         ) : (
           // Message list
-          messages.map((message, index) => (
-            <div
-              key={index}
-              className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
-            >
-              <div className={`message-bubble ${message.role === 'user' ? 'message-user' : 'message-assistant'}`}>
-                {message.role === 'assistant' && index === messages.length - 1 && isAnimating ? (
-                  // If it's the last assistant message and it's animating
-                  <span className="typing-animation">{displayedText}</span>
-                ) : (
-                  // Otherwise, display the message normally
-                  formatMessage(message.content)
-                )}
+          messages.map((message, index) => {
+            const isLastAssistantMessage = 
+              message.role === 'assistant' && 
+              index === messages.length - 1 && 
+              isAnimating;
+              
+            return (
+              <div
+                key={index}
+                className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                aria-label={`${message.role === 'user' ? 'Tu' : currentTherapist.name} a spus`}
+              >
+                <div 
+                  className={`message-bubble ${message.role === 'user' ? 'message-user' : 'message-assistant'}`}
+                >
+                  {isLastAssistantMessage ? (
+                    // If it's the last assistant message and it's animating
+                    <div className="typing-animation-container">
+                      <div className="typing-animation">
+                        {formatMessage(displayedText)}
+                      </div>
+                    </div>
+                  ) : (
+                    // Otherwise, display the message normally
+                    formatMessage(message.content)
+                  )}
+                </div>
               </div>
-            </div>
-          ))
+            );
+          })
         )}
 
         {/* Loading indicator */}
         {isLoading && (
           <div className="flex justify-start">
-            <div className="message-bubble message-assistant loading-indicator">
-              <div className="loading-dot" />
-              <div className="loading-dot" />
-              <div className="loading-dot" />
+            <div 
+              className="message-bubble message-assistant loading-indicator"
+              aria-label={`${currentTherapist.name} scrie...`}
+            >
+              <div className="loading-dot" aria-hidden="true" />
+              <div className="loading-dot" aria-hidden="true" />
+              <div className="loading-dot" aria-hidden="true" />
             </div>
           </div>
         )}
@@ -271,17 +340,20 @@ export default function Chat() {
         <div className="input-container">
           <form onSubmit={handleSubmit} className="input-grid">
             <div className="textarea-container">
+              <label htmlFor="message-input" className="sr-only">Scrie un mesaj</label>
               <textarea
+                id="message-input"
                 ref={textareaRef}
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder="Scrie un mesaj..."
                 disabled={isLoading}
                 rows={1}
+                aria-label="Mesaj către terapeut"
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
-                    handleSubmit(e);
+                    handleSubmit(e as unknown as React.FormEvent<HTMLFormElement>);
                   }
                 }}
               />
@@ -291,7 +363,7 @@ export default function Chat() {
               type="submit"
               disabled={isLoading || !input.trim()}
               className="send-button"
-              aria-label="Send message"
+              aria-label="Trimite mesaj"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -299,6 +371,7 @@ export default function Chat() {
                 viewBox="0 0 24 24"
                 stroke="white"
                 className="w-4 h-4"
+                aria-hidden="true"
               >
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14M12 5l7 7-7 7" />
               </svg>

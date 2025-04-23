@@ -660,18 +660,59 @@ textarea {
   animation: fadeIn 0.5s ease-out forwards;
 }
 
-/* Typing animation */
-.typing-animation {
-  display: inline-block;
+/* Improved typing animation */
+.typing-animation-container {
+  position: relative;
   overflow: hidden;
-  white-space: nowrap;
-  animation: typing 1s steps(30, end);
+  display: inline-block;
+  width: 100%;
 }
 
-@keyframes typing {
-  from { width: 0 }
-  to { width: 100% }
+.typing-animation {
+  animation: typing 1.5s steps(50, end), 
+             blink-caret 0.75s step-end infinite;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  max-width: 100%;
 }
+
+/* Typing animation */
+@keyframes typing {
+  from { 
+    width: 0;
+    opacity: 0.8;
+  }
+  to { 
+    width: 100%;
+    opacity: 1;
+  }
+}
+
+/* Optional blinking cursor effect */
+@keyframes blink-caret {
+  from, to { border-right-color: transparent }
+  50% { border-right-color: var(--color-heading) }
+}
+
+/* Fix for Safari animation performance */
+@media not all and (min-resolution:.001dpcm) { 
+  @supports (-webkit-appearance:none) {
+    .typing-animation {
+      /* Use transform instead of width for better performance on Safari */
+      animation: typing-safari 1.5s ease-out forwards;
+      width: 100%;
+      clip-path: inset(0 100% 0 0);
+    }
+    
+    @keyframes typing-safari {
+      to { 
+        clip-path: inset(0 0 0 0);
+      }
+    }
+  }
+}
+
 
 /* Loading indicator */
 .loading-indicator {

@@ -1,6 +1,12 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
 import { TherapistId } from '@/app/types';
+
+// Define error types
+type ApiError = {
+  status: number;
+  message: string;
+};
 
 // Initialize the Anthropic client
 const anthropic = new Anthropic({
@@ -47,41 +53,174 @@ Răspunsurile tale trebuie să fie în LIMBA ROMÂNĂ.
 7. Răspunde DOAR în limba română, indiferent de limba în care ți se adresează utilizatorul
 `;
 
-export async function POST(request: Request) {
+// Helper function to validate input and format error responses
+function validateInput(data: any): { valid: true } | { valid: false, error: ApiError } {
+  if (!data) {
+    return {
+      valid: false,
+      error: {
+        status: 400,
+        message: 'Request body is required'
+      }
+    };
+  }
+
+  const { messages, therapistId } = data;
+
+  if (!messages) {
+    return {
+      valid: false,
+      error: {
+        status: 400,
+        message: 'Messages array is required'
+      }
+    };
+  }
+
+  if (!Array.isArray(messages)) {
+    return {
+      valid: false,
+      error: {
+        status: 400,
+        message: 'Messages must be an array'
+      }
+    };
+  }
+
+  if (messages.length === 0) {
+    return {
+      valid: false,
+      error: {
+        status: 400,
+        message: 'At least one message is required'
+      }
+    };
+  }
+
+  if (therapistId && !['maria', 'alin', 'ana', 'teodora'].includes(therapistId)) {
+    return {
+      valid: false,
+      error: {
+        status: 400,
+        message: 'Invalid therapist ID'
+      }
+    };
+  }
+
+  return { valid: true };
+}
+
+// Create a rate limiter
+const rateLimits = new Map<string, { count: number, timestamp: number }>();
+
+function checkRateLimit(ip: string): boolean {
+  const now = Date.now();
+  const limit = 20; // 20 requests
+  const window = 60 * 1000; // per minute
+  
+  const userRateLimit = rateLimits.get(ip) || { count: 0, timestamp: now };
+  
+  // Reset counter if outside the time window
+  if (now - userRateLimit.timestamp > window) {
+    userRateLimit.count = 1;
+    userRateLimit.timestamp = now;
+  } else {
+    userRateLimit.count += 1;
+  }
+  
+  rateLimits.set(ip, userRateLimit);
+  
+  return userRateLimit.count <= limit;
+}
+
+export async function POST(request: NextRequest) {
+  // Get client IP for rate limiting
+  const ip = request.headers.get('x-forwarded-for') || 
+             request.headers.get('x-real-ip') || 
+             'unknown';
+  
+  // Check rate limit
+  if (!checkRateLimit(ip)) {
+    return NextResponse.json(
+      { error: 'Prea multe cereri. Te rugăm să aștepți un minut.' },
+      { status: 429 }
+    );
+  }
+
   try {
-    const { messages, therapistId = 'maria' } = await request.json();
+    // Parse request body
+    const data = await request.json().catch(() => null);
     
     // Validate input
-    if (!messages || !Array.isArray(messages)) {
+    const validation = validateInput(data);
+    if (!validation.valid) {
       return NextResponse.json(
-        { error: 'Messages array is required' },
-        { status: 400 }
+        { error: validation.error.message },
+        { status: validation.error.status }
       );
     }
 
+    const { messages, therapistId = 'maria' } = data;
+    
     // Get the appropriate system prompt based on therapist
     const therapistPrompt = therapistPrompts[therapistId as TherapistId] || therapistPrompts.maria;
     const systemPrompt = `${baseSystemPrompt}\n\n${therapistPrompt}`;
 
-    // Call Claude API
-    const response = await anthropic.messages.create({
-      model: "claude-3-7-sonnet-20250219", // or your preferred Claude model
-      max_tokens: 1000,
-      messages: messages,
-      system: systemPrompt,
-    });
+    // Set up a timeout for the API call
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 25000); // 25 second timeout
+    
+    try {
+      // Call Claude API
+      const response = await anthropic.messages.create({
+        model: "claude-3-7-sonnet-20250219", // or your preferred Claude model
+        max_tokens: 1000,
+        messages: messages,
+        system: systemPrompt,
+      }, { signal: controller.signal });
 
-    // Return the response
-    const responseContent = response.content[0].type === 'text' 
-      ? response.content[0].text 
-      : 'Am primit un răspuns într-un format neașteptat. Te rog să încerci din nou.';
-      
-    return NextResponse.json({ 
-      content: responseContent,
-      id: response.id 
-    });
-  } catch (error) {
+      clearTimeout(timeoutId);
+
+      // Return the response
+      const responseContent = response.content[0].type === 'text' 
+        ? response.content[0].text 
+        : 'Am primit un răspuns într-un format neașteptat. Te rog să încerci din nou.';
+        
+      return NextResponse.json({ 
+        content: responseContent,
+        id: response.id 
+      });
+    } catch (error) {
+      clearTimeout(timeoutId);
+      throw error; // Re-throw to be caught by outer catch block
+    }
+  } catch (error: any) {
     console.error('Error calling Claude API:', error);
+    
+    // Handle different error types
+    if (error.name === 'AbortError') {
+      return NextResponse.json(
+        { error: 'Cererea a durat prea mult. Te rugăm să încerci din nou.' },
+        { status: 504 }
+      );
+    }
+    
+    if (error.status === 429 || (error.error && error.error.type === 'rate_limit_exceeded')) {
+      return NextResponse.json(
+        { error: 'Serviciul este momentan ocupat. Te rugăm să încerci din nou după câteva momente.' },
+        { status: 429 }
+      );
+    }
+    
+    if (error.status === 401 || error.status === 403) {
+      console.error('API authentication error:', error);
+      return NextResponse.json(
+        { error: 'Eroare de autentificare API.' },
+        { status: 500 }
+      );
+    }
+    
+    // Default error response
     return NextResponse.json(
       { error: 'Nu am putut procesa cererea ta. Te rog să încerci din nou.' },
       { status: 500 }

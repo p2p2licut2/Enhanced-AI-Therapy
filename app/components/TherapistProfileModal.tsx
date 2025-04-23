@@ -3,6 +3,7 @@
 import React, { useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { Therapist } from '@/app/types';
+import FocusTrap from '../utils/FocusTrap';
 
 interface TherapistProfileModalProps {
   therapist: Therapist;
@@ -16,6 +17,7 @@ export default function TherapistProfileModal({
   onClose 
 }: TherapistProfileModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
 
   // Close when clicking outside the modal
   useEffect(() => {
@@ -35,32 +37,60 @@ export default function TherapistProfileModal({
     if (isOpen) {
       document.addEventListener('mousedown', handleClickOutside);
       document.addEventListener('keydown', handleKeyDown);
+      
+      // Focus the close button when modal opens
+      if (closeButtonRef.current) {
+        closeButtonRef.current.focus();
+      }
+      
+      // Prevent scrolling on body when modal is open
+      document.body.style.overflow = 'hidden';
     }
 
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
       document.removeEventListener('keydown', handleKeyDown);
+      
+      // Restore scrolling on body when modal closes
+      document.body.style.overflow = '';
     };
   }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
   return (
-    <>
+    <FocusTrap isActive={isOpen}>
       {/* Backdrop overlay */}
-      <div className="custom-overlay visible" onClick={onClose} />
+      <div 
+        className="custom-overlay visible" 
+        onClick={onClose}
+        aria-hidden="true"
+      />
       
       {/* Modal */}
-      <div className="therapist-profile-modal" ref={modalRef}>
+      <div 
+        className="therapist-profile-modal" 
+        ref={modalRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="profile-title"
+        aria-describedby="profile-description"
+      >
         <div className="modal-header">
-          <span>Profilul terapeutului</span>
-          <button className="modal-close" onClick={onClose} aria-label="Close profile">
+          <span id="profile-title">Profilul terapeutului</span>
+          <button 
+            ref={closeButtonRef}
+            className="modal-close" 
+            onClick={onClose} 
+            aria-label="Închide profilul"
+          >
             <svg 
               xmlns="http://www.w3.org/2000/svg" 
               fill="none" 
               viewBox="0 0 24 24" 
               stroke="currentColor" 
               className="w-5 h-5"
+              aria-hidden="true"
             >
               <path 
                 strokeLinecap="round" 
@@ -77,7 +107,7 @@ export default function TherapistProfileModal({
             <div className="therapist-avatar-large">
               <Image
                 src={therapist.avatarSrc}
-                alt={therapist.name}
+                alt={`Imagine de profil a terapeutului ${therapist.name}`}
                 width={100}
                 height={100}
                 className="rounded-full object-cover"
@@ -90,7 +120,7 @@ export default function TherapistProfileModal({
             </div>
           </div>
           
-          <div className="therapist-description-container">
+          <div id="profile-description" className="therapist-description-container">
             <h3 className="description-heading">Abordare terapeutică</h3>
             <p className="therapist-description-text">{therapist.description}</p>
             
@@ -100,7 +130,7 @@ export default function TherapistProfileModal({
           </div>
         </div>
       </div>
-    </>
+    </FocusTrap>
   );
 }
 
@@ -111,7 +141,7 @@ function getTherapistDetails(therapistId: string) {
     maria: (
       <>
         <p>Maria folosește o abordare bazată pe <strong>terapie cognitiv-comportamentală</strong> pentru a te ajuta să identifici și să modifici tiparele de gândire care îți creează dificultăți.</p>
-        <ul className="approach-list">
+        <ul className="approach-list" role="list">
           <li>Ascultă cu empatie și înțelegere</li>
           <li>Oferă observații valoroase</li>
           <li>Te ghidează spre propriile concluzii</li>
@@ -122,7 +152,7 @@ function getTherapistDetails(therapistId: string) {
     alin: (
       <>
         <p>Alin folosește metoda <strong>"dragoste dură"</strong> pentru a te provoca să ieși din zona de confort și să îți atingi potențialul maxim.</p>
-        <ul className="approach-list">
+        <ul className="approach-list" role="list">
           <li>Pune întrebări provocatoare</li>
           <li>Contestă presupunerile limitative</li>
           <li>Folosește umor și energie pozitivă</li>
@@ -133,7 +163,7 @@ function getTherapistDetails(therapistId: string) {
     ana: (
       <>
         <p>Ana te ghidează într-o călătorie de <strong>descoperire personală</strong> și te ajută să îți înțelegi mai bine valorile și tiparele de gândire.</p>
-        <ul className="approach-list">
+        <ul className="approach-list" role="list">
           <li>Utilizează întrebări reflective</li>
           <li>Încurajează contemplația și meditația</li>
           <li>Folosește metafore revelatorii</li>
@@ -144,7 +174,7 @@ function getTherapistDetails(therapistId: string) {
     teodora: (
       <>
         <p>Teodora te ajută să te concentrezi pe <strong>responsabilitatea personală</strong> și pe aspectele vieții tale pe care le poți controla și modifica.</p>
-        <ul className="approach-list">
+        <ul className="approach-list" role="list">
           <li>Oferă perspective imparțiale și directe</li>
           <li>Dezvoltă reziliența emoțională</li>
           <li>Învață strategii de auto-control</li>
