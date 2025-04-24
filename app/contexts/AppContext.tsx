@@ -6,7 +6,6 @@ import { v4 as uuidv4 } from 'uuid';
 
 // Define therapists data
 const therapists: Record<TherapistId, Therapist> = {
-  // ... codul existent pentru therapists ...
   maria: {
     id: 'maria',
     name: 'Maria',
@@ -93,6 +92,8 @@ interface AppContextType {
   renameConversation: (conversationId: string, newTitle: string) => void;
   deleteConversation: (conversationId: string) => void;
   pendingConversationTitle: string | null;
+  showWelcomePage: boolean;
+  setShowWelcomePage: (show: boolean) => void;
 }
 
 // Create context with default values
@@ -109,6 +110,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [messages, setMessages] = useState<Message[]>([]);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isTherapistSelectorOpen, setIsTherapistSelectorOpen] = useState(false);
+  // Welcome page state
+  const [showWelcomePage, setShowWelcomePage] = useState<boolean>(true);
   // Titlul pentru conversația neîncepută încă
   const [pendingConversationTitle, setPendingConversationTitle] = useState<string | null>('Începe conversația...');
 
@@ -136,6 +139,25 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       setCurrentConversationId(savedCurrentConversationId);
     }
   }, []);
+
+  // Check if we should show the welcome page based on user preference
+  useEffect(() => {
+    const hasSeenWelcome = localStorage.getItem('hasSeenWelcome');
+    
+    // Only show welcome page if user hasn't seen it, or we're in a completely new session
+    if (hasSeenWelcome === 'true' && currentConversationId) {
+      setShowWelcomePage(false);
+    } else {
+      setShowWelcomePage(true);
+    }
+  }, [currentConversationId]);
+
+  // Save welcome page state when it changes
+  useEffect(() => {
+    if (!showWelcomePage) {
+      localStorage.setItem('hasSeenWelcome', 'true');
+    }
+  }, [showWelcomePage]);
 
   // Update localStorage when conversations change
   useEffect(() => {
@@ -311,7 +333,9 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         recentConversations,
         renameConversation,
         deleteConversation,
-        pendingConversationTitle
+        pendingConversationTitle,
+        showWelcomePage,
+        setShowWelcomePage
       }}
     >
       {children}

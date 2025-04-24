@@ -7,7 +7,54 @@ import Header from './components/Header';
 import LeftMenu from './components/LeftMenu';
 import TherapistSelector from './components/TherapistSelector';
 import InstallPrompt from './components/InstallPrompt';
+import WelcomePage from './components/WelcomePage';
+import { useApp } from './contexts/AppContext';
 
+// Wrapper component that uses the AppContext
+function AppContent() {
+  const { showWelcomePage } = useApp();
+  
+  // Set scrolling behavior based on current view
+  useEffect(() => {
+    if (showWelcomePage) {
+      // Enable scrolling for welcome page
+      document.body.style.overflow = 'auto';
+      document.documentElement.style.overflow = 'auto';
+    } else {
+      // Use your existing overflow handling for chat interface
+      document.body.style.overflow = 'hidden';
+      document.documentElement.style.overflow = 'hidden';
+    }
+    
+    return () => {
+      // Cleanup
+      document.body.style.overflow = '';
+      document.documentElement.style.overflow = '';
+    };
+  }, [showWelcomePage]);
+  
+  return (
+    <>
+      {showWelcomePage ? (
+        <div className="welcome-page-container">
+          <WelcomePage />
+        </div>
+      ) : (
+        <main className="flex min-h-screen overflow-hidden p-0 m-0">
+          <LeftMenu />
+          <TherapistSelector />
+          <div className="app-container">
+            <Header />
+            <Chat />
+          </div>
+          <InstallPrompt />
+        </main>
+      )}
+    </>
+  );
+}
+
+// Main page component
 export default function Home() {
   const [mounted, setMounted] = useState(false);
 
@@ -42,18 +89,9 @@ export default function Home() {
     return null;
   }
 
-  
   return (
     <AppProvider>
-      <main className="flex min-h-screen overflow-hidden p-0 m-0">
-        <LeftMenu />
-        <TherapistSelector />
-        <div className="app-container">
-          <Header />
-          <Chat />
-        </div>
-        <InstallPrompt />
-      </main>
+      <AppContent />
     </AppProvider>
   );
 }
