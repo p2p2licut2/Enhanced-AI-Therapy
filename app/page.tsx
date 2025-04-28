@@ -9,10 +9,15 @@ import TherapistSelector from './components/TherapistSelector';
 import InstallPrompt from './components/InstallPrompt';
 import WelcomePage from './components/WelcomePage';
 import { useApp } from './contexts/AppContext';
+import { useSession } from 'next-auth/react';
+import { redirect } from 'next/navigation';
+import Link from 'next/link';
+import EmailVerificationBanner from './components/auth/EmailVerificationBanner';
 
 // Wrapper component that uses the AppContext
 function AppContent() {
   const { showWelcomePage } = useApp();
+  const { status } = useSession();
   
   // Set scrolling behavior based on current view
   useEffect(() => {
@@ -32,6 +37,43 @@ function AppContent() {
       document.documentElement.style.overflow = '';
     };
   }, [showWelcomePage]);
+
+  // Redirecționare către autentificare dacă utilizatorul nu este autentificat
+  if (status === 'unauthenticated') {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-background p-4">
+        <div className="text-center max-w-md">
+          <h1 className="text-3xl font-bold text-heading mb-4">Bine ai venit la Terapie AI</h1>
+          <p className="mb-8 text-text">
+            Pentru a accesa aplicația, te rugăm să te autentifici sau să îți creezi un cont nou.
+          </p>
+          <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 justify-center">
+            <Link 
+              href="/auth/login" 
+              className="px-6 py-3 bg-primary text-white rounded-md hover:bg-primary-dark transition-colors"
+            >
+              Autentificare
+            </Link>
+            <Link 
+              href="/auth/register" 
+              className="px-6 py-3 bg-accent text-text rounded-md hover:opacity-90 transition-colors"
+            >
+              Creare cont
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+  
+  // Afișare loading în timp ce se verifică sesiunea
+  if (status === 'loading') {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
   
   return (
     <>
@@ -40,11 +82,12 @@ function AppContent() {
           <WelcomePage />
         </div>
       ) : (
-        <main className="flex min-h-screen overflow-hidden p-0 m-0">
+<main className="flex min-h-screen overflow-hidden p-0 m-0">
           <LeftMenu />
           <TherapistSelector />
           <div className="app-container">
             <Header />
+            <EmailVerificationBanner />
             <Chat />
           </div>
           <InstallPrompt />

@@ -2,16 +2,18 @@
 import type { Metadata } from 'next';
 import { Nunito } from 'next/font/google';
 import './globals.css';
+import './styles/auth.css'; // Stiluri pentru autentificare
+import { AuthProvider } from './providers/auth-provider';
 
 export const metadata: Metadata = {
   title: 'Terapie AI',
   description: 'Conversează cu terapeutul tău personal AI',
   manifest: '/manifest.json',
   icons: {
-    icon: '/favicon.ico',                 // <link rel="icon" href="/favicon.ico"/>
-    shortcut: '/favicon.ico',             // pentru unele browsere
+    icon: '/favicon.ico',
+    shortcut: '/favicon.ico',
     apple: [
-      '/icons/apple-touch-icon.png'       // <link rel="apple-touch-icon" .../>
+      '/icons/apple-touch-icon.png'
     ],
   },
   appleWebApp: {
@@ -34,7 +36,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {/* Nu mai ai nevoie de link-uri manuale pentru icon-uri sau manifest */}
       </head>
       <body className={nunito.className}>
-        {children}
+        <AuthProvider>
+          {children}
+        </AuthProvider>
       </body>
     </html>
   );

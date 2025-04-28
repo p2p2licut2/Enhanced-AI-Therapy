@@ -6,6 +6,7 @@ import { useApp } from '@/app/contexts/AppContext';
 import { formatDistanceToNow } from 'date-fns';
 import { ro } from 'date-fns/locale';
 import ConfirmDialog from './ConfirmDialog';
+import { useSession } from 'next-auth/react';
 
 export default function LeftMenu() {
   const {
@@ -26,9 +27,11 @@ export default function LeftMenu() {
   const [editingItemId, setEditingItemId] = useState<string | null>(null);
   const [conversationToDelete, setConversationToDelete] = useState<string | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const optionsRef = useRef<HTMLDivElement>(null);
   const titleInputRef = useRef<HTMLInputElement>(null);
   const [hoveredConversationId, setHoveredConversationId] = useState<string | null>(null);
+  const { signOut } = useSession();
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -77,6 +80,18 @@ export default function LeftMenu() {
   ) => {
     e.stopPropagation();
     setShowOptionsFor(`${conversationId}-${section}`);
+  };
+
+  const handleLogout = () => {
+    setShowLogoutConfirm(true);
+  };
+
+  const handleConfirmLogout = async () => {
+    try {
+      await signOut({ callbackUrl: '/login' });
+    } catch (error) {
+      console.error('Eroare la deconectare:', error);
+    }
   };
 
   const getConversationIdFromComposite = (compositeId: string): string => {
@@ -333,6 +348,31 @@ export default function LeftMenu() {
 
         {/* Divider */}
         <div className="menu-divider" />
+        {/* Logout button */}
+        <div className="menu-section mt-auto">
+          <div
+            className="menu-item text-red-600 hover:bg-red-50"
+            onClick={handleLogout}
+          >
+            <div className="flex items-center">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                className="w-5 h-5 mr-3"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                />
+              </svg>
+              <span>Deconectare</span>
+            </div>
+          </div>
+        </div>
 
         {/* Favorite conversations */}
         {favoriteConversations.length > 0 && (
@@ -401,6 +441,7 @@ export default function LeftMenu() {
             </div>
           )}
         </div>
+
       </div>
 
       {/* Custom Delete Confirmation Dialog */}
@@ -418,6 +459,19 @@ export default function LeftMenu() {
         confirmText="Da, șterge"
         cancelText="Anulează"
         isDestructive={true}
+      />
+
+      <ConfirmDialog
+        isOpen={showLogoutConfirm}
+        onClose={() => setShowLogoutConfirm(false)}
+        onConfirm={handleConfirmLogout}
+        title="Confirmare deconectare"
+        message={
+          <p>Ești sigur că dorești să te deconectezi?</p>
+        }
+        confirmText="Da, deconectează-mă"
+        cancelText="Anulează"
+        isDestructive={false}
       />
     </>
   );
