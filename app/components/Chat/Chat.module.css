@@ -1,0 +1,626 @@
+/* app/components/Chat/Chat.module.css */
+/*
+ * CSS Module pentru componenta Chat
+ * Optimizat pentru experiență terapeutică
+ */
+
+ @import '../../styles/design-system/index.css';
+ @import '../../styles/mental-health/_therapeutic.css';
+ 
+ /* Container principal */
+ .chatWindow {
+   flex: 1;
+   display: flex;
+   flex-direction: column;
+   height: calc(var(--vh, 1vh) * 100 - var(--header-height));
+   margin-top: var(--header-height);
+   overflow: hidden;
+   position: relative;
+   transition: background-color var(--transition-calm);
+ }
+ 
+ /* Versiune pentru mod calm */
+ .calmMode {
+   background-color: var(--color-background);
+   position: relative;
+ }
+ 
+ .calmMode::before {
+   content: "";
+   position: absolute;
+   top: 0;
+   left: 0;
+   width: 100%;
+   height: 100%;
+   background: linear-gradient(to bottom, rgba(162, 197, 224, 0.08), transparent);
+   pointer-events: none;
+   z-index: 0;
+ }
+ 
+ /* Container mesaje */
+ .messagesContainer {
+   flex: 1;
+   overflow-y: auto;
+   overflow-x: hidden;
+   padding: var(--spacing-md) var(--spacing-base) var(--spacing-lg);
+   word-break: break-word;
+   -webkit-overflow-scrolling: touch;
+   position: relative;
+   z-index: 1;
+   scroll-behavior: smooth;
+ }
+ 
+ .calmMessagesContainer {
+   scroll-behavior: smooth;
+   padding-top: var(--spacing-lg);
+   transition: padding var(--transition-calm);
+ }
+ 
+ /* Stiluri pentru bule de mesaj */
+ .messageBubble {
+   padding: var(--spacing-md) var(--spacing-lg);
+   margin-bottom: var(--spacing-md);
+   max-width: 90%;
+   word-break: break-word;
+   overflow-wrap: break-word;
+   position: relative;
+   transition: background-color var(--transition-standard), transform var(--transition-standard);
+ }
+ 
+ .userMessage {
+   background-color: var(--color-primary);
+   color: white;
+   border-radius: var(--border-radius-lg);
+   border-bottom-right-radius: var(--border-radius-sm);
+   align-self: flex-end;
+   transition: background-color var(--transition-standard);
+ }
+ 
+ .assistantMessage {
+   background-color: var(--color-secondary);
+   color: var(--color-text);
+   border-radius: var(--border-radius-lg);
+   border-bottom-left-radius: var(--border-radius-sm);
+   align-self: flex-start;
+   white-space: pre-wrap;
+   line-height: var(--line-height-base);
+   animation: fadeIn var(--transition-slow) forwards;
+   transition: background-color var(--transition-calm), transform var(--transition-calm);
+ }
+ 
+ /* Versiuni calme pentru bule */
+ .calmBubble {
+   transition: all var(--transition-calm);
+   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+ }
+ 
+ .calmBubble.userMessage {
+   background-color: var(--color-primary-dark);
+ }
+ 
+ .calmBubble.assistantMessage {
+   background-color: var(--color-secondary-light);
+ }
+ 
+ /* Variante terapeutice pentru mesaje */
+ .messageSupportive {
+   background-color: var(--color-support-light);
+   border-left: 3px solid var(--color-support);
+ }
+ 
+ .messageCalming {
+   background-color: var(--color-calm-light);
+   border-left: 3px solid var(--color-calm);
+ }
+ 
+ .messageFocusing {
+   background-color: var(--color-focus-light);
+   border-left: 3px solid var(--color-focus);
+ }
+ 
+ .messageNeutral {
+   background-color: var(--color-neutral-light);
+   border-left: 3px solid var(--color-neutral);
+ }
+ 
+ /* Indicator pentru conținut emoțional */
+ .emotionalContent {
+   position: relative;
+ }
+ 
+ .emotionalContent::before {
+   content: "";
+   position: absolute;
+   left: 0;
+   top: 0;
+   bottom: 0;
+   width: 4px;
+   border-radius: var(--border-radius-pill);
+   opacity: 0.7;
+ }
+ 
+ .emotionPositive::before {
+   background-color: var(--color-success);
+ }
+ 
+ .emotionNeutral::before {
+   background-color: var(--color-info);
+ }
+ 
+ .emotionSensitive::before {
+   background-color: var(--color-warning);
+ }
+ 
+ /* Adăugăm highlight pentru mesaje cu exerciții */
+ .withExercise {
+   position: relative;
+ }
+ 
+ .withExercise::after {
+   content: "Exercițiu disponibil";
+   position: absolute;
+   bottom: -8px;
+   left: 16px;
+   background-color: var(--color-focus-light);
+   color: var(--color-text);
+   font-size: var(--font-size-xs);
+   padding: 2px 8px;
+   border-radius: 10px;
+   border: 1px solid var(--color-focus);
+   font-weight: var(--font-weight-semibold);
+ }
+ 
+ /* Acces mai facil la mesaje cu conținut important*/
+ .highlightable {
+   transition: transform var(--transition-calm), box-shadow var(--transition-calm);
+ }
+ 
+ .highlightable:hover {
+   transform: scale(1.01);
+   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+ }
+ 
+ /* Animație pentru mesaje */
+ .typingAnimation {
+   position: relative;
+   overflow: hidden;
+   display: inline-block;
+   width: 100%;
+ }
+ 
+ .typingText {
+   animation: typing 1.5s steps(50, end), 
+            blink-caret 0.75s step-end infinite;
+   white-space: pre-wrap;
+   overflow-wrap: break-word;
+   word-break: break-word;
+   max-width: 100%;
+ }
+ 
+ /* Versiune mai blândă pentru calm mode */
+ .calmTypingText {
+   animation: calmTyping 3s ease-in-out, 
+            blink-caret 1.5s step-end infinite;
+   white-space: pre-wrap;
+   overflow-wrap: break-word;
+   word-break: break-word;
+   max-width: 100%;
+ }
+ 
+ /* Loading indicator */
+ .loadingIndicator {
+   display: flex;
+   gap: 0.5rem;
+   padding: var(--spacing-sm) var(--spacing-lg);
+   background-color: var(--color-secondary);
+   color: var(--color-text);
+   border-radius: var(--border-radius-lg);
+   border-bottom-left-radius: var(--border-radius-sm);
+   margin-bottom: var(--spacing-md);
+   max-width: 80px;
+ }
+ 
+ .calmLoadingIndicator {
+   background-color: var(--color-calm-light);
+   border-left: 3px solid var(--color-calm);
+ }
+ 
+ .loadingDot {
+   width: 8px;
+   height: 8px;
+   border-radius: 50%;
+   background-color: var(--color-heading);
+   opacity: 0.75;
+   animation: bounce 1.4s infinite ease-in-out;
+ }
+ 
+ /* Versiuni mai blânde pentru loadingDot în calm mode */
+ .calmLoadingIndicator .loadingDot {
+   background-color: var(--color-calm);
+   animation: gentleBounce 2s infinite ease-in-out;
+ }
+ 
+ .loadingDot:nth-child(1) {
+   animation-delay: 0s;
+ }
+ 
+ .loadingDot:nth-child(2) {
+   animation-delay: 0.2s;
+ }
+ 
+ .loadingDot:nth-child(3) {
+   animation-delay: 0.4s;
+ }
+ 
+ /* Container input */
+ .inputContainer {
+   position: sticky;
+   bottom: 0;
+   left: 0;
+   right: 0;
+   width: 100%;
+   background-color: var(--color-background);
+   z-index: 30;
+   transition: all var(--transition-standard);
+   display: flex;
+   flex-direction: column;
+   padding-bottom: calc(env(safe-area-inset-bottom) + 3px);
+   margin-top: auto;
+   border-top: 1px solid rgba(0, 0, 0, 0.05);
+ }
+ 
+ .calmInputContainer {
+   background-color: var(--color-background);
+   border-top: 1px solid rgba(162, 197, 224, 0.2);
+   transition: all var(--transition-calm);
+ }
+ 
+ .innerInputContainer {
+   background-color: var(--color-background-light);
+   border-radius: var(--border-radius-xl);
+   padding: var(--spacing-sm);
+   box-shadow: var(--shadow-input);
+   margin: var(--spacing-md);
+   margin-bottom: var(--spacing-sm);
+   transition: box-shadow var(--transition-standard), background-color var(--transition-standard);
+ }
+ 
+ .calmInputContainer .innerInputContainer {
+   background-color: rgba(255, 255, 255, 0.9);
+   box-shadow: 0 1px 3px rgba(162, 197, 224, 0.2);
+   transition: all var(--transition-calm);
+ }
+ 
+ .inputGrid {
+   display: grid;
+   grid-template-columns: 1fr auto;
+   gap: var(--spacing-md);
+   align-items: center;
+ }
+ 
+ .textareaContainer {
+   background-color: transparent;
+ }
+ 
+ .textarea {
+   width: 100%;
+   padding: var(--spacing-md);
+   min-height: 50px;
+   max-height: 120px;
+   outline: none;
+   resize: none;
+   border: none !important;
+   font-family: var(--font-family-primary);
+   font-size: var(--font-size-md);
+   line-height: 1.5;
+   background-color: transparent;
+   transition: all var(--transition-standard);
+ }
+ 
+ .calmTextarea {
+   font-size: var(--font-size-md);
+   transition: all var(--transition-calm);
+   padding: var(--spacing-md) var(--spacing-md) var(--spacing-md) var(--spacing-lg);
+ }
+ 
+ .sendButton {
+   width: var(--control-size-md);
+   height: var(--control-size-md);
+   border-radius: 50%;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   border: none;
+   padding: 0;
+   background-color: var(--color-accent);
+   transition: background-color var(--transition-standard);
+   margin-right: 4px;
+   margin-left: 8px;
+ }
+ 
+ .sendButton:hover {
+   background-color: var(--color-accent-dark);
+ }
+ 
+ .calmSendButton {
+   background-color: var(--color-calm);
+   transition: all var(--transition-calm);
+ }
+ 
+ .calmSendButton:hover {
+   background-color: var(--color-calm);
+   opacity: 0.9;
+   transform: scale(1.03);
+ }
+ 
+ .sendButton:disabled {
+   opacity: 0.5;
+   cursor: not-allowed;
+   background-color: var(--color-gray-400);
+ }
+ 
+ /* Welcome - primire inițială */
+ .welcomeContainer {
+   display: flex;
+   flex-direction: column;
+   align-items: center;
+   justify-content: center;
+   height: 100%;
+   text-align: center;
+   padding: var(--spacing-2xl);
+   transition: all var(--transition-standard);
+ }
+ 
+ .calmWelcomeContainer {
+   transition: all var(--transition-calm);
+ }
+ 
+ .welcomeIcon {
+   background-color: var(--color-accent);
+   width: 48px;
+   height: 48px;
+   border-radius: var(--border-radius-circle);
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   margin-bottom: var(--spacing-base);
+   transition: background-color var(--transition-standard);
+ }
+ 
+ .calmWelcomeContainer .welcomeIcon {
+   background-color: var(--color-calm);
+   transform: scale(1.05);
+   transition: all var(--transition-calm);
+ }
+ 
+ .welcomeTitle {
+   font-weight: var(--font-weight-semibold);
+   margin-bottom: var(--spacing-sm);
+   font-size: var(--font-size-lg);
+   color: var(--color-heading);
+   transition: color var(--transition-standard);
+ }
+ 
+ .calmWelcomeContainer .welcomeTitle {
+   color: var(--color-calm);
+   transition: color var(--transition-calm);
+ }
+ 
+ .welcomeText {
+   font-size: var(--font-size-md);
+   max-width: 320px;
+   margin: 0 auto;
+   transition: all var(--transition-standard);
+ }
+ 
+ .calmWelcomeContainer .welcomeText {
+   line-height: 1.7;
+   transition: all var(--transition-calm);
+ }
+ 
+ /* Disclaimer text */
+ .disclaimerText {
+   text-align: center;
+   font-size: var(--font-size-xs);
+   color: var(--color-text-light);
+   padding: 0 var(--spacing-lg);
+   margin-top: 0.1rem;
+   min-height: 18px;
+   line-height: var(--line-height-tight);
+   visibility: visible;
+   opacity: 1;
+   transition: opacity var(--transition-standard);
+ }
+ 
+ .calmDisclaimerText {
+   color: var(--color-calm);
+   font-size: calc(var(--font-size-xs) + 1px);
+   transition: all var(--transition-calm);
+ }
+ 
+ .hidden {
+   visibility: hidden;
+   opacity: 0;
+   height: 0;
+   margin: 0;
+ }
+ 
+ /* Calm mode toggle button */
+ .calmModeButton {
+   position: absolute;
+   top: 12px;
+   right: 12px;
+   z-index: 10;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   width: 32px;
+   height: 32px;
+   border-radius: 50%;
+   background-color: white;
+   color: var(--color-text-light);
+   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+   transition: all var(--transition-standard);
+ }
+ 
+ .calmModeButton:hover {
+   background-color: var(--color-calm-light);
+   color: var(--color-calm);
+ }
+ 
+ .calmModeActive {
+   background-color: var(--color-calm-light);
+   color: var(--color-calm);
+   box-shadow: 0 1px 3px rgba(162, 197, 224, 0.3);
+ }
+ 
+ /* Support message pentru conținut emoțional */
+ .supportMessage {
+   padding: var(--spacing-md);
+   margin: 0 var(--spacing-md) var(--spacing-md);
+   background-color: var(--color-support-light);
+   border-radius: var(--border-radius-md);
+   border-left: 3px solid var(--color-support);
+   font-size: var(--font-size-sm);
+   transition: all var(--transition-standard);
+ }
+ 
+ .calmSupportMessage {
+   background-color: var(--color-calm-light);
+   border-left: 3px solid var(--color-calm);
+   padding: var(--spacing-lg);
+   transition: all var(--transition-calm);
+ }
+ 
+ .supportButton {
+   margin-top: var(--spacing-sm);
+   padding: var(--spacing-xs) var(--spacing-sm);
+   background-color: var(--color-calm);
+   color: white;
+   border: none;
+   border-radius: var(--border-radius-md);
+   font-size: var(--font-size-xs);
+   font-weight: var(--font-weight-semibold);
+   transition: all var(--transition-calm);
+ }
+ 
+ .supportButton:hover {
+   background-color: var(--color-calm-dark, var(--color-calm));
+   transform: translateY(-1px);
+ }
+ 
+ /* Animații - optimizate */
+ @keyframes fadeIn {
+   from {
+     opacity: 0;
+     transform: translateY(10px);
+   }
+   to {
+     opacity: 1;
+     transform: translateY(0);
+   }
+ }
+ 
+ @keyframes calmFadeIn {
+   0% {
+     opacity: 0;
+   }
+   30% {
+     opacity: 0.3;
+   }
+   100% {
+     opacity: 1;
+   }
+ }
+ 
+ @keyframes typing {
+   from { 
+     width: 0;
+     opacity: 0.8;
+   }
+   to { 
+     width: 100%;
+     opacity: 1;
+   }
+ }
+ 
+ /* Versiune mai blândă și predictibilă pentru utilizatorii cu anxietate */
+ @keyframes calmTyping {
+   0% { 
+     width: 0;
+     opacity: 0.5;
+   }
+   30% {
+     width: 40%;
+     opacity: 0.7;
+   }
+   70% {
+     width: 80%;
+     opacity: 0.9;
+   }
+   100% { 
+     width: 100%;
+     opacity: 1;
+   }
+ }
+ 
+ @keyframes blink-caret {
+   from, 40%, 60%, to { border-right-color: transparent }
+   45%, 55% { border-right-color: var(--color-heading) }
+ }
+ 
+ @keyframes bounce {
+   0%, 80%, 100% {
+     transform: translateY(0);
+   }
+   40% {
+     transform: translateY(-10px);
+   }
+ }
+ 
+ /* Versiune mai blândă pentru bounce */
+ @keyframes gentleBounce {
+   0%, 90%, 100% {
+     transform: translateY(0);
+   }
+   45% {
+     transform: translateY(-5px);
+   }
+ }
+ 
+ /* Optimizare pentru Safari */
+ @media not all and (min-resolution:.001dpcm) { 
+   @supports (-webkit-appearance:none) {
+     @keyframes typing-safari {
+       to { 
+         clip-path: inset(0 0 0 0);
+       }
+     }
+   }
+ }
+ 
+ /* Responsive */
+ @media (max-width: 640px) {
+   .messageBubble {
+     max-width: 85%;
+   }
+ }
+ 
+ /* Preferințe pentru reducerea mișcării */
+ @media (prefers-reduced-motion: reduce) {
+   .typingText, .calmTypingText {
+     animation: none !important;
+   }
+   
+   .loadingDot {
+     animation: none !important;
+   }
+   
+   .highlightable:hover {
+     transform: none;
+   }
+   
+   .supportButton:hover {
+     transform: none;
+   }
+ }

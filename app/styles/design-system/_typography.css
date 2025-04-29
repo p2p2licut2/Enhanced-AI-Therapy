@@ -1,0 +1,53 @@
+/* app/styles/design-system/_typography.css */
+/* 
+ * Sistemul tipografic pentru Terapie AI
+ * Definește:
+ * - Familii de fonturi
+ * - Mărimi de text și linie
+ * - Grosimi și stiluri
+ * - Scală tipografică
+ */
+
+ :root {
+    /* Font family */
+    --font-family-primary: 'Nunito', sans-serif;
+    --font-family-heading: 'Nunito', sans-serif;
+    
+    /* Font weights */
+    --font-weight-regular: 400;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
+    
+    /* Base size and line heights */
+    --font-size-base: 16px;
+    --line-height-base: 1.6;
+    --line-height-tight: 1.35;
+    --line-height-loose: 1.8;
+    
+    /* Type scale (cu mărimi relative pentru mai multă flexibilitate) */
+    --font-size-xs: 0.75rem;      /* 12px */
+    --font-size-sm: 0.875rem;     /* 14px */
+    --font-size-md: 1rem;         /* 16px (base) */
+    --font-size-lg: 1.125rem;     /* 18px */
+    --font-size-xl: 1.25rem;      /* 20px */
+    --font-size-2xl: 1.5rem;      /* 24px */
+    --font-size-3xl: 1.875rem;    /* 30px */
+    --font-size-4xl: 2.25rem;     /* 36px */
+    
+    /* Spacing specific pentru text */
+    --letter-spacing-tight: -0.025em;
+    --letter-spacing-normal: 0;
+    --letter-spacing-wide: 0.025em;
+    
+    /* Paragraph spacing */
+    --paragraph-spacing: 1.25rem;
+  }
+  
+  /* Media queries pentru scalare tipografică responsivă */
+  @media (max-width: 640px) {
+    :root {
+      --font-size-base: 15px;
+      --font-size-3xl: 1.75rem;
+      --font-size-4xl: 2rem;
+    }
+  }

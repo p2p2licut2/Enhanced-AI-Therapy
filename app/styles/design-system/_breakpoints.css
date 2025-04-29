@@ -1,0 +1,98 @@
+/* app/styles/design-system/_breakpoints.css */
+/* 
+ * Sistemul de media queries și breakpoint-uri pentru Terapie AI
+ * Definește:
+ * - Breakpoint-uri standard pentru design responsiv
+ * - Media features pentru diverse dispozitive
+ * - Variabile pentru media queries
+ */
+
+ :root {
+    /* Breakpoint-uri standard (px) */
+    --breakpoint-xs: 480px;
+    --breakpoint-sm: 640px;
+    --breakpoint-md: 768px;
+    --breakpoint-lg: 1024px;
+    --breakpoint-xl: 1280px;
+  }
+  
+  /* 
+   * Notă: Aceste breakpoint-uri sunt destinate utilizării directe în CSS.
+   * Pentru consistență, aceleași valori ar trebui sincronizate
+   * cu configurația Tailwind în tailwind.config.js
+   *
+   * Exemplu de utilizare:
+   * @media (min-width: var(--breakpoint-md)) {
+   *   .my-component {
+   *     margin: var(--spacing-lg);
+   *   }
+   * }
+   */
+  
+  /* 
+   * Media feature pentru preferințe și dispozitive
+   * Acestea pot fi utilizate în CSS sau JavaScript pentru a detecta
+   * și a adapta interfața în funcție de preferințele utilizatorului
+   */
+  
+  /* Preferințe culoare */
+  @media (prefers-color-scheme: dark) {
+    :root {
+      /* 
+       * Aici vom defini variabilele pentru tema dark în viitor
+       * Deocamdată aplicația nu are temă dark, dar pregătim infrastructura
+       */
+    }
+  }
+  
+  /* Preferințe animație redusă */
+  @media (prefers-reduced-motion: reduce) {
+    :root {
+      --transition-fast: 0;
+      --transition-base: 0;
+      --transition-slow: 0;
+      --transition-slower: 0;
+    }
+    
+    /* Dezactivează animațiile pentru accesibilitate */
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+  
+  /* Media query-uri pentru interacțiuni specifice dispozitivelor */
+  @media (hover: hover) {
+    /* Stiluri ce se aplică doar pe dispozitive cu hover (mouse) */
+    .hover-effect {
+      transition: var(--transition-base);
+    }
+    
+    .hover-effect:hover {
+      transform: translateY(-2px);
+    }
+  }
+  
+  /* Safari specific fix pentru animații */
+  @media not all and (min-resolution:.001dpcm) { 
+    @supports (-webkit-appearance:none) {
+      /* Fixuri specifice pentru Safari se pot adăuga aici */
+    }
+  }
+  
+  /* iOS specific fix */
+  @supports (-webkit-touch-callout: none) {
+    .input-container-wrapper {
+      padding-bottom: max(env(safe-area-inset-bottom), 10px);
+    }
+    
+    .chat-window {
+      height: calc(var(--vh, 1vh) * 100 - var(--header-height) - env(safe-area-inset-bottom, 0px));
+    }
+    
+    .welcome-page-container {
+      height: -webkit-fill-available;
+    }
+  }

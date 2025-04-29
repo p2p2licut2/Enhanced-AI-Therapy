@@ -5,7 +5,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useApp } from '@/app/contexts/AppContext';
 import { formatDistanceToNow } from 'date-fns';
 import { ro } from 'date-fns/locale';
-import ConfirmDialog from './ConfirmDialog';
+import ConfirmDialog from '../ConfirmDialog/ConfirmDialog';
+import styles from './LeftMenu.module.css';
 
 export default function LeftMenu() {
   const {
@@ -29,6 +30,8 @@ export default function LeftMenu() {
   const optionsRef = useRef<HTMLDivElement>(null);
   const titleInputRef = useRef<HTMLInputElement>(null);
   const [hoveredConversationId, setHoveredConversationId] = useState<string | null>(null);
+  // Stare pentru activarea modului calm
+  const [calmMode, setCalmMode] = useState(false);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -46,13 +49,20 @@ export default function LeftMenu() {
   }, []);
 
   useEffect(() => {
-    // Focus the input when renaming starts
+    // Focus the input when renaming starts with o mică întârziere pentru a reduce anxietatea
     if (isRenaming && titleInputRef.current) {
-      titleInputRef.current.focus();
+      const focusTimer = setTimeout(() => {
+        if (titleInputRef.current) {
+          titleInputRef.current.focus();
+        }
+      }, 100);
+      
+      return () => clearTimeout(focusTimer);
     }
   }, [isRenaming]);
 
   const handleCloseMenu = () => {
+    // Tranziție mai calmă la închidere
     setIsMenuOpen(false);
     setShowOptionsFor(null);
     setIsRenaming(false);
@@ -133,6 +143,11 @@ export default function LeftMenu() {
     return formatDistanceToNow(new Date(timestamp), { addSuffix: true, locale: ro });
   };
 
+  // Toggle calm mode pentru utilizatorii cu anxietate
+  const toggleCalmMode = () => {
+    setCalmMode(prev => !prev);
+  };
+
   const renderConversationItem = (
     conversation: Conversation,
     isCurrent: boolean = false,
@@ -142,32 +157,44 @@ export default function LeftMenu() {
     const isCurrentlyRenaming = isRenaming && editingItemId === itemId;
     const showOptionButtons = isCurrent || hoveredConversationId === conversation.id;
 
+    // Identificăm tipul emoțional al conversației pentru personalizare
+    const isPositiveConversation = conversation.title.toLowerCase().includes('bine') || 
+                                  conversation.title.toLowerCase().includes('progres');
+    const isCalmingConversation = conversation.title.toLowerCase().includes('calm') || 
+                                 conversation.title.toLowerCase().includes('relaxare');
+
     return (
       <div
         key={`${conversation.id}-${section}`}
-        className={`conversation-item ${isCurrent ? 'current-conversation' : ''}`}
+        className={`${styles.conversationItem} 
+                   ${isCurrent ? styles.currentConversation : ''} 
+                   ${isPositiveConversation ? styles.positiveConversation : ''}
+                   ${isCalmingConversation ? styles.calmingConversation : ''}
+                   ${calmMode ? styles.calmModeItem : ''}`}
         onClick={() => handleConversationClick(conversation.id)}
         onMouseEnter={() => setHoveredConversationId(conversation.id)}
         onMouseLeave={() => setHoveredConversationId(null)}
+        aria-current={isCurrent ? 'true' : 'false'}
       >
         {isCurrentlyRenaming ? (
-          <form onSubmit={handleRenameSubmit} className="rename-form-menu" onClick={e => e.stopPropagation()}>
+          <form onSubmit={handleRenameSubmit} className={styles.renameForm} onClick={e => e.stopPropagation()}>
             <input
               ref={titleInputRef}
               type="text"
               value={newTitle}
               onChange={(e) => setNewTitle(e.target.value)}
-              className="rename-input-menu"
+              className={styles.renameInput}
               placeholder="Introdu un nou titlu"
+              aria-label="Numele conversației"
             />
-            <div className="rename-actions-menu">
-              <button type="submit" className="rename-save-btn">
+            <div className={styles.renameActions}>
+              <button type="submit" className={styles.saveButton}>
                 Salvează
               </button>
               <button
                 type="button"
                 onClick={handleRenameCancel}
-                className="rename-cancel-btn"
+                className={styles.cancelButton}
               >
                 Anulează
               </button>
@@ -175,18 +202,30 @@ export default function LeftMenu() {
           </form>
         ) : (
           <>
-            <div className="conversation-details">
-              <div className="conversation-item-title">{conversation.title}</div>
-              <div className="conversation-item-date">{formatDate(conversation.updatedAt)}</div>
+            <div className={styles.conversationDetails}>
+              <div className={styles.conversationTitle}>
+                {/* Indicator emoțional pentru conversație */}
+                {isPositiveConversation && (
+                  <span className={`${styles.moodIndicator} ${styles.moodPositive}`} 
+                        aria-label="Conversație pozitivă"></span>
+                )}
+                {isCalmingConversation && (
+                  <span className={`${styles.moodIndicator} ${styles.moodCalm}`}
+                        aria-label="Conversație calmantă"></span>
+                )}
+                {conversation.title}
+              </div>
+              <div className={styles.conversationDate}>{formatDate(conversation.updatedAt)}</div>
             </div>
 
-            <div className="conversation-actions">
+            <div className={styles.conversationActions}>
               {conversation.isFavorite && (
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 24 24"
                   fill="currentColor"
-                  className="w-4 h-4 text-yellow-500 mr-2"
+                  className={styles.favoriteIcon}
+                  aria-label="Conversație favorită"
                 >
                   <path
                     fillRule="evenodd"
@@ -199,9 +238,9 @@ export default function LeftMenu() {
               {/* Show options button when hovering or when it's the current conversation */}
               {showOptionButtons && (
                 <button
-                  className="options-button"
+                  className={styles.optionsButton}
                   onClick={(e) => handleOptionsClick(e, conversation.id, section)}
-                  aria-label="Options"
+                  aria-label="Opțiuni pentru conversație"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -209,6 +248,7 @@ export default function LeftMenu() {
                     viewBox="0 0 24 24"
                     stroke="currentColor"
                     className="w-5 h-5"
+                    aria-hidden="true"
                   >
                     <path
                       strokeLinecap="round"
@@ -221,9 +261,9 @@ export default function LeftMenu() {
               )}
 
               {showOptionsFor === itemId && (
-                <div className="conversation-options" ref={optionsRef} onClick={e => e.stopPropagation()}>
+                <div className={styles.conversationOptions} ref={optionsRef} onClick={e => e.stopPropagation()}>
                   <div
-                    className="conversation-option"
+                    className={styles.conversationOption}
                     onClick={() => handleRename(conversation.id, section)}
                   >
                     <svg
@@ -232,6 +272,7 @@ export default function LeftMenu() {
                       viewBox="0 0 24 24"
                       stroke="currentColor"
                       className="w-4 h-4 mr-2"
+                      aria-hidden="true"
                     >
                       <path
                         strokeLinecap="round"
@@ -243,7 +284,7 @@ export default function LeftMenu() {
                     Redenumește
                   </div>
                   <div
-                    className="conversation-option conversation-option-delete"
+                    className={`${styles.conversationOption} ${styles.deleteOption}`}
                     onClick={() => handleDelete(conversation.id)}
                   >
                     <svg
@@ -252,6 +293,7 @@ export default function LeftMenu() {
                       viewBox="0 0 24 24"
                       stroke="currentColor"
                       className="w-4 h-4 mr-2"
+                      aria-hidden="true"
                     >
                       <path
                         strokeLinecap="round"
@@ -273,43 +315,72 @@ export default function LeftMenu() {
 
   return (
     <>
-      {/* Backdrop overlay */}
+      {/* Backdrop overlay with calm transition */}
       <div
-        className={`overlay ${isMenuOpen ? 'visible' : ''}`}
+        className={`${styles.overlay} ${isMenuOpen ? styles.visibleOverlay : ''} ${calmMode ? styles.calmOverlay : ''}`}
         onClick={handleCloseMenu}
+        aria-hidden="true"
       />
 
-      {/* Side menu panel */}
-      <div className={`side-menu ${isMenuOpen ? 'open' : ''}`}>
-        <div className="menu-header">
+      {/* Side menu panel with therapeutic considerations */}
+      <div className={`${styles.sideMenu} ${isMenuOpen ? styles.openMenu : ''} ${calmMode ? styles.calmModeMenu : ''}`}>
+        <div className={styles.menuHeader}>
           <span>Terapie AI</span>
-          <button
-            className="menu-close"
-            onClick={handleCloseMenu}
-            aria-label="Close menu"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              className="w-6 h-6"
+          <div className={styles.headerActions}>
+            {/* Buton pentru modul calm - nou adăugat */}
+            <button 
+              className={`${styles.calmModeToggle} ${calmMode ? styles.calmModeActive : ''}`}
+              onClick={toggleCalmMode}
+              aria-label={calmMode ? "Dezactivează modul calm" : "Activează modul calm"}
+              aria-pressed={calmMode}
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </button>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                className="w-5 h-5"
+                aria-hidden="true"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
+                />
+              </svg>
+            </button>
+            <button
+              className={styles.menuClose}
+              onClick={handleCloseMenu}
+              aria-label="Închide meniul"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                className="w-6 h-6"
+                aria-hidden="true"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+          </div>
         </div>
 
-        {/* New conversation option */}
-        <div className="menu-section">
+        {/* New conversation option with soothing hover */}
+        <div className={styles.menuSection}>
           <div
-            className="menu-item"
+            className={`${styles.menuItem} ${calmMode ? styles.calmMenuItem : ''}`}
             onClick={handleNewConversation}
+            role="button"
+            aria-label="Începe o nouă conversație"
           >
             <div className="flex items-center">
               <svg
@@ -318,6 +389,7 @@ export default function LeftMenu() {
                 viewBox="0 0 24 24"
                 stroke="currentColor"
                 className="w-5 h-5 mr-3"
+                aria-hidden="true"
               >
                 <path
                   strokeLinecap="round"
@@ -332,18 +404,19 @@ export default function LeftMenu() {
         </div>
 
         {/* Divider */}
-        <div className="menu-divider" />
+        <div className={styles.menuDivider} />
 
         {/* Favorite conversations */}
         {favoriteConversations.length > 0 && (
-          <div className="menu-section">
-            <div className="menu-section-title">
+          <div className={styles.menuSection}>
+            <div className={styles.sectionTitle}>
               <div className="flex items-center">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 24 24"
                   fill="currentColor"
-                  className="w-4 h-4 mr-2 text-yellow-500"
+                  className={styles.sectionIcon}
+                  aria-hidden="true"
                 >
                   <path
                     fillRule="evenodd"
@@ -355,26 +428,29 @@ export default function LeftMenu() {
               </div>
             </div>
 
-            {favoriteConversations.map(conversation =>
-              renderConversationItem(
-                conversation,
-                conversation.id === currentConversation?.id,
-                'favorite'
-              )
-            )}
+            <div className={styles.conversationsList} role="list" aria-label="Conversații favorite">
+              {favoriteConversations.map(conversation =>
+                renderConversationItem(
+                  conversation,
+                  conversation.id === currentConversation?.id,
+                  'favorite'
+                )
+              )}
+            </div>
           </div>
         )}
 
         {/* Recent conversations */}
-        <div className="menu-section">
-          <div className="menu-section-title">
+        <div className={styles.menuSection}>
+          <div className={styles.sectionTitle}>
             <div className="flex items-center">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
-                className="w-4 h-4 mr-2"
+                className={styles.sectionIcon}
+                aria-hidden="true"
               >
                 <path
                   strokeLinecap="round"
@@ -387,23 +463,35 @@ export default function LeftMenu() {
             </div>
           </div>
 
-          {recentConversations.length > 0 ? (
-            recentConversations.map(conversation =>
-              renderConversationItem(
-                conversation,
-                conversation.id === currentConversation?.id,
-                'recent'
+          <div className={styles.conversationsList} role="list" aria-label="Istoricul conversațiilor">
+            {recentConversations.length > 0 ? (
+              recentConversations.map(conversation =>
+                renderConversationItem(
+                  conversation,
+                  conversation.id === currentConversation?.id,
+                  'recent'
+                )
               )
-            )
-          ) : (
-            <div className="px-4 py-2 text-gray-500 text-sm">
-              Nu există conversații în istoric
-            </div>
-          )}
+            ) : (
+              <div className={styles.emptyText}>
+                Nu există conversații în istoric
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Secțiune nouă pentru suport emoțional */}
+        <div className={`${styles.supportSection} ${calmMode ? styles.calmSupportSection : ''}`}>
+          <p className={styles.supportText}>
+            Este important să ții minte că ai resurse la dispoziție în orice moment.
+          </p>
+          <a href="#" className={styles.supportLink}>
+            Resurse pentru sănătate mintală
+          </a>
         </div>
       </div>
 
-      {/* Custom Delete Confirmation Dialog */}
+      {/* Custom Delete Confirmation Dialog - cu tranziții blânde */}
       <ConfirmDialog
         isOpen={showDeleteConfirm}
         onClose={() => setShowDeleteConfirm(false)}
@@ -418,6 +506,7 @@ export default function LeftMenu() {
         confirmText="Da, șterge"
         cancelText="Anulează"
         isDestructive={true}
+        calmMode={calmMode}
       />
     </>
   );

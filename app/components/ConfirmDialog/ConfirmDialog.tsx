@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useEffect, useRef } from 'react';
-import FocusTrap from '../utils/FocusTrap';
+import FocusTrap from '../../utils/FocusTrap';
+import styles from './ConfirmDialog.module.css';
 
 interface ConfirmDialogProps {
   isOpen: boolean;
@@ -12,6 +13,7 @@ interface ConfirmDialogProps {
   confirmText?: string;
   cancelText?: string;
   isDestructive?: boolean;
+  calmMode?: boolean; // Adăugat pentru starea de calm
 }
 
 export default function ConfirmDialog({
@@ -22,10 +24,12 @@ export default function ConfirmDialog({
   message,
   confirmText = 'Confirmă',
   cancelText = 'Anulează',
-  isDestructive = false
+  isDestructive = false,
+  calmMode = false
 }: ConfirmDialogProps) {
   const dialogRef = useRef<HTMLDivElement>(null);
   const confirmButtonRef = useRef<HTMLButtonElement>(null);
+  const cancelButtonRef = useRef<HTMLButtonElement>(null);
 
   // Close when clicking outside the dialog
   useEffect(() => {
@@ -49,16 +53,21 @@ export default function ConfirmDialog({
       // Focus on the appropriate button when dialog opens
       // For destructive dialogs, focus the cancel button by default
       // For normal dialogs, focus the confirm button
+      // În calm mode, întârzie focusul pentru a nu crea anxietate
+      const focusDelay = calmMode ? 300 : 100;
+      
       setTimeout(() => {
-        if (confirmButtonRef.current && !isDestructive) {
+        if (isDestructive && cancelButtonRef.current) {
+          cancelButtonRef.current.focus();
+        } else if (confirmButtonRef.current && !isDestructive) {
           confirmButtonRef.current.focus();
         } else if (dialogRef.current) {
-          const cancelButton = dialogRef.current.querySelector('.cancel-button') as HTMLButtonElement;
+          const cancelButton = dialogRef.current.querySelector(`.${styles.cancelButton}`) as HTMLButtonElement;
           if (cancelButton) {
             cancelButton.focus();
           }
         }
-      }, 0);
+      }, focusDelay);
       
       // Prevent scrolling on body
       document.body.style.overflow = 'hidden';
@@ -71,32 +80,32 @@ export default function ConfirmDialog({
       // Restore scrolling
       document.body.style.overflow = '';
     };
-  }, [isOpen, onClose, isDestructive]);
+  }, [isOpen, onClose, isDestructive, calmMode]);
 
   if (!isOpen) return null;
 
   return (
     <FocusTrap isActive={isOpen}>
-      {/* Backdrop overlay */}
+      {/* Backdrop overlay cu tranziție mai lentă în calm mode */}
       <div 
-        className="custom-overlay visible" 
+        className={`${styles.overlay} ${styles.visibleOverlay} ${calmMode ? styles.calmOverlay : ''}`} 
         onClick={onClose} 
         aria-hidden="true"
       />
       
       {/* Dialog */}
       <div 
-        className="confirm-dialog" 
+        className={`${styles.dialog} ${calmMode ? styles.calmDialog : ''}`} 
         ref={dialogRef}
         role="alertdialog"
         aria-modal="true"
         aria-labelledby="dialog-title"
         aria-describedby="dialog-message"
       >
-        <div className="dialog-header">
+        <div className={`${styles.dialogHeader} ${calmMode ? styles.calmDialogHeader : ''}`}>
           <span id="dialog-title">{title}</span>
           <button 
-            className="modal-close" 
+            className={styles.closeButton} 
             onClick={onClose} 
             aria-label="Închide dialogul"
           >
@@ -118,14 +127,15 @@ export default function ConfirmDialog({
           </button>
         </div>
         
-        <div className="dialog-content">
-          <div id="dialog-message" className="dialog-message" style={{ color: 'var(--color-text)' }}>
+        <div className={styles.dialogContent}>
+          <div id="dialog-message" className={styles.dialogMessage}>
             {message}
           </div>
           
-          <div className="dialog-actions">
+          <div className={styles.dialogActions}>
             <button 
-              className="dialog-button cancel-button" 
+              ref={cancelButtonRef}
+              className={`${styles.dialogButton} ${styles.cancelButton} ${calmMode ? styles.calmButton : ''}`} 
               onClick={onClose}
             >
               {cancelText}
@@ -133,7 +143,9 @@ export default function ConfirmDialog({
             
             <button 
               ref={confirmButtonRef}
-              className={`dialog-button confirm-button ${isDestructive ? 'destructive-button' : ''}`} 
+              className={`${styles.dialogButton} ${styles.confirmButton} 
+                         ${isDestructive ? styles.destructiveButton : ''} 
+                         ${calmMode ? styles.calmButton : ''}`} 
               onClick={() => {
                 onConfirm();
                 onClose();
@@ -143,6 +155,13 @@ export default function ConfirmDialog({
             </button>
           </div>
         </div>
+        
+        {/* Mesaj de suport emoțional pentru ștergere în calm mode */}
+        {isDestructive && calmMode && (
+          <div className={styles.supportNote}>
+            Decizia ta este importantă. Poți lua o pauză înainte de a continua.
+          </div>
+        )}
       </div>
     </FocusTrap>
   );

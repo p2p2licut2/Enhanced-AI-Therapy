@@ -1,0 +1,128 @@
+/* app/styles/base/_global.css */
+/*
+ * Stiluri globale de bază pentru aplicația Terapie AI
+ * Aplică variabilele design system-ului la elementele de bază
+ */
+
+ body {
+    color: var(--color-text);
+    background-color: var(--color-background);
+    font-family: var(--font-family-primary);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-regular);
+  }
+  
+  /* Scrollbars customizate */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+    display: block;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background-color: rgba(210, 163, 138, 0.4);
+    border-radius: 20px;
+  }
+  
+  /* Ascunde scrollbar pentru textarea */
+  textarea::-webkit-scrollbar {
+    display: none;
+  }
+  
+  textarea {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    resize: none;
+    border: none !important;
+    outline: none;
+    font-family: inherit;
+  }
+  
+  /* Ascunde scrollbar dar păstrează funcționalitatea scrolling-ului */
+  .no-scrollbar {
+    -ms-overflow-style: none;      /* IE / Edge */
+    scrollbar-width: none;         /* Firefox */
+  }
+  
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;                 /* Chrome / Safari / Opera */
+  }
+  
+  /* Stiluri pentru accesibilitate */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+  
+  /* Fix pentru Safari și iOS */
+  @supports (-webkit-touch-callout: none) {
+    .full-height {
+      height: -webkit-fill-available;
+    }
+  }
+  
+  /* Corecție pentru vh pe mobile */
+  .use-vh {
+    height: calc(var(--vh, 1vh) * 100);
+  }
+  
+  /* Seturi de tranziții predefinite */
+  .transition-standard {
+    transition: all var(--transition-standard);
+  }
+  
+  .transition-transform {
+    transition: transform var(--transition-standard);
+  }
+  
+  .transition-opacity {
+    transition: opacity var(--transition-standard);
+  }
+  
+  /* Previn artefacte de animație */
+  .hardware-accelerated {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    perspective: 1000px;
+  }
+  
+  /* Stiluri generale pentru butoane */
+  .button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: var(--font-weight-semibold);
+    padding: var(--spacing-sm) var(--spacing-lg);
+    border-radius: var(--border-radius-md);
+    transition: background-color var(--transition-standard);
+  }
+  
+  /* Stiluri generale pentru overlay */
+  .overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1500;
+    background-color: var(--color-overlay);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity var(--transition-standard), visibility var(--transition-standard);
+  }
+  
+  .overlay.visible {
+    opacity: 1;
+    visibility: visible;
+  }

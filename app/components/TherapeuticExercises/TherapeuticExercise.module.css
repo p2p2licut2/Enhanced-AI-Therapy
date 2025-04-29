@@ -1,0 +1,397 @@
+/* app/components/TherapeuticExercises/TherapeuticExercise.module.css */
+/*
+ * CSS Module pentru componenta TherapeuticExercise
+ * Stiluri pentru exerciții terapeutice specializate
+ */
+
+ @import '../../styles/design-system/index.css';
+ @import '../../styles/mental-health/_therapeutic.css';
+ 
+ /* Container principal */
+ .container {
+   margin: 0 var(--spacing-md) var(--spacing-lg);
+   background-color: white;
+   border-radius: var(--border-radius-lg);
+   overflow: hidden;
+   box-shadow: var(--shadow-card);
+   border-left: 4px solid var(--color-focus);
+   transition: all var(--transition-standard);
+   max-height: 200px; /* Înălțime inițială */
+ }
+ 
+ .calmContainer {
+   border-left: 4px solid var(--color-calm);
+   background-color: var(--color-calm-light);
+   box-shadow: 0 2px 10px rgba(162, 197, 224, 0.1);
+   transition: all var(--transition-calm);
+ }
+ 
+ .expanded {
+   max-height: 500px; /* Înălțime extinsă */
+ }
+ 
+ /* Header */
+ .header {
+   display: flex;
+   justify-content: space-between;
+   align-items: center;
+   padding: var(--spacing-md);
+   border-bottom: 1px solid var(--color-gray-200);
+ }
+ 
+ .title {
+   font-weight: var(--font-weight-semibold);
+   color: var(--color-heading);
+   font-size: var(--font-size-md);
+ }
+ 
+ .controls {
+   display: flex;
+   gap: var(--spacing-xs);
+ }
+ 
+ .controlButton {
+   width: 28px;
+   height: 28px;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   border-radius: var(--border-radius-circle);
+   background-color: var(--color-gray-100);
+   color: var(--color-text);
+   transition: all var(--transition-standard);
+ }
+ 
+ .controlButton:hover {
+   background-color: var(--color-gray-200);
+ }
+ 
+ .calmContainer .controlButton {
+   background-color: rgba(255, 255, 255, 0.5);
+   transition: all var(--transition-calm);
+ }
+ 
+ .calmContainer .controlButton:hover {
+   background-color: rgba(255, 255, 255, 0.8);
+ }
+ 
+ /* Conținut principal */
+ .content {
+   padding: var(--spacing-md);
+   height: auto;
+   max-height: 400px;
+   overflow: hidden;
+   transition: max-height var(--transition-standard);
+ }
+ 
+ .contentHidden {
+   max-height: 0;
+   padding-top: 0;
+   padding-bottom: 0;
+ }
+ 
+ /* Progress bar */
+ .progressContainer {
+   height: 4px;
+   background-color: var(--color-gray-200);
+   overflow: hidden;
+ }
+ 
+ .progressBar {
+   height: 100%;
+   background-color: var(--color-focus);
+   transition: width 1s linear;
+   width: 0%;
+ }
+ 
+ .calmProgressBar {
+   background-color: var(--color-calm);
+ }
+ 
+ .noTransition {
+   transition: none !important;
+ }
+ 
+ /* Footer */
+ .footer {
+   display: flex;
+   justify-content: space-between;
+   align-items: center;
+   padding: var(--spacing-sm) var(--spacing-md);
+   border-top: 1px solid var(--color-gray-200);
+   font-size: var(--font-size-sm);
+ }
+ 
+ .timeRemaining {
+   font-weight: var(--font-weight-semibold);
+   font-variant-numeric: tabular-nums;
+ }
+ 
+ .benefitText {
+   color: var(--color-text-light);
+   font-size: var(--font-size-xs);
+   max-width: 70%;
+   text-align: right;
+ }
+ 
+ /* Breathing Exercise */
+ .breathingExercise {
+   display: flex;
+   flex-direction: column;
+   align-items: center;
+   gap: var(--spacing-md);
+ }
+ 
+ .breathingCircle {
+   width: 100px;
+   height: 100px;
+   border-radius: 50%;
+   background-color: var(--color-focus-light);
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   transition: transform 1s ease-in-out, background-color 1s ease-in-out;
+   position: relative;
+ }
+ 
+ .breathingInner {
+   font-size: var(--font-size-3xl);
+   font-weight: var(--font-weight-bold);
+   color: var(--color-focus);
+   z-index: 2;
+ }
+ 
+ .inhale {
+   animation: expand 4s ease-in-out;
+   background-color: var(--color-focus-light);
+ }
+ 
+ .calmExercise .inhale {
+   animation: gentleExpand 4s var(--ease-calm);
+   background-color: var(--color-calm-light);
+ }
+ 
+ .hold {
+   animation: pulse 1s infinite alternate;
+   background-color: var(--color-primary-light);
+ }
+ 
+ .calmExercise .hold {
+   animation: gentlePulse 1.5s infinite alternate var(--ease-calm);
+   background-color: var(--color-calm-light);
+ }
+ 
+ .exhale {
+   animation: contract 4s ease-in-out;
+   background-color: var(--color-support-light);
+ }
+ 
+ .calmExercise .exhale {
+   animation: gentleContract 4s var(--ease-calm);
+   background-color: var(--color-calm-light);
+ }
+ 
+ .rest {
+   background-color: var(--color-background);
+ }
+ 
+ .instructions {
+   text-align: center;
+ }
+ 
+ .phase {
+   font-size: var(--font-size-md);
+   font-weight: var(--font-weight-semibold);
+   margin-bottom: var(--spacing-xs);
+   color: var(--color-focus);
+ }
+ 
+ .calmExercise .phase {
+   color: var(--color-calm);
+ }
+ 
+ .tip {
+   font-size: var(--font-size-sm);
+   color: var(--color-text-light);
+   max-width: 280px;
+   margin: 0 auto;
+ }
+ 
+ /* Mindfulness Exercise */
+ .mindfulnessExercise {
+   text-align: center;
+   padding: var(--spacing-md) 0;
+ }
+ 
+ .mindfulnessTimer {
+   font-size: var(--font-size-4xl);
+   font-weight: var(--font-weight-bold);
+   margin: var(--spacing-md) 0;
+   color: var(--color-focus);
+   font-variant-numeric: tabular-nums;
+ }
+ 
+ .calmExercise .mindfulnessTimer {
+   color: var(--color-calm);
+ }
+ 
+ /* Grounding Exercise */
+ .groundingExercise {
+   padding: var(--spacing-sm) 0;
+ }
+ 
+ .groundingList {
+   list-style: none;
+   padding: 0;
+   margin: var(--spacing-md) 0;
+ }
+ 
+ .groundingList li {
+   margin-bottom: var(--spacing-sm);
+   padding-left: var(--spacing-md);
+   position: relative;
+ }
+ 
+ .groundingList li::before {
+   content: "";
+   position: absolute;
+   left: 0;
+   top: 50%;
+   transform: translateY(-50%);
+   width: 8px;
+   height: 8px;
+   border-radius: 50%;
+   background-color: var(--color-focus);
+ }
+ 
+ .calmExercise .groundingList li::before {
+   background-color: var(--color-calm);
+ }
+ 
+ /* Animații */
+ @keyframes expand {
+   from {
+     transform: scale(1);
+     box-shadow: 0 0 0 0 rgba(184, 196, 187, 0.3);
+   }
+   to {
+     transform: scale(1.2);
+     box-shadow: 0 0 0 10px rgba(184, 196, 187, 0);
+   }
+ }
+ 
+ @keyframes gentleExpand {
+   0% {
+     transform: scale(1);
+     box-shadow: 0 0 0 0 rgba(162, 197, 224, 0.3);
+   }
+   40% {
+     transform: scale(1.1);
+   }
+   100% {
+     transform: scale(1.15);
+     box-shadow: 0 0 0 8px rgba(162, 197, 224, 0);
+   }
+ }
+ 
+ @keyframes contract {
+   from {
+     transform: scale(1.2);
+   }
+   to {
+     transform: scale(1);
+   }
+ }
+ 
+ @keyframes gentleContract {
+   0% {
+     transform: scale(1.15);
+   }
+   60% {
+     transform: scale(1.05);
+   }
+   100% {
+     transform: scale(1);
+   }
+ }
+ 
+ @keyframes pulse {
+   from {
+     box-shadow: 0 0 0 0 rgba(210, 163, 138, 0.4);
+   }
+   to {
+     box-shadow: 0 0 0 10px rgba(210, 163, 138, 0);
+   }
+ }
+ 
+ @keyframes gentlePulse {
+   0% {
+     box-shadow: 0 0 0 0 rgba(162, 197, 224, 0.4);
+   }
+   50% {
+     box-shadow: 0 0 0 5px rgba(162, 197, 224, 0.2);
+   }
+   100% {
+     box-shadow: 0 0 0 8px rgba(162, 197, 224, 0);
+   }
+ }
+ 
+ /* Media queries */
+ @media (max-width: 640px) {
+   .container {
+     margin: 0 var(--spacing-sm) var(--spacing-md);
+   }
+   
+   .breathingCircle {
+     width: 80px;
+     height: 80px;
+   }
+   
+   .breathingInner {
+     font-size: var(--font-size-2xl);
+   }
+ }
+ 
+ /* Suport pentru preferințe de reducere a mișcării */
+ @media (prefers-reduced-motion: reduce) {
+   .breathingCircle,
+   .inhale,
+   .hold,
+   .exhale,
+   .rest {
+     animation: none !important;
+     transition: none !important;
+   }
+   
+   .inhale::before {
+     content: "Inspiră";
+     position: absolute;
+     top: -25px;
+     font-size: var(--font-size-xs);
+     color: var(--color-text-light);
+   }
+   
+   .hold::before {
+     content: "Ține";
+     position: absolute;
+     top: -25px;
+     font-size: var(--font-size-xs);
+     color: var(--color-text-light);
+   }
+   
+   .exhale::before {
+     content: "Expiră";
+     position: absolute;
+     top: -25px;
+     font-size: var(--font-size-xs);
+     color: var(--color-text-light);
+   }
+   
+   .rest::before {
+     content: "Pauză";
+     position: absolute;
+     top: -25px;
+     font-size: var(--font-size-xs);
+     color: var(--color-text-light);
+   }
+ }

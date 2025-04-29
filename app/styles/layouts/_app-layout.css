@@ -1,0 +1,200 @@
+/* app/styles/layouts/_app-layout.css */
+/*
+ * Stiluri pentru layout-ul principal al aplicației
+ * Compartimentarea paginii și containere principale
+ */
+
+/* Container principal pentru layout */
+.app-container {
+    display: flex;
+    flex-direction: column;
+    height: calc(var(--vh, 1vh) * 100);
+    width: 100%;
+    max-width: var(--container-max-width);
+    margin: 0 auto;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  /* Chatbox - conținut principal */
+  .chat-window {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: calc(var(--vh, 1vh) * 100 - var(--header-height));
+    margin-top: var(--header-height);
+    overflow: hidden;
+    position: relative;
+  }
+  
+  /* Containerul pentru mesaje */
+  .messages-container {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: var(--spacing-md) var(--spacing-base) var(--spacing-lg);
+    word-break: break-word;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Container pentru input text */
+  .input-container-wrapper {
+    position: sticky;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    background-color: var(--color-background);
+    z-index: 30;
+    transition: all var(--transition-standard);
+    display: flex;
+    flex-direction: column;
+    padding-bottom: calc(env(safe-area-inset-bottom) + 3px);
+    margin-top: auto;
+    border-top: 1px solid var(--color-overlay-light);
+  }
+  
+  /* Header-ul principal */
+  .global-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: var(--header-height);
+    padding: var(--spacing-sm) var(--spacing-base) 0;
+    z-index: 1000;
+    background: var(--color-background);
+  }
+  
+  .header-content {
+    display: flex;
+    background: transparent;
+    align-items: center;
+    width: 100%;
+    max-width: var(--container-max-width);
+    margin: 0 auto;
+    justify-content: space-between;
+    padding-bottom: 6px;
+  }
+  
+  /* Menu lateral */
+  .side-menu {
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 300px;
+    background-color: white;
+    box-shadow: var(--shadow-menu);
+    transform: translateX(-100%);
+    transition: transform var(--transition-standard);
+    z-index: 2000;
+    overflow-y: auto;
+    padding: var(--spacing-base);
+  }
+  
+  .side-menu.open {
+    transform: translateX(0);
+  }
+  
+  /* Card container */
+  .card {
+    background-color: var(--color-background-light);
+    border-radius: var(--border-radius-lg);
+    padding: var(--spacing-lg);
+    box-shadow: var(--shadow-card);
+    margin-bottom: var(--spacing-lg);
+  }
+  
+  /* Modal overlay și container */
+  .custom-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--color-overlay-dark);
+    z-index: 2000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity var(--transition-standard), visibility var(--transition-standard);
+    backdrop-filter: var(--backdrop-blur);
+  }
+  
+  .custom-overlay.visible {
+    opacity: 1;
+    visibility: visible;
+  }
+  
+  /* Modals */
+  .modal-base {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    max-width: 400px;
+    background-color: white;
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-modal);
+    z-index: 2100;
+    overflow: hidden;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    animation: modalFadeIn var(--transition-slow) var(--ease-out);
+  }
+  
+  /* Fix pentru iOS safe area */
+  @supports (-webkit-touch-callout: none) {
+    .input-container-wrapper {
+      padding-bottom: max(env(safe-area-inset-bottom), 10px);
+    }
+    
+    .chat-window {
+      height: calc(var(--vh, 1vh) * 100 - var(--header-height) - env(safe-area-inset-bottom, 0px));
+    }
+  }
+  
+  /* Welcome page layout */
+  .welcome-page-container {
+    position: relative;
+    height: 100vh;
+    width: 100vw;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    background-color: var(--color-background);
+  }
+  
+  /* Fix iOS Safari scrolling issues */
+  @supports (-webkit-touch-callout: none) {
+    .welcome-page-container {
+      height: -webkit-fill-available;
+    }
+  }
+  
+  /* Grid layouts */
+  .grid-container {
+    display: grid;
+    gap: var(--spacing-lg);
+  }
+  
+  .grid-2-cols {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .grid-3-cols {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  /* Mobile adjustments */
+  @media (max-width: 640px) {
+    .grid-2-cols,
+    .grid-3-cols {
+      grid-template-columns: 1fr;
+    }
+    
+    .side-menu {
+      width: 85%;
+    }
+  }
