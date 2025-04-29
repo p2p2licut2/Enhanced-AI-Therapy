@@ -129,10 +129,15 @@ export async function POST(request: NextRequest) {
       });
       
       // Generăm un nou token de verificare (48 ore valabilitate)
+      // Includem email-ul în token pentru recuperare
       console.log('Creating new verification token for user:', user.id);
-      const verificationToken = await createEmailVerificationToken(user.id, 48);
+      const verificationToken = await createEmailVerificationToken(user.id, 48, email);
       console.log('Created verification token:', verificationToken.token.substring(0, 6) + '...');
       console.log('Token expires at:', verificationToken.expires);
+      
+      // Generăm un link de verificare care include parametrul nopreload
+      const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
+      const verificationLink = `${baseUrl}/auth/verify?token=${verificationToken.token}&nopreload=true`;
       
       // Trimitem email-ul de verificare
       console.log('Sending verification email to:', user.email);

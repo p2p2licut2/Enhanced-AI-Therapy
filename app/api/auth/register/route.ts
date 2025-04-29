@@ -109,15 +109,36 @@ export async function POST(request: NextRequest) {
         lastName,
       });
       
-      // Generăm tokenul de verificare email
-      const verificationToken = await createEmailVerificationToken(user.id);
+      // Generăm tokenul de verificare email, incluzând email-ul pentru recuperare
+      const verificationToken = await createEmailVerificationToken(user.id, 48, email);
+      
+      // Generăm un link de verificare care include parametrul nopreload pentru a evita preîncărcarea
+      const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
+      const verificationLink = `${baseUrl}/auth/verify?token=${verificationToken.token}&nopreload=true`;
       
       // Trimitem email-ul de verificare
-      await emailService.sendVerificationEmail(
+      const emailResult = await emailService.sendVerificationEmail(
         user.email,
         `${firstName} ${lastName}`.trim(),
         verificationToken.token
       );
+      
+      // Verificăm dacă email-ul a fost trimis cu succes
+      if (!emailResult.success) {
+        console.error('Eroare la trimiterea email-ului de verificare:', emailResult.error);
+        
+        // Logăm eroarea de trimitere email
+        await AuditService.log({
+          userId: user.id,
+          action: 'REGISTER_EMAIL_SEND_FAILED',
+          details: `Email: ${email}, Error: ${emailResult.error || 'Unknown error'}`,
+          ipAddress,
+          userAgent,
+        });
+        
+        // Continuăm procesul, dar notificăm utilizatorul
+        // Nu aruncăm o eroare pentru a permite utilizatorului să folosească "Retrimite email"
+      }
       
       // Logăm înregistrarea reușită
       await AuditService.log({
@@ -136,7 +157,8 @@ export async function POST(request: NextRequest) {
           id: user.id,
           email: user.email,
           name: `${firstName} ${lastName}`.trim(),
-        }
+        },
+        emailSent: emailResult.success
       });
       
     } catch (error) {

@@ -149,7 +149,9 @@ class EmailService {
    */
   async sendVerificationEmail(email, name, token) {
     const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
-    const verificationLink = `${baseUrl}/auth/verify?token=${token}`;
+    
+    // Adăugăm parametrul nopreload pentru a evita preîncărcarea linkurilor
+    const verificationLink = `${baseUrl}/auth/verify?token=${token}&nopreload=true`;
     
     const subject = 'Verifică-ți adresa de email - Terapie AI';
     
@@ -160,6 +162,8 @@ class EmailService {
       
       Te rugăm să confirmi adresa de email accesând următorul link:
       ${verificationLink}
+      
+      IMPORTANT: Dacă folosești o aplicație de email care preîncarcă linkurile, te rugăm să deschizi link-ul într-o fereastră nouă de browser.
       
       Acest link va expira în 48 de ore.
       
@@ -188,14 +192,22 @@ class EmailService {
           <p>Pentru a activa contul tău și a începe conversațiile cu terapeutul AI, te rugăm să confirmi adresa de email:</p>
           
           <div style="text-align: center; margin: 30px 0;">
-            <a href="${verificationLink}" style="background-color: #d2a38a; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: bold;">
+            <a href="${verificationLink}" style="background-color: #d2a38a; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: bold; display: inline-block;" target="_blank" rel="noopener noreferrer">
               Confirmă adresa de email
             </a>
           </div>
           
+          <div style="background-color: #ffffe0; border-left: 4px solid #e2d562; padding: 12px; margin-bottom: 20px;">
+            <p style="margin: 0; font-size: 14px; color: #856404;">
+              <strong>Important:</strong> Unele servicii de email pot preîncărca linkurile. Pentru a evita probleme, 
+              te rugăm să deschizi linkul de confirmare într-o fereastră nouă de browser sau să faci click dreapta 
+              și să alegi "Deschide într-o fereastră nouă".
+            </p>
+          </div>
+          
           <p style="font-size: 14px; color: #666;">
             Dacă butonul nu funcționează, copiază și lipește următorul link în browser:<br>
-            <a href="${verificationLink}" style="color: #d2a38a;">${verificationLink}</a>
+            <a href="${verificationLink}" style="color: #d2a38a; word-break: break-all;">${verificationLink}</a>
           </p>
           
           <p style="font-size: 14px; color: #666;">
@@ -212,7 +224,7 @@ class EmailService {
           <p>Dacă nu ai solicitat acest email, te rugăm să îl ignori.</p>
           <p>
             Acest email a fost trimis către ${email}. 
-            <a href="${unsubscribeLink}" style="color: #999; text-decoration: underline;">Dezabonare</a>
+            <a href="${unsubscribeLink}" style="color: #999; text-decoration: underline;" target="_blank" rel="noopener noreferrer">Dezabonare</a>
           </p>
           <p>&copy; ${new Date().getFullYear()} Terapie AI. Toate drepturile rezervate.</p>
           <p>

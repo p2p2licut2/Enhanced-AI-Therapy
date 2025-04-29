@@ -13,6 +13,7 @@ export default function VerifyEmailPage() {
   const [message, setMessage] = useState<string>('Verificăm token-ul tău...');
   const [isAlreadyVerified, setIsAlreadyVerified] = useState(false);
   const [email, setEmail] = useState<string | null>(null);
+  const [attemptCount, setAttemptCount] = useState(0);
 
   useEffect(() => {
     const verifyToken = async () => {
@@ -23,6 +24,15 @@ export default function VerifyEmailPage() {
           setStatus('error');
           setMessage('Token-ul lipsește sau este invalid.');
           return;
+        }
+        
+        // Prevenim preîncărcarea linkurilor de către Ethereal sau alte servicii
+        const noPreload = searchParams.get('nopreload');
+        if (attemptCount === 0 && !noPreload) {
+          // Prima încercare, verificăm dacă este un preload
+          setAttemptCount(1);
+          // Așteptăm puțin pentru a evita problema de preîncărcare
+          await new Promise(resolve => setTimeout(resolve, 500));
         }
         
         console.log('Verificăm token-ul:', token.substring(0, 6) + '...');
@@ -69,7 +79,15 @@ export default function VerifyEmailPage() {
           }, 3000);
         } else {
           setStatus('error');
-          setMessage(data.error || 'Token-ul de verificare este invalid sau a expirat.');
+          
+          // Verificăm cazuri specifice de eroare
+          if (data.alreadyVerified) {
+            setIsAlreadyVerified(true);
+            setEmail(data.email || null);
+            setMessage('Contul tău a fost deja activat anterior. Te poți autentifica cu contul tău.');
+          } else {
+            setMessage(data.error || 'Token-ul de verificare este invalid sau a expirat.');
+          }
         }
       } catch (error) {
         console.error('Eroare la verificarea token-ului:', error);
@@ -79,7 +97,7 @@ export default function VerifyEmailPage() {
     };
 
     verifyToken();
-  }, [searchParams, router, email]);
+  }, [searchParams, router, email, attemptCount]);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -139,23 +157,36 @@ export default function VerifyEmailPage() {
                 </svg>
               </div>
               
-              <h3 className="text-lg font-medium text-gray-900 mb-2">Verificare eșuată</h3>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">
+                {isAlreadyVerified ? 'Email deja verificat' : 'Verificare eșuată'}
+              </h3>
               <p className="text-center text-gray-700 mb-6">{message}</p>
               
               <div className="flex flex-col space-y-3 sm:flex-row sm:space-y-0 sm:space-x-3">
-                <Link
-                  href="/auth/resend-verification"
-                  className="inline-flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
-                >
-                  Retrimite email
-                </Link>
-                
-                <Link
-                  href="/auth/login"
-                  className="inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
-                >
-                  Înapoi la login
-                </Link>
+                {isAlreadyVerified ? (
+                  <Link
+                    href="/auth/login"
+                    className="inline-flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+                  >
+                    Mergi la autentificare
+                  </Link>
+                ) : (
+                  <>
+                    <Link
+                      href="/auth/resend-verification"
+                      className="inline-flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+                    >
+                      Retrimite email
+                    </Link>
+                    
+                    <Link
+                      href="/auth/login"
+                      className="inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+                    >
+                      Înapoi la login
+                    </Link>
+                  </>
+                )}
               </div>
             </div>
           )}

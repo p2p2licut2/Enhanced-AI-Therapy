@@ -75,11 +75,22 @@ export async function createUser({
 /**
  * Generează un token de verificare email
  * @param userId ID-ul utilizatorului
+ * @param email Adresa de email a utilizatorului (pentru recuperare)
  * @param expiresInHours Perioada de expirare în ore (default: 48 ore)
  */
-export async function createEmailVerificationToken(userId: string, expiresInHours: number = 48) {
-  const token = generateToken();
-  // A fost modificat de la 24 ore la 48 ore (sau valoarea parametrului)
+export async function createEmailVerificationToken(userId: string, expiresInHours: number = 48, email?: string) {
+  // Generăm partea aleatorie a tokenului
+  const randomPart = crypto.randomBytes(20).toString('hex');
+  
+  // Dacă avem email, îl includem în token pentru recuperare
+  let token = randomPart;
+  if (email) {
+    // Codificăm emailul și îl adăugăm la token
+    const encodedEmail = Buffer.from(email).toString('base64');
+    token = `${randomPart}_${encodedEmail}`;
+  }
+  
+  // Calculăm data de expirare
   const expires = new Date(Date.now() + expiresInHours * 60 * 60 * 1000);
 
   // Ștergem orice token anterior
@@ -106,10 +117,21 @@ export async function createEmailVerificationToken(userId: string, expiresInHour
 /**
  * Generează un token pentru resetarea parolei
  * @param userId ID-ul utilizatorului
+ * @param email Adresa de email a utilizatorului (pentru recuperare)
  * @param expiresInHours Perioada de expirare în ore (default: 1 oră)
  */
-export async function createPasswordResetToken(userId: string, expiresInHours: number = 1) {
-  const token = generateToken();
+export async function createPasswordResetToken(userId: string, expiresInHours: number = 1, email?: string) {
+  // Generăm partea aleatorie a tokenului
+  const randomPart = crypto.randomBytes(20).toString('hex');
+  
+  // Dacă avem email, îl includem în token pentru recuperare
+  let token = randomPart;
+  if (email) {
+    // Codificăm emailul și îl adăugăm la token
+    const encodedEmail = Buffer.from(email).toString('base64');
+    token = `${randomPart}_${encodedEmail}`;
+  }
+  
   const expires = new Date(Date.now() + expiresInHours * 60 * 60 * 1000);
 
   // Ștergem orice token anterior

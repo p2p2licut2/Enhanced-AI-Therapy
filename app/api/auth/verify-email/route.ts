@@ -57,8 +57,45 @@ export async function POST(request: NextRequest) {
         },
       });
       
+      // Când tokenul nu este găsit, verificăm dacă emailul este deja verificat
       if (!verificationToken) {
         console.error('Token not found in database');
+        
+        // Încercăm să extragem informații din token (dacă are un format specific)
+        const token_parts = token.split('_');
+        if (token_parts.length > 1) {
+          try {
+            // Încercăm să decodificăm partea de email din token
+            const potentialEmail = Buffer.from(token_parts[1], 'base64').toString('utf-8');
+            if (potentialEmail.includes('@')) {
+              const user = await prisma.user.findUnique({
+                where: { email: potentialEmail.toLowerCase() },
+                select: { id: true, email: true, emailVerified: true },
+              });
+              
+              if (user && user.emailVerified) {
+                // Emailul este deja verificat, oferim un mesaj mai clar
+                await AuditService.log({
+                  userId: user.id,
+                  action: 'EMAIL_VERIFICATION_ALREADY_VERIFIED_FROM_TOKEN',
+                  details: `Email: ${potentialEmail}`,
+                  ipAddress,
+                  userAgent,
+                });
+                
+                return NextResponse.json({ 
+                  success: true,
+                  message: 'Contul tău a fost deja activat anterior.',
+                  alreadyVerified: true,
+                  email: user.email
+                });
+              }
+            }
+          } catch (err) {
+            // Ignorăm erorile în această cale de recuperare
+            console.warn('Error trying to decode email from token:', err);
+          }
+        }
         
         // Logăm tentativa de folosire a unui token invalid
         await AuditService.log({
@@ -87,7 +124,7 @@ export async function POST(request: NextRequest) {
           userAgent,
         });
         
-        // Încercăm să ștergem token-ul expirat - cu try/catch pentru siguranță
+        // Ștergem token-ul expirat cu gestionarea erorilor
         try {
           await prisma.verificationToken.delete({
             where: { id: verificationToken.id },
@@ -95,7 +132,6 @@ export async function POST(request: NextRequest) {
           console.log('Expired token deleted');
         } catch (deleteError) {
           console.warn('Could not delete expired token:', deleteError);
-          // Continuăm execuția chiar dacă ștergerea a eșuat
         }
         
         return NextResponse.json(
@@ -108,7 +144,7 @@ export async function POST(request: NextRequest) {
       if (verificationToken.user.emailVerified) {
         console.log('Email already verified for user:', verificationToken.user.email);
         
-        // Încercăm să ștergem token-ul - cu try/catch pentru siguranță
+        // Ștergem token-ul care nu mai e necesar
         try {
           await prisma.verificationToken.delete({
             where: { id: verificationToken.id },
@@ -116,7 +152,6 @@ export async function POST(request: NextRequest) {
           console.log('Token for already verified email deleted');
         } catch (deleteError) {
           console.warn('Could not delete token for already verified email:', deleteError);
-          // Continuăm execuția chiar dacă ștergerea a eșuat
         }
         
         // Logăm tentativa pentru un email deja verificat
@@ -138,23 +173,21 @@ export async function POST(request: NextRequest) {
       
       console.log('Updating user emailVerified status for:', verificationToken.user.email);
       
-      // Actualizăm starea utilizatorului
-      await prisma.user.update({
-        where: { id: verificationToken.userId },
-        data: { emailVerified: new Date() },
-      });
-      
-      // Încercăm să ștergem token-ul folosit - cu try/catch pentru a evita eroarea
-      try {
-        await prisma.verificationToken.delete({
+      // Folosim o tranzacție pentru a asigura că ambele operațiuni sunt finalizate împreună
+      await prisma.$transaction(async (tx) => {
+        // Actualizăm starea utilizatorului
+        await tx.user.update({
+          where: { id: verificationToken.userId },
+          data: { emailVerified: new Date() },
+        });
+        
+        // Ștergem token-ul folosit
+        await tx.verificationToken.delete({
           where: { id: verificationToken.id },
         });
-        console.log('Verification token deleted successfully');
-      } catch (deleteError) {
-        // Dacă token-ul nu poate fi șters, logăm avertismentul dar continuăm execuția
-        console.warn('Could not delete verification token:', deleteError);
-        // Nu aruncăm eroarea mai departe, permitem fluxului să continue
-      }
+      });
+      
+      console.log('User verified and token deleted successfully');
       
       // Logăm verificarea reușită
       await AuditService.log({
