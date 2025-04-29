@@ -1,5 +1,6 @@
-import './auth.css';
+import '../styles/auth.css';
 import Image from 'next/image';
+import Link from 'next/link';
 
 export default function AuthLayout({
   children,
@@ -11,16 +12,18 @@ export default function AuthLayout({
       {/* Header pentru Auth */}
       <header className="bg-white shadow-sm py-4">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-center">
-          <div className="flex items-center">
-            <Image
-              src="/logo.png" // Adaugă un logo pentru aplicația ta
-              alt="Terapie AI Logo"
-              width={40}
-              height={40}
-              className="mr-2"
-            />
+          <Link href="/" className="flex items-center">
+            <div className="relative w-10 h-10 mr-2">
+              <Image
+                src="/logo.png"
+                alt="Terapie AI Logo"
+                fill
+                sizes="40px"
+                className="object-contain"
+              />
+            </div>
             <span className="text-xl font-bold text-primary-dark">Terapie AI</span>
-          </div>
+          </Link>
         </div>
       </header>
       
@@ -35,9 +38,15 @@ export default function AuthLayout({
           <div className="text-center text-sm text-gray-500">
             <p>&copy; {new Date().getFullYear()} Terapie AI. Toate drepturile rezervate.</p>
             <div className="mt-2 flex justify-center space-x-4">
-              <a href="/terms" className="hover:text-gray-600">Termeni și Condiții</a>
-              <a href="/privacy" className="hover:text-gray-600">Politica de Confidențialitate</a>
-              <a href="/contact" className="hover:text-gray-600">Contact</a>
+              <Link href="/terms" className="hover:text-gray-600">
+                Termeni și Condiții
+              </Link>
+              <Link href="/privacy" className="hover:text-gray-600">
+                Politica de Confidențialitate
+              </Link>
+              <Link href="/contact" className="hover:text-gray-600">
+                Contact
+              </Link>
             </div>
           </div>
         </div>

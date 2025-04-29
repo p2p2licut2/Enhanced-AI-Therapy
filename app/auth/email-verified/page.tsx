@@ -3,27 +3,40 @@
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function EmailVerifiedPage() {
   const router = useRouter();
   
-  // Opțional: redirecționează automat către login după un anumit timp
+  // Redirecționează automat către login după un anumit timp
   useEffect(() => {
     const redirectTimer = setTimeout(() => {
-      router.push('/login');
-    }, 10000); // 10 secunde
+      router.push('/auth/login');
+    }, 8000); // 8 secunde
     
     return () => clearTimeout(redirectTimer);
   }, [router]);
   
   return (
     <div className="min-h-screen flex flex-col justify-center items-center py-12 px-4 sm:px-6 lg:px-8 bg-gray-50">
-      <div className="max-w-md w-full bg-white shadow-md rounded-lg overflow-hidden">
-        <div className="bg-primary px-6 py-4">
-          <h2 className="text-xl font-semibold text-white">Email verificat</h2>
+      <div className="w-full max-w-md space-y-8">
+        <div className="text-center">
+          <div className="mx-auto w-20 h-20 relative mb-4">
+            <Image
+              src="/logo.png"
+              alt="Terapie AI Logo"
+              fill
+              sizes="(max-width: 80px) 100vw"
+              priority
+              className="object-contain"
+            />
+          </div>
+          <h2 className="text-center text-3xl font-extrabold text-gray-900">
+            Email verificat
+          </h2>
         </div>
         
-        <div className="p-6">
+        <div className="bg-white p-6 shadow-md rounded-lg">
           <div className="flex flex-col items-center">
             <div className="rounded-full bg-green-100 p-4 mx-auto mb-4">
               <svg className="h-10 w-10 text-green-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -56,8 +69,8 @@ export default function EmailVerifiedPage() {
             
             <div className="mt-4 w-full">
               <Link 
-                href="/login"
-                className="w-full inline-flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary-dark"
+                href="/auth/login"
+                className="w-full inline-flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
               >
                 Continuă către autentificare
               </Link>
@@ -66,7 +79,7 @@ export default function EmailVerifiedPage() {
             <div className="mt-4 w-full">
               <Link 
                 href="/"
-                className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+                className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-300"
               >
                 Înapoi la pagina principală
               </Link>

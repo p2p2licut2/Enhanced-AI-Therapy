@@ -6,7 +6,7 @@ import { useApp } from '@/app/contexts/AppContext';
 import { formatDistanceToNow } from 'date-fns';
 import { ro } from 'date-fns/locale';
 import ConfirmDialog from './ConfirmDialog';
-import { useSession } from 'next-auth/react';
+import { useSession, signOut } from 'next-auth/react'; // Import signOut directly
 
 export default function LeftMenu() {
   const {
@@ -31,7 +31,7 @@ export default function LeftMenu() {
   const optionsRef = useRef<HTMLDivElement>(null);
   const titleInputRef = useRef<HTMLInputElement>(null);
   const [hoveredConversationId, setHoveredConversationId] = useState<string | null>(null);
-  const { signOut } = useSession();
+  const { data: session } = useSession(); // Changed to use only session data
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -88,7 +88,7 @@ export default function LeftMenu() {
 
   const handleConfirmLogout = async () => {
     try {
-      await signOut({ callbackUrl: '/login' });
+      await signOut({ callbackUrl: '/auth/login' }); // Using imported signOut function
     } catch (error) {
       console.error('Eroare la deconectare:', error);
     }

@@ -19,11 +19,11 @@ export default function RegisterForm() {
     hasSpecial: false,
     message: '',
   });
-  const [formErrors, setFormErrors] = useState({});
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   
   const { register, isLoading, error } = useAuth();
 
-  const validatePassword = (value) => {
+  const validatePassword = (value: string) => {
     const validation = {
       length: value.length >= 10,
       hasUppercase: /[A-Z]/.test(value),
@@ -48,12 +48,12 @@ export default function RegisterForm() {
       else if (!validation.hasSpecial) message = 'Parola trebuie să conțină cel puțin un caracter special';
     }
     
-    setPasswordValidation({...validation, message});
+    setPasswordValidation({...validation, message, isValid: validation.isValid});
     return validation.isValid;
   };
 
   const validateForm = () => {
-    const errors = {};
+    const errors: Record<string, string> = {};
     
     if (!firstName.trim()) errors.firstName = 'Prenumele este obligatoriu';
     if (!lastName.trim()) errors.lastName = 'Numele este obligatoriu';
@@ -78,7 +78,7 @@ export default function RegisterForm() {
     return Object.keys(errors).length === 0;
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     
     if (!validateForm()) {
@@ -120,7 +120,7 @@ export default function RegisterForm() {
                 type="text"
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
-                className={`auth-input ${formErrors.firstName ? 'border-red-500' : ''}`}
+                className={`appearance-none block w-full px-3 py-2 border ${formErrors.firstName ? 'border-red-500' : 'border-gray-300'} rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm`}
                 disabled={isLoading}
               />
               {formErrors.firstName && (
@@ -140,7 +140,7 @@ export default function RegisterForm() {
                 type="text"
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
-                className={`auth-input ${formErrors.lastName ? 'border-red-500' : ''}`}
+                className={`appearance-none block w-full px-3 py-2 border ${formErrors.lastName ? 'border-red-500' : 'border-gray-300'} rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm`}
                 disabled={isLoading}
               />
               {formErrors.lastName && (
@@ -161,7 +161,7 @@ export default function RegisterForm() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className={`auth-input ${formErrors.email ? 'border-red-500' : ''}`}
+              className={`appearance-none block w-full px-3 py-2 border ${formErrors.email ? 'border-red-500' : 'border-gray-300'} rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm`}
               disabled={isLoading}
             />
             {formErrors.email && (
@@ -184,14 +184,14 @@ export default function RegisterForm() {
                 setPassword(e.target.value);
                 validatePassword(e.target.value);
               }}
-              className={`auth-input ${formErrors.password ? 'border-red-500' : ''}`}
+              className={`appearance-none block w-full px-3 py-2 border ${formErrors.password ? 'border-red-500' : 'border-gray-300'} rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm`}
               disabled={isLoading}
             />
             {formErrors.password ? (
               <p className="mt-1 text-sm text-red-600">{formErrors.password}</p>
             ) : (
-              <div className="mt-2 space-y-1">
-                <div className="text-xs text-gray-600 mb-1">Parola trebuie să conțină:</div>
+              <div className="mt-2 p-3 bg-gray-50 rounded-md">
+                <div className="text-xs text-gray-600 mb-1 font-medium">Parola trebuie să conțină:</div>
                 <div className="grid grid-cols-2 gap-x-2 gap-y-1">
                   <div className={`text-xs flex items-center ${passwordValidation.length ? 'text-green-600' : 'text-gray-500'}`}>
                     <span className="mr-1">{passwordValidation.length ? '✓' : '○'}</span> Minim 10 caractere
@@ -225,7 +225,7 @@ export default function RegisterForm() {
               type="password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              className={`auth-input ${formErrors.confirmPassword ? 'border-red-500' : ''}`}
+              className={`appearance-none block w-full px-3 py-2 border ${formErrors.confirmPassword ? 'border-red-500' : 'border-gray-300'} rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm`}
               disabled={isLoading}
             />
             {formErrors.confirmPassword && (
@@ -237,7 +237,9 @@ export default function RegisterForm() {
             <button
               type="submit"
               disabled={isLoading}
-              className="auth-button"
+              className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white ${
+                isLoading ? 'bg-primary-light cursor-not-allowed' : 'bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary'
+              }`}
             >
               {isLoading ? 'Se procesează...' : 'Creează cont'}
             </button>
@@ -248,7 +250,7 @@ export default function RegisterForm() {
       <div className="text-center mt-4">
         <p className="text-sm text-gray-600">
           Ai deja un cont?{' '}
-          <Link href="/login" className="auth-link">
+          <Link href="/auth/login" className="font-medium text-primary hover:text-primary-dark">
             Autentifică-te
           </Link>
         </p>

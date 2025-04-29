@@ -8,12 +8,12 @@ export default function LoginForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
-  const [formErrors, setFormErrors] = useState({});
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   
   const { login, isLoading, error } = useAuth();
 
   const validateForm = () => {
-    const errors = {};
+    const errors: Record<string, string> = {};
     
     if (!email.trim()) {
       errors.email = 'Email-ul este obligatoriu';
@@ -29,14 +29,14 @@ export default function LoginForm() {
     return Object.keys(errors).length === 0;
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     
     if (!validateForm()) {
       return;
     }
     
-    await login(email, password, rememberMe);
+    await login(email, password);
   };
 
   return (
@@ -49,9 +49,9 @@ export default function LoginForm() {
         {error && (
           <div className="mb-4 p-3 bg-red-50 border border-red-300 text-red-800 rounded">
             {error}
-            {error.includes('Email-ul nu a fost verificat') && (
+            {error && error.includes && error.includes('Email-ul nu a fost verificat') && (
               <div className="mt-2">
-                <Link href={`/resend-verification?email=${encodeURIComponent(email)}`} className="font-medium text-primary-dark hover:underline">
+                <Link href={`/auth/resend-verification?email=${encodeURIComponent(email)}`} className="font-medium text-primary-dark hover:underline">
                   Retrimite email-ul de verificare
                 </Link>
               </div>
@@ -72,7 +72,7 @@ export default function LoginForm() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className={`auth-input ${formErrors.email ? 'border-red-500' : ''}`}
+              className={`appearance-none block w-full px-3 py-2 border ${formErrors.email ? 'border-red-500' : 'border-gray-300'} rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm`}
               disabled={isLoading}
               autoComplete="email"
             />
@@ -93,7 +93,7 @@ export default function LoginForm() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className={`auth-input ${formErrors.password ? 'border-red-500' : ''}`}
+              className={`appearance-none block w-full px-3 py-2 border ${formErrors.password ? 'border-red-500' : 'border-gray-300'} rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm`}
               disabled={isLoading}
               autoComplete="current-password"
             />
@@ -118,7 +118,7 @@ export default function LoginForm() {
             </div>
             
             <div className="text-sm">
-              <Link href="/forgot-password" className="auth-link">
+              <Link href="/auth/forgot-password" className="font-medium text-primary hover:text-primary-dark">
                 Ai uitat parola?
               </Link>
             </div>
@@ -128,21 +128,14 @@ export default function LoginForm() {
             <button
               type="submit"
               disabled={isLoading}
-              className="auth-button mt-6"
+              className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white ${
+                isLoading ? 'bg-primary-light cursor-not-allowed' : 'bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary'
+              } mt-6`}
             >
               {isLoading ? 'Se procesează...' : 'Autentificare'}
             </button>
           </div>
         </form>
-      </div>
-      
-      <div className="text-center mt-4">
-        <p className="text-sm text-gray-600">
-          Nu ai un cont?{' '}
-          <Link href="/register" className="auth-link">
-            Înregistrează-te
-          </Link>
-        </p>
       </div>
       
       <div className="mt-10">

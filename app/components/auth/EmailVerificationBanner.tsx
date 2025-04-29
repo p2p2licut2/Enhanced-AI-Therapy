@@ -12,7 +12,7 @@ export default function EmailVerificationBanner() {
   const [isLoading, setIsLoading] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
   const [success, setSuccess] = useState(false);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
   
   // Nu afișăm nimic dacă utilizatorul nu este autentificat sau se încarcă sesiunea
   if (status !== 'authenticated' || !session?.user) {
@@ -29,7 +29,7 @@ export default function EmailVerificationBanner() {
       setIsLoading(true);
       setError(null);
       
-      const response = await fetch('/api/resend-verification', {
+      const response = await fetch('/api/auth/resend-verification', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

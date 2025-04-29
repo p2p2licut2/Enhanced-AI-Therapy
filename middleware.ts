@@ -20,9 +20,15 @@ export default withAuth(
     }
 
     // Protejăm rutele care necesită autentificare
-    const protectedPaths = ['/profile', '/settings', '/conversations'];
+    const protectedPaths = [
+      '/profile', 
+      '/settings', 
+      '/conversations'
+    ];
+    
     const isProtectedPath = protectedPaths.some(path => 
-      req.nextUrl.pathname.startsWith(path)
+      req.nextUrl.pathname === path || 
+      req.nextUrl.pathname.startsWith(`${path}/`)
     );
 
     if (isProtectedPath && !isAuthenticated) {
@@ -33,18 +39,39 @@ export default withAuth(
     }
 
     // Verificare pentru rute admin
-    if (req.nextUrl.pathname.startsWith('/admin') && 
-        token?.role !== 'ADMIN') {
+    const adminPaths = ['/admin'];
+    
+    const isAdminPath = adminPaths.some(path => 
+      req.nextUrl.pathname === path || 
+      req.nextUrl.pathname.startsWith(`${path}/`)
+    );
+    
+    if (isAdminPath && (!isAuthenticated || token?.role !== 'ADMIN')) {
       // Redirecționăm utilizatorii non-admin către pagina principală
       return NextResponse.redirect(new URL('/', req.url));
+    }
+
+    // Verificare pentru email verificat
+    const requiresVerifiedEmail = [
+      '/settings/billing',
+      '/settings/subscription'
+    ];
+    
+    const needsVerifiedEmail = requiresVerifiedEmail.some(path => 
+      req.nextUrl.pathname === path || 
+      req.nextUrl.pathname.startsWith(`${path}/`)
+    );
+    
+    if (needsVerifiedEmail && isAuthenticated && !token.emailVerified) {
+      // Redirecționăm către o pagină de avertizare pentru verificarea email-ului
+      return NextResponse.redirect(new URL('/auth/verify-request', req.url));
     }
 
     return NextResponse.next();
   },
   {
     callbacks: {
-      // Returnăm true pentru a nu executa middleware-ul pentru anumite rute
-      // De exemplu, nu verificăm autentificarea pentru pagina principală sau resurse statice
+      // Returnăm true pentru a nu activa middleware-ul pentru rute publice
       authorized: () => true,
     },
   }

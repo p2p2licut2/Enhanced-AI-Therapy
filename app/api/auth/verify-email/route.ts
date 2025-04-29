@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { prisma } from '@/lib/db';
 import { AuditService } from '@/app/lib/services/audit-service';
-import { validateToken } from '@/app/lib/auth/utils';
+import { emailService } from '@/app/lib/services/email-service';
 
 // Schema de validare pentru verificarea email-ului
 const verifyEmailSchema = z.object({
@@ -40,7 +40,53 @@ export async function POST(request: NextRequest) {
     
     try {
       // Căutăm token-ul în baza de date
-      const verificationToken = await validateToken(token, 'EMAIL_VERIFICATION');
+      const verificationToken = await prisma.verificationToken.findFirst({
+        where: {
+          token,
+          type: 'EMAIL_VERIFICATION',
+          expires: { gt: new Date() },
+        },
+        include: {
+          user: true,
+        },
+      });
+      
+      if (!verificationToken) {
+        // Logăm tentativa de folosire a unui token invalid
+        await AuditService.log({
+          action: 'EMAIL_VERIFICATION_INVALID_TOKEN',
+          details: `Token: ${token.slice(0, 6)}...`,
+          ipAddress,
+          userAgent,
+        });
+        
+        return NextResponse.json(
+          { error: 'Token-ul de verificare este invalid sau a expirat.' },
+          { status: 400 }
+        );
+      }
+      
+      // Verificăm dacă email-ul este deja verificat
+      if (verificationToken.user.emailVerified) {
+        // Ștergem token-ul folosit
+        await prisma.verificationToken.delete({
+          where: { id: verificationToken.id },
+        });
+        
+        // Logăm tentativa pentru un email deja verificat
+        await AuditService.log({
+          userId: verificationToken.userId,
+          action: 'EMAIL_VERIFICATION_ALREADY_VERIFIED',
+          details: `Email: ${verificationToken.user.email}`,
+          ipAddress,
+          userAgent,
+        });
+        
+        return NextResponse.json({ 
+          success: true,
+          message: 'Acest email a fost deja verificat. Te poți autentifica cu contul tău.',
+        });
+      }
       
       // Actualizăm starea utilizatorului
       await prisma.user.update({
@@ -57,13 +103,26 @@ export async function POST(request: NextRequest) {
       await AuditService.log({
         userId: verificationToken.userId,
         action: 'EMAIL_VERIFICATION_SUCCESS',
+        details: `Email: ${verificationToken.user.email}`,
         ipAddress,
         userAgent,
       });
       
+      // Trimitem opțional un email de confirmare/bun venit
+      try {
+        const userName = verificationToken.user.name || 
+                        `${verificationToken.user.firstName || ''} ${verificationToken.user.lastName || ''}`.trim();
+        
+        // Aici putem adăuga trimiterea unui email de bun venit
+        // await emailService.sendWelcomeEmail(verificationToken.user.email, userName);
+      } catch (emailError) {
+        // Continuăm chiar dacă email-ul de bun venit eșuează
+        console.error('Eroare la trimiterea email-ului de bun venit:', emailError);
+      }
+      
       return NextResponse.json({
         success: true,
-        message: 'Email-ul a fost verificat cu succes.',
+        message: 'Email-ul a fost verificat cu succes. Te poți autentifica cu contul tău.',
       });
       
     } catch (error) {
@@ -77,16 +136,8 @@ export async function POST(request: NextRequest) {
         userAgent,
       });
       
-      // Verificăm tipul erorii pentru un răspuns mai specific
-      if (error instanceof Error && error.message === 'INVALID_TOKEN') {
-        return NextResponse.json(
-          { error: 'Token-ul de verificare este invalid sau a expirat.' },
-          { status: 400 }
-        );
-      }
-      
       return NextResponse.json(
-        { error: 'A apărut o eroare la verificarea email-ului. Încercați din nou.' },
+        { error: 'A apărut o eroare la verificarea email-ului. Încearcă din nou.' },
         { status: 500 }
       );
     }

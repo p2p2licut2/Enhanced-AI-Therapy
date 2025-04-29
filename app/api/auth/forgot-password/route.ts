@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { prisma } from '@/lib/db';
 import { AuditService } from '@/app/lib/services/audit-service';
@@ -12,7 +12,7 @@ const forgotPasswordSchema = z.object({
   email: z.string().email('Email invalid'),
 });
 
-export async function POST(request) {
+export async function POST(request: NextRequest) {
   try {
     // Extragem informații despre client pentru logging
     const ipAddress = request.headers.get('x-forwarded-for') || 
