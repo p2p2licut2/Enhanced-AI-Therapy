@@ -1,0 +1,73 @@
+/* app/styles/design-system/_spacing.css */
+/* 
+ * Sistemul de spațiere pentru Terapie AI
+ * Definește:
+ * - Unități de spațiere consistente
+ * - Margini și padding standard
+ * - Dimensiuni pentru componentele comune
+ */
+
+ :root {
+    /* Unități de spațiere de bază */
+    --spacing-xs: 0.25rem;   /* 4px */
+    --spacing-sm: 0.5rem;    /* 8px */
+    --spacing-md: 0.75rem;   /* 12px */
+    --spacing-base: 1rem;    /* 16px */
+    --spacing-lg: 1.5rem;    /* 24px */
+    --spacing-xl: 2rem;      /* 32px */
+    --spacing-2xl: 3rem;     /* 48px */
+    --spacing-3xl: 4rem;     /* 64px */
+    
+    /* Spații predefinite pentru componente */
+    --spacing-card-padding: var(--spacing-lg);
+    --spacing-section-padding: var(--spacing-xl);
+    --spacing-item-gap: var(--spacing-sm);
+    
+    /* Layout */
+    --container-padding: var(--spacing-md);
+    --container-max-width: 768px;
+    
+    /* Înălțimi standard */
+    --header-height: 60px;
+    --input-height: 50px;
+    --input-height-min: 24px;
+    --input-height-max: 120px;
+    
+    /* Border-radius */
+    --border-radius-sm: 4px;
+    --border-radius-md: 8px;
+    --border-radius-lg: 12px;
+    --border-radius-xl: 16px;
+    --border-radius-pill: 999px;
+    --border-radius-circle: 50%;
+    
+    /* Input padding */
+    --input-padding-x: 0.75rem;
+    --input-padding-y: 0.75rem;
+    
+    /* Dimensiunea avatar */
+    --avatar-size-sm: 36px;
+    --avatar-size-md: 40px;
+    --avatar-size-lg: 64px;
+    --avatar-size-xl: 80px;
+    --avatar-size-2xl: 100px;
+    
+    /* Width pentru butoane și controale */
+    --control-size-sm: 24px;
+    --control-size-md: 32px;
+    --control-size-lg: 40px;
+    
+    /* Border */
+    --border-width: 1px;
+    --border-width-thick: 2px;
+    --border-width-thicker: 3px;
+  }
+  
+  /* Media queries pentru layout responsiv */
+  @media (max-width: 640px) {
+    :root {
+      --spacing-lg: 1.25rem;
+      --spacing-xl: 1.5rem;
+      --container-padding: var(--spacing-sm);
+    }
+  }

@@ -2,12 +2,12 @@
 
 import { useState, useEffect } from 'react';
 import { AppProvider } from './contexts/AppContext';
-import Chat from './components/Chat';
-import Header from './components/Header';
-import LeftMenu from './components/LeftMenu';
-import TherapistSelector from './components/TherapistSelector';
-import InstallPrompt from './components/InstallPrompt';
-import WelcomePage from './components/WelcomePage';
+import Chat from './components/Chat/Chat';
+import Header from './components/Header/Header';
+import LeftMenu from './components//LeftMenu/LeftMenu';
+import TherapistSelector from './components/TherapistSelector/TherapistSelector';
+import InstallPrompt from './components/InstallPrompt/InstallPrompt';
+import WelcomePage from './components/WelcomePage/WelcomePage';
 import { useApp } from './contexts/AppContext';
 
 // Wrapper component that uses the AppContext

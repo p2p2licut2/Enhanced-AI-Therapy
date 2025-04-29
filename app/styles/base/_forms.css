@@ -1,0 +1,221 @@
+/* app/styles/base/_forms.css */
+/*
+ * Stiluri de bază pentru formulare, input-uri și controale
+ * pentru aplicația Terapie AI
+ */
+
+/* Input-uri */
+input,
+textarea,
+select {
+  font-family: var(--font-family-primary);
+  font-size: var(--font-size-md);
+  color: var(--color-text);
+  background-color: var(--color-background-light);
+  border: var(--border-width) solid var(--color-gray-300);
+  border-radius: var(--border-radius-md);
+  padding: var(--input-padding-y) var(--input-padding-x);
+  width: 100%;
+  transition: border-color var(--transition-standard), box-shadow var(--transition-standard);
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px var(--color-primary-light);
+}
+
+/* Textarea specifice */
+textarea {
+  min-height: var(--input-height-min);
+  max-height: var(--input-height-max);
+  overflow-y: auto;
+}
+
+/* Buton general */
+button,
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-family-primary);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-md);
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border-radius: var(--border-radius-md);
+  transition: all var(--transition-standard);
+  cursor: pointer;
+  text-align: center;
+  border: none;
+}
+
+/* Variații de butoane */
+.button-primary {
+  background-color: var(--color-primary);
+  color: white;
+}
+
+.button-primary:hover {
+  background-color: var(--color-primary-dark);
+}
+
+.button-secondary {
+  background-color: var(--color-secondary);
+  color: var(--color-text);
+}
+
+.button-secondary:hover {
+  background-color: var(--color-secondary-dark);
+}
+
+.button-accent {
+  background-color: var(--color-accent);
+  color: white;
+}
+
+.button-accent:hover {
+  background-color: var(--color-accent-dark);
+}
+
+.button-outline {
+  background-color: transparent;
+  border: var(--border-width) solid var(--color-primary);
+  color: var(--color-primary);
+}
+
+.button-outline:hover {
+  background-color: var(--color-primary);
+  color: white;
+}
+
+.button-ghost {
+  background-color: transparent;
+  color: var(--color-text);
+}
+
+.button-ghost:hover {
+  background-color: var(--color-gray-200);
+}
+
+/* Stări buton */
+button:disabled,
+.button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Mărimi buton */
+.button-sm {
+  font-size: var(--font-size-sm);
+  padding: var(--spacing-xs) var(--spacing-md);
+}
+
+.button-lg {
+  font-size: var(--font-size-lg);
+  padding: var(--spacing-md) var(--spacing-xl);
+}
+
+/* Buton Icon */
+.button-icon {
+  width: var(--control-size-md);
+  height: var(--control-size-md);
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--border-radius-circle);
+}
+
+.button-icon-sm {
+  width: var(--control-size-sm);
+  height: var(--control-size-sm);
+}
+
+.button-icon-lg {
+  width: var(--control-size-lg);
+  height: var(--control-size-lg);
+}
+
+/* Input group */
+.input-group {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-bottom: var(--spacing-md);
+}
+
+.input-group > input {
+  flex: 1;
+}
+
+/* Form layout utilities */
+.form-row {
+  display: flex;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+}
+
+.form-column {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.form-label {
+  display: block;
+  margin-bottom: var(--spacing-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+}
+
+.form-helper {
+  display: block;
+  margin-top: var(--spacing-xs);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-light);
+}
+
+/* Stiluri pentru formularele din aplicație */
+.input-container {
+  background-color: var(--color-input-bg);
+  border-radius: var(--border-radius-xl);
+  padding: var(--spacing-sm);
+  box-shadow: var(--shadow-input);
+  margin: var(--spacing-md);
+  margin-bottom: var(--spacing-sm);
+}
+
+.input-grid {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--spacing-md);
+  align-items: center;
+}
+
+.send-button {
+  width: var(--control-size-md);
+  height: var(--control-size-md);
+  border-radius: var(--border-radius-circle);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  padding: 0;
+  background-color: var(--color-accent);
+  transition: background-color var(--transition-standard);
+  margin-right: 4px;
+  margin-left: 8px;
+}
+
+.send-button:hover {
+  background-color: var(--color-accent-dark);
+}
+
+.send-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background-color: var(--color-gray-400);
+}

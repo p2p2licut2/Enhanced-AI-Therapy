@@ -1,0 +1,40 @@
+/* app/styles/design-system/_shadows.css */
+/* 
+ * Sistemul de umbre și efecte pentru Terapie AI
+ * Definește:
+ * - Umbre consistente pentru elevație
+ * - Efecte pentru hover și focus
+ * - Umbre pentru diverse componente
+ */
+
+ :root {
+    /* Umbre de bază pentru elevație */
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 4px 12px rgba(0, 0, 0, 0.1);
+    --shadow-xl: 0 10px 25px rgba(0, 0, 0, 0.2);
+    
+    /* Umbre specifice pentru componente */
+    --shadow-input: var(--shadow-sm);
+    --shadow-card: var(--shadow-md);
+    --shadow-dropdown: var(--shadow-lg);
+    --shadow-modal: var(--shadow-xl);
+    --shadow-menu: 2px 0 10px rgba(0, 0, 0, 0.1);
+    
+    /* Umbre pentru hover states */
+    --shadow-hover: 0 8px 20px rgba(0, 0, 0, 0.08);
+    --shadow-hover-light: 0 4px 12px rgba(0, 0, 0, 0.08);
+    
+    /* Umbre pentru componente specifice */
+    --shadow-avatar: 0 2px 10px rgba(0, 0, 0, 0.1);
+    --shadow-button: 0 2px 4px rgba(0, 0, 0, 0.05);
+    --shadow-raised: 0 12px 28px rgba(0, 0, 0, 0.12);
+    
+    /* Umbre pentru terapeuti - pentru personalizarea viitoare */
+    --shadow-therapist-card: 0 4px 10px rgba(0, 0, 0, 0.05);
+    --shadow-therapist-card-hover: 0 8px 20px rgba(0, 0, 0, 0.08);
+    --shadow-therapist-card-active: 0 8px 20px rgba(210, 163, 138, 0.2);
+    
+    /* Blur effect pentru overlay-uri */
+    --backdrop-blur: blur(2px);
+  }

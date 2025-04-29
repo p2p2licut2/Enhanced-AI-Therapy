@@ -3,7 +3,7 @@
 import React, { useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { Therapist } from '@/app/types';
-import FocusTrap from '../utils/FocusTrap';
+import FocusTrap from '../../utils/FocusTrap';
 
 interface TherapistProfileModalProps {
   therapist: Therapist;
