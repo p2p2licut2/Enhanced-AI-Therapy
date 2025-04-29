@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
 
@@ -8,11 +8,44 @@ import { useSession } from 'next-auth/react';
  * Componentă pentru afișarea unui banner de notificare pentru utilizatorii neconfirmați
  */
 export default function EmailVerificationBanner() {
-  const { data: session, status } = useSession();
+  const { data: session, status, update } = useSession();
   const [isLoading, setIsLoading] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isVerified, setIsVerified] = useState<boolean | null>(null);
+  
+  // Verificăm direct în baza de date dacă email-ul este verificat pentru a evita inconsistențele
+  useEffect(() => {
+    if (status === 'authenticated' && session?.user?.email) {
+      const checkEmailVerification = async () => {
+        try {
+          const response = await fetch('/api/auth/check-verification', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ email: session.user.email }),
+          });
+          
+          if (response.ok) {
+            const data = await response.json();
+            console.log('Verificare email direct din baza de date:', data);
+            setIsVerified(data.isVerified);
+            
+            // Actualizăm sesiunea dacă există o discrepanță
+            if (data.isVerified && !session.user.emailVerified) {
+              update(); // Actualizează sesiunea pentru a reflecta starea reală
+            }
+          }
+        } catch (err) {
+          console.error('Eroare la verificarea stării email-ului:', err);
+        }
+      };
+      
+      checkEmailVerification();
+    }
+  }, [session?.user?.email, status, session?.user?.emailVerified, update]);
   
   // Nu afișăm nimic dacă utilizatorul nu este autentificat sau se încarcă sesiunea
   if (status !== 'authenticated' || !session?.user) {
@@ -20,7 +53,8 @@ export default function EmailVerificationBanner() {
   }
   
   // Nu afișăm nimic dacă email-ul este deja verificat
-  if (session.user.emailVerified) {
+  // Folosim aici fie starea din sesiune, fie cea obținută direct din baza de date
+  if (session.user.emailVerified || isVerified === true) {
     return null;
   }
   

@@ -19,10 +19,15 @@ export async function POST(request: NextRequest) {
     
     // Parsăm și validăm datele
     const body = await request.json();
+    
+    console.log('Received verify-email request with token:', body.token ? body.token.substring(0, 6) + '...' : 'missing');
+    
     const result = verifyEmailSchema.safeParse(body);
     
     if (!result.success) {
       // Logăm încercarea eșuată
+      console.error('Token validation failed:', result.error.format());
+      
       await AuditService.log({
         action: 'EMAIL_VERIFICATION_VALIDATION_FAILED',
         details: JSON.stringify(result.error.format()),
@@ -39,12 +44,13 @@ export async function POST(request: NextRequest) {
     const { token } = result.data;
     
     try {
+      console.log('Looking up token in database:', token.substring(0, 6) + '...');
+      
       // Căutăm token-ul în baza de date
       const verificationToken = await prisma.verificationToken.findFirst({
         where: {
           token,
           type: 'EMAIL_VERIFICATION',
-          expires: { gt: new Date() },
         },
         include: {
           user: true,
@@ -52,6 +58,8 @@ export async function POST(request: NextRequest) {
       });
       
       if (!verificationToken) {
+        console.error('Token not found in database');
+        
         // Logăm tentativa de folosire a unui token invalid
         await AuditService.log({
           action: 'EMAIL_VERIFICATION_INVALID_TOKEN',
@@ -66,12 +74,50 @@ export async function POST(request: NextRequest) {
         );
       }
       
+      // Verificăm dacă token-ul a expirat
+      if (verificationToken.expires < new Date()) {
+        console.error('Token has expired. Expiry:', verificationToken.expires);
+        
+        // Logăm tentativa de folosire a unui token expirat
+        await AuditService.log({
+          userId: verificationToken.userId,
+          action: 'EMAIL_VERIFICATION_EXPIRED_TOKEN',
+          details: `Token: ${token.slice(0, 6)}..., Expired: ${verificationToken.expires.toISOString()}`,
+          ipAddress,
+          userAgent,
+        });
+        
+        // Încercăm să ștergem token-ul expirat - cu try/catch pentru siguranță
+        try {
+          await prisma.verificationToken.delete({
+            where: { id: verificationToken.id },
+          });
+          console.log('Expired token deleted');
+        } catch (deleteError) {
+          console.warn('Could not delete expired token:', deleteError);
+          // Continuăm execuția chiar dacă ștergerea a eșuat
+        }
+        
+        return NextResponse.json(
+          { error: 'Token-ul de verificare a expirat. Te rugăm să soliciți un token nou.' },
+          { status: 400 }
+        );
+      }
+      
       // Verificăm dacă email-ul este deja verificat
       if (verificationToken.user.emailVerified) {
-        // Ștergem token-ul folosit
-        await prisma.verificationToken.delete({
-          where: { id: verificationToken.id },
-        });
+        console.log('Email already verified for user:', verificationToken.user.email);
+        
+        // Încercăm să ștergem token-ul - cu try/catch pentru siguranță
+        try {
+          await prisma.verificationToken.delete({
+            where: { id: verificationToken.id },
+          });
+          console.log('Token for already verified email deleted');
+        } catch (deleteError) {
+          console.warn('Could not delete token for already verified email:', deleteError);
+          // Continuăm execuția chiar dacă ștergerea a eșuat
+        }
         
         // Logăm tentativa pentru un email deja verificat
         await AuditService.log({
@@ -85,8 +131,12 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ 
           success: true,
           message: 'Acest email a fost deja verificat. Te poți autentifica cu contul tău.',
+          alreadyVerified: true,
+          email: verificationToken.user.email
         });
       }
+      
+      console.log('Updating user emailVerified status for:', verificationToken.user.email);
       
       // Actualizăm starea utilizatorului
       await prisma.user.update({
@@ -94,10 +144,17 @@ export async function POST(request: NextRequest) {
         data: { emailVerified: new Date() },
       });
       
-      // Ștergem token-ul folosit
-      await prisma.verificationToken.delete({
-        where: { id: verificationToken.id },
-      });
+      // Încercăm să ștergem token-ul folosit - cu try/catch pentru a evita eroarea
+      try {
+        await prisma.verificationToken.delete({
+          where: { id: verificationToken.id },
+        });
+        console.log('Verification token deleted successfully');
+      } catch (deleteError) {
+        // Dacă token-ul nu poate fi șters, logăm avertismentul dar continuăm execuția
+        console.warn('Could not delete verification token:', deleteError);
+        // Nu aruncăm eroarea mai departe, permitem fluxului să continue
+      }
       
       // Logăm verificarea reușită
       await AuditService.log({
@@ -123,6 +180,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({
         success: true,
         message: 'Email-ul a fost verificat cu succes. Te poți autentifica cu contul tău.',
+        email: verificationToken.user.email
       });
       
     } catch (error) {

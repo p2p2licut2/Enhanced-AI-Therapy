@@ -4,12 +4,15 @@ import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
+import { signIn } from 'next-auth/react';
 
 export default function VerifyEmailPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
   const [message, setMessage] = useState<string>('Verificăm token-ul tău...');
+  const [isAlreadyVerified, setIsAlreadyVerified] = useState(false);
+  const [email, setEmail] = useState<string | null>(null);
 
   useEffect(() => {
     const verifyToken = async () => {
@@ -22,6 +25,8 @@ export default function VerifyEmailPage() {
           return;
         }
         
+        console.log('Verificăm token-ul:', token.substring(0, 6) + '...');
+        
         // Trimitem cererea către API pentru a verifica token-ul
         const response = await fetch('/api/auth/verify-email', {
           method: 'POST',
@@ -32,14 +37,35 @@ export default function VerifyEmailPage() {
         });
 
         const data = await response.json();
+        console.log('Răspuns verificare email:', data);
 
         if (response.ok) {
           setStatus('success');
           setMessage(data.message || 'Email-ul tău a fost verificat cu succes! Acum te poți autentifica.');
           
-          // După 3 secunde, redirecționăm către pagina de login
+          // Setăm dacă email-ul a fost deja verificat
+          if (data.alreadyVerified) {
+            setIsAlreadyVerified(true);
+          }
+          
+          // Salvăm email-ul dacă este disponibil
+          if (data.email) {
+            setEmail(data.email);
+          }
+          
+          // După un scurt delay, redirecționăm către pagina de login
+          // sau autentificăm direct utilizatorul dacă email-ul este disponibil
           setTimeout(() => {
-            router.push('/auth/login');
+            if (email) {
+              // Încercăm să autentificăm utilizatorul automat
+              // (utilizatorul va trebui să-și introducă parola)
+              signIn('credentials', { 
+                email, 
+                callbackUrl: '/' 
+              });
+            } else {
+              router.push('/auth/login');
+            }
           }, 3000);
         } else {
           setStatus('error');
@@ -53,7 +79,7 @@ export default function VerifyEmailPage() {
     };
 
     verifyToken();
-  }, [searchParams, router]);
+  }, [searchParams, router, email]);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -90,7 +116,9 @@ export default function VerifyEmailPage() {
                 </svg>
               </div>
               
-              <h3 className="text-lg font-medium text-gray-900 mb-2">Verificare reușită!</h3>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">
+                {isAlreadyVerified ? 'Email deja verificat' : 'Verificare reușită!'}
+              </h3>
               <p className="text-center text-gray-700 mb-4">{message}</p>
               <p className="text-sm text-gray-500">Vei fi redirecționat către pagina de autentificare...</p>
               

@@ -13,6 +13,7 @@ import { useSession } from 'next-auth/react';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import EmailVerificationBanner from './components/auth/EmailVerificationBanner';
+import SyncController from './components/SyncController';
 
 // Wrapper component that uses the AppContext
 function AppContent() {
@@ -82,7 +83,7 @@ function AppContent() {
           <WelcomePage />
         </div>
       ) : (
-<main className="flex min-h-screen overflow-hidden p-0 m-0">
+        <main className="flex min-h-screen overflow-hidden p-0 m-0">
           <LeftMenu />
           <TherapistSelector />
           <div className="app-container">
@@ -134,6 +135,8 @@ export default function Home() {
 
   return (
     <AppProvider>
+      {/* Adăugăm SyncController pentru a sincroniza conversațiile între sesiuni */}
+      <SyncController />
       <AppContent />
     </AppProvider>
   );

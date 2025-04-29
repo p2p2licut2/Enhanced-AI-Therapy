@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { createUser, createEmailVerificationToken } from '@/app/lib/auth/utils';
 import { AuditService } from '@/app/lib/services/audit-service';
+import { emailService } from '@/app/lib/services/email-service';
+import { RateLimiter } from '@/app/lib/auth/rate-limiter';
 import { prisma } from '@/lib/db';
 
 // Schema de validare pentru datele de înregistrare
@@ -9,7 +11,7 @@ const registerSchema = z.object({
   email: z.string().email('Email invalid'),
   password: z
     .string()
-    .min(8, 'Parola trebuie să aibă cel puțin 8 caractere')
+    .min(10, 'Parola trebuie să aibă cel puțin 10 caractere')
     .regex(/[A-Z]/, 'Parola trebuie să conțină cel puțin o literă mare')
     .regex(/[a-z]/, 'Parola trebuie să conțină cel puțin o literă mică')
     .regex(/[0-9]/, 'Parola trebuie să conțină cel puțin o cifră')
@@ -40,7 +42,10 @@ export async function POST(request: NextRequest) {
       });
       
       return NextResponse.json(
-        { error: 'Datele furnizate sunt invalide', issues: result.error.format() },
+        { 
+          error: 'Datele furnizate sunt invalide', 
+          issues: result.error.format() 
+        },
         { status: 400 }
       );
     }
@@ -48,6 +53,34 @@ export async function POST(request: NextRequest) {
     const { email, password, firstName, lastName } = result.data;
     
     try {
+      // Verificăm limitarea ratei pentru prevenirea abuzurilor
+      const rateLimit = await RateLimiter.checkLimit({
+        email,
+        ipAddress,
+        action: 'REGISTER',
+        maxAttempts: 5, // Maxim 5 încercări de înregistrare
+        windowHours: 24, // În 24 de ore
+      });
+      
+      if (!rateLimit.allowed) {
+        // Logăm tentativa limitată
+        await AuditService.log({
+          action: 'REGISTER_RATE_LIMITED',
+          details: `Email: ${email}, IP: ${ipAddress}`,
+          ipAddress,
+          userAgent,
+        });
+        
+        return NextResponse.json(
+          { 
+            error: RateLimiter.formatLimitMessage(rateLimit.nextAttemptAt),
+            rateLimited: true,
+            nextAttemptAt: rateLimit.nextAttemptAt
+          },
+          { status: 429 }
+        );
+      }
+      
       // Verificăm dacă utilizatorul există deja
       const existingUser = await prisma.user.findUnique({
         where: { email: email.toLowerCase() },
@@ -79,6 +112,13 @@ export async function POST(request: NextRequest) {
       // Generăm tokenul de verificare email
       const verificationToken = await createEmailVerificationToken(user.id);
       
+      // Trimitem email-ul de verificare
+      await emailService.sendVerificationEmail(
+        user.email,
+        `${firstName} ${lastName}`.trim(),
+        verificationToken.token
+      );
+      
       // Logăm înregistrarea reușită
       await AuditService.log({
         userId: user.id,
@@ -87,14 +127,16 @@ export async function POST(request: NextRequest) {
         ipAddress,
         userAgent,
       });
-      
-      // Aici ar trebui să trimitem email-ul de verificare
-      // Implementarea trimiterii email-ului va fi adăugată în pașii următori
 
       // Returnăm succes fără a include date sensibile
       return NextResponse.json({ 
         success: true,
-        message: 'Utilizator înregistrat cu succes. Verificați email-ul pentru confirmarea contului.'
+        message: 'Utilizator înregistrat cu succes. Verificați email-ul pentru confirmarea contului.',
+        user: {
+          id: user.id,
+          email: user.email,
+          name: `${firstName} ${lastName}`.trim(),
+        }
       });
       
     } catch (error) {
@@ -117,7 +159,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Eroare la procesarea cererii:', error);
     return NextResponse.json(
-      { error: 'A apărut o eroare la procesarea cererii' },
+      { error: 'A apărut o eroare la procesarea cererii.' },
       { status: 500 }
     );
   }

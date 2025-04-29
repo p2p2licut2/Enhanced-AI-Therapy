@@ -6,15 +6,19 @@ import nodemailer from 'nodemailer';
 class EmailService {
   constructor() {
     // Inițializăm transportul de email
-    this.transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST,
-      port: parseInt(process.env.SMTP_PORT || '587', 10),
-      secure: process.env.SMTP_SECURE === 'true',
-      auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASSWORD,
-      },
-    });
+    if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASSWORD) {
+      this.transporter = nodemailer.createTransport({
+        host: process.env.SMTP_HOST,
+        port: parseInt(process.env.SMTP_PORT || '587', 10),
+        secure: process.env.SMTP_SECURE === 'true',
+        auth: {
+          user: process.env.SMTP_USER,
+          pass: process.env.SMTP_PASSWORD,
+        },
+      });
+    } else {
+      console.warn('SMTP configuration incomplete. Email service will not send real emails.');
+    }
     
     this.from = process.env.SMTP_FROM || 'noreply@terapie-ai.ro';
   }
@@ -30,39 +34,86 @@ class EmailService {
    */
   async sendEmail({ to, subject, text, html }) {
     try {
+      console.log('Sending email to:', to);
+      console.log('Email subject:', subject);
+      console.log('Environment:', process.env.NODE_ENV);
+      console.log('USE_ETHEREAL setting:', process.env.USE_ETHEREAL);
+      
       // Verificăm dacă suntem în mediul de dezvoltare și utilizăm Ethereal pentru testare
       if (process.env.NODE_ENV === 'development' && process.env.USE_ETHEREAL === 'true') {
-        // Creăm un cont de test Ethereal pentru a vizualiza email-urile în browser
-        const testAccount = await nodemailer.createTestAccount();
+        console.log('Using Ethereal for email testing');
         
-        // Creăm un transporter Ethereal
-        const testTransporter = nodemailer.createTransport({
-          host: 'smtp.ethereal.email',
-          port: 587,
-          secure: false,
-          auth: {
-            user: testAccount.user,
-            pass: testAccount.pass,
-          },
-        });
+        try {
+          // Creăm un cont de test Ethereal pentru a vizualiza email-urile în browser
+          const testAccount = await nodemailer.createTestAccount();
+          console.log('Created Ethereal test account:', testAccount.user);
+          
+          // Creăm un transporter Ethereal
+          const testTransporter = nodemailer.createTransport({
+            host: 'smtp.ethereal.email',
+            port: 587,
+            secure: false,
+            auth: {
+              user: testAccount.user,
+              pass: testAccount.pass,
+            },
+          });
+          
+          // Trimitem email-ul folosind Ethereal
+          const info = await testTransporter.sendMail({
+            from: `Terapie AI <${this.from}>`,
+            to,
+            subject,
+            text,
+            html,
+          });
+          
+          // Returnăm URL-ul de previzualizare pentru email
+          const previewUrl = nodemailer.getTestMessageUrl(info);
+          console.log(`Email sent successfully. Preview URL: ${previewUrl}`);
+          return {
+            success: true,
+            messageId: info.messageId,
+            previewUrl,
+          };
+        } catch (etherealError) {
+          console.error('Error with Ethereal email:', etherealError);
+          throw etherealError;
+        }
+      } else if (process.env.NODE_ENV === 'development') {
+        // În dezvoltare, dacă nu folosim Ethereal, doar logăm conținutul
+        console.log('Development mode without Ethereal - logging email content:');
+        console.log('To:', to);
+        console.log('Subject:', subject);
+        console.log('Text content:', text);
+        console.log('HTML content length:', html ? html.length : 0);
         
-        // Trimitem email-ul folosind Ethereal
-        const info = await testTransporter.sendMail({
-          from: `Terapie AI <${this.from}>`,
-          to,
-          subject,
-          text,
-          html,
-        });
-        
-        // Returnăm URL-ul de previzualizare pentru email
-        console.log(`Email trimis: ${nodemailer.getTestMessageUrl(info)}`);
         return {
           success: true,
-          messageId: info.messageId,
-          previewUrl: nodemailer.getTestMessageUrl(info),
+          messageId: 'dev-mode-' + Date.now(),
+          previewUrl: null,
+          devMode: true,
         };
       }
+      
+      // Verificăm dacă transporterul a fost configurat
+      if (!this.transporter) {
+        console.error('Email transporter not configured');
+        return {
+          success: false,
+          error: 'Email service not configured',
+          devMode: process.env.NODE_ENV === 'development'
+        };
+      }
+      
+      // Verificăm configurarea transporterului
+      console.log('SMTP Configuration:', {
+        host: process.env.SMTP_HOST,
+        port: process.env.SMTP_PORT,
+        secure: process.env.SMTP_SECURE,
+        user: process.env.SMTP_USER ? '***configured***' : '***missing***',
+        from: this.from,
+      });
       
       // Trimitem email-ul folosind transporterul configurat
       const info = await this.transporter.sendMail({
@@ -73,21 +124,22 @@ class EmailService {
         html,
       });
       
+      console.log('Email sent successfully with configured transporter:', info.messageId);
       return {
         success: true,
         messageId: info.messageId,
       };
     } catch (error) {
-      console.error('Eroare la trimiterea email-ului:', error);
+      console.error('Error sending email:', error);
       return {
         success: false,
         error: error.message,
       };
     }
   }
-  
-  
 
+
+  
   /**
    * Trimite un email de verificare
    * @param {string} email - Adresa de email
@@ -97,7 +149,7 @@ class EmailService {
    */
   async sendVerificationEmail(email, name, token) {
     const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
-    const verificationLink = `${baseUrl}/verify?token=${token}`;
+    const verificationLink = `${baseUrl}/auth/verify?token=${token}`;
     
     const subject = 'Verifică-ți adresa de email - Terapie AI';
     
@@ -109,7 +161,7 @@ class EmailService {
       Te rugăm să confirmi adresa de email accesând următorul link:
       ${verificationLink}
       
-      Acest link va expira în 24 de ore.
+      Acest link va expira în 48 de ore.
       
       Dacă nu ai solicitat acest email, te rugăm să îl ignori.
       
@@ -120,7 +172,7 @@ class EmailService {
     // Generăm unsubscribe link pentru GDPR compliance
     const unsubscribeLink = `${baseUrl}/unsubscribe?email=${encodeURIComponent(email)}&type=verification`;
 
-const html = `
+    const html = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
         <div style="text-align: center; margin-bottom: 20px;">
           <img src="${baseUrl}/logo.png" alt="Terapie AI" style="max-width: 120px;">
@@ -147,7 +199,7 @@ const html = `
           </p>
           
           <p style="font-size: 14px; color: #666;">
-            Acest link va expira în 24 de ore.
+            Acest link va expira în 48 de ore.
           </p>
           
           <p style="margin-top: 30px; margin-bottom: 0;">
@@ -178,17 +230,17 @@ const html = `
       html,
     });
   }
-  
-/**
+
+  /**
    * Trimite un email pentru resetarea parolei
    * @param {string} email - Adresa de email
    * @param {string} name - Numele utilizatorului
    * @param {string} token - Token-ul de resetare
    * @returns {Promise<Object>} - Rezultatul trimiterii email-ului
    */
-async sendPasswordResetEmail(email, name, token) {
+  async sendPasswordResetEmail(email, name, token) {
     const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
-    const resetLink = `${baseUrl}/reset-password?token=${token}`;
+    const resetLink = `${baseUrl}/auth/reset-password?token=${token}`;
     
     // Generăm unsubscribe link pentru GDPR compliance
     const unsubscribeLink = `${baseUrl}/unsubscribe?email=${encodeURIComponent(email)}&type=security`;
@@ -273,13 +325,13 @@ async sendPasswordResetEmail(email, name, token) {
     });
   }
 
- /**
+  /**
    * Trimite un email de confirmare după modificarea parolei
    * @param {string} email - Adresa de email
    * @param {string} name - Numele utilizatorului
    * @returns {Promise<Object>} - Rezultatul trimiterii email-ului
    */
- async sendPasswordChangedEmail(email, name) {
+  async sendPasswordChangedEmail(email, name) {
     const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
     
     // Generăm unsubscribe link pentru GDPR compliance
@@ -293,7 +345,7 @@ async sendPasswordResetEmail(email, name, token) {
       Parola contului tău Terapie AI a fost modificată cu succes.
       
       Dacă nu tu ai făcut această modificare, te rugăm să ne contactezi imediat la adresa de email support@terapie-ai.ro sau să-ți resetezi parola accesând:
-      ${baseUrl}/forgot-password
+      ${baseUrl}/auth/forgot-password
       
       Cu stimă,
       Echipa Terapie AI
@@ -322,7 +374,7 @@ async sendPasswordResetEmail(email, name, token) {
           </div>
           
           <div style="text-align: center; margin: 30px 0;">
-            <a href="${baseUrl}/forgot-password" style="background-color: #d2a38a; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: bold;">
+            <a href="${baseUrl}/auth/forgot-password" style="background-color: #d2a38a; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: bold;">
               Resetează parola
             </a>
           </div>
@@ -354,7 +406,6 @@ async sendPasswordResetEmail(email, name, token) {
       html,
     });
   }
-  
 }
 
 // Exportăm o instanță singleton a serviciului

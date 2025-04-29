@@ -74,10 +74,13 @@ export async function createUser({
 
 /**
  * Generează un token de verificare email
+ * @param userId ID-ul utilizatorului
+ * @param expiresInHours Perioada de expirare în ore (default: 48 ore)
  */
-export async function createEmailVerificationToken(userId: string) {
+export async function createEmailVerificationToken(userId: string, expiresInHours: number = 48) {
   const token = generateToken();
-  const expires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 ore
+  // A fost modificat de la 24 ore la 48 ore (sau valoarea parametrului)
+  const expires = new Date(Date.now() + expiresInHours * 60 * 60 * 1000);
 
   // Ștergem orice token anterior
   await prisma.verificationToken.deleteMany({
@@ -102,10 +105,12 @@ export async function createEmailVerificationToken(userId: string) {
 
 /**
  * Generează un token pentru resetarea parolei
+ * @param userId ID-ul utilizatorului
+ * @param expiresInHours Perioada de expirare în ore (default: 1 oră)
  */
-export async function createPasswordResetToken(userId: string) {
+export async function createPasswordResetToken(userId: string, expiresInHours: number = 1) {
   const token = generateToken();
-  const expires = new Date(Date.now() + 60 * 60 * 1000); // 1 oră
+  const expires = new Date(Date.now() + expiresInHours * 60 * 60 * 1000);
 
   // Ștergem orice token anterior
   await prisma.verificationToken.deleteMany({

@@ -93,7 +93,8 @@ export const authOptions: NextAuthOptions = {
             email: user.email,
             name: user.name,
             image: user.image,
-            role: user.role
+            role: user.role,
+            emailVerified: user.emailVerified
           };
         } catch (error) {
           console.error('Auth error:', error);
@@ -106,13 +107,45 @@ export const authOptions: NextAuthOptions = {
   
   // Callbacks pentru personalizarea fluxului de autentificare
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger, session }) {
+      // Adăugăm date adiționale la token când se creează prima dată
       if (user) {
-        // Adăugăm date adiționale la token
         token.id = user.id;
         token.role = user.role;
-        token.emailVerified = user.emailVerified;
+        token.emailVerified = user.emailVerified ? true : false;
       }
+
+      // Actualizăm token-ul când sesiunea este actualizată
+      if (trigger === "update" && session) {
+        // Permitem actualizarea emailVerified prin sesiune
+        if (session.emailVerified !== undefined) {
+          token.emailVerified = session.emailVerified;
+        }
+        
+        // Actualizăm și alte câmpuri dacă sunt prezente
+        if (session.name) token.name = session.name;
+        if (session.email) token.email = session.email;
+        if (session.role) token.role = session.role;
+      }
+
+      // Verificăm periodic starea email-ului din baza de date
+      if (token.email && (!token.emailVerified || trigger === "update")) {
+        try {
+          // Verificăm direct în baza de date starea actuală
+          const user = await prisma.user.findUnique({
+            where: { email: token.email as string },
+            select: { emailVerified: true }
+          });
+          
+          if (user && user.emailVerified) {
+            // Actualizăm token-ul dacă email-ul este verificat în baza de date
+            token.emailVerified = true;
+          }
+        } catch (error) {
+          console.error('Error checking email verification status:', error);
+        }
+      }
+      
       return token;
     },
     
@@ -121,8 +154,10 @@ export const authOptions: NextAuthOptions = {
         // Adăugăm date adiționale la sesiune
         session.user.id = token.id as string;
         session.user.role = token.role as string;
-        session.user.emailVerified = token.emailVerified ? true : false;
+        session.user.emailVerified = token.emailVerified as boolean;
       }
+      
+      // Adăugăm o funcție de actualizare a sesiunii
       return session;
     },
   },

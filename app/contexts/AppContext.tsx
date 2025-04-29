@@ -3,6 +3,8 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { Therapist, TherapistId, Conversation, Message } from '../types';
 import { v4 as uuidv4 } from 'uuid';
+import { useSession } from 'next-auth/react';
+import { conversationService } from '../lib/services/conversation-service';
 
 // Define therapists data
 const therapists: Record<TherapistId, Therapist> = {
@@ -104,41 +106,96 @@ export const useApp = () => useContext(AppContext);
 
 // Provider component
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const { data: session, status } = useSession();
+  const isAuthenticated = status === 'authenticated';
+
   const [currentTherapistId, setCurrentTherapistId] = useState<TherapistId>('maria');
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [currentConversationId, setCurrentConversationId] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isTherapistSelectorOpen, setIsTherapistSelectorOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   // Welcome page state
   const [showWelcomePage, setShowWelcomePage] = useState<boolean>(true);
   // Titlul pentru conversația neîncepută încă
   const [pendingConversationTitle, setPendingConversationTitle] = useState<string | null>('Începe conversația...');
 
-  // Load conversations from localStorage on initial load
+  // Încarcă conversațiile pentru utilizatorul autentificat
   useEffect(() => {
-    const savedConversations = localStorage.getItem('conversations');
-    if (savedConversations) {
-      // Încărcăm doar conversațiile care au cel puțin un mesaj
-      const parsedConversations = JSON.parse(savedConversations);
-      const validConversations = parsedConversations.filter(
-        (conv: Conversation) => conv.messages && conv.messages.length > 0
-      );
-      
-      // Dacă am eliminat conversații, actualizăm localStorage
-      if (validConversations.length !== parsedConversations.length) {
-        localStorage.setItem('conversations', JSON.stringify(validConversations));
+    const loadUserConversations = async () => {
+      if (isAuthenticated && session?.user?.id) {
+        try {
+          setIsLoading(true);
+          console.log('Loading conversations from API for user:', session.user.id);
+          const userConversations = await conversationService.getConversations();
+          
+          console.log('Loaded conversations:', userConversations.length);
+          setConversations(userConversations);
+        } catch (error) {
+          console.error('Error loading user conversations:', error);
+        } finally {
+          setIsLoading(false);
+        }
+      } else if (status === 'unauthenticated') {
+        // Pentru utilizatorii neautentificați, încercăm să încărcăm din localStorage
+        const loadLocalConversations = () => {
+          try {
+            console.log('Loading conversations from localStorage for unauthenticated user');
+            const savedConversations = localStorage.getItem('conversations');
+            if (savedConversations) {
+              // Încărcăm doar conversațiile care au cel puțin un mesaj
+              const parsedConversations = JSON.parse(savedConversations);
+              const validConversations = parsedConversations.filter(
+                (conv: Conversation) => conv.messages && conv.messages.length > 0
+              );
+              
+              // Dacă am eliminat conversații, actualizăm localStorage
+              if (validConversations.length !== parsedConversations.length) {
+                localStorage.setItem('conversations', JSON.stringify(validConversations));
+              }
+              
+              console.log('Loaded conversations from localStorage:', validConversations.length);
+              setConversations(validConversations);
+            }
+          } catch (error) {
+            console.error('Error loading conversations from localStorage:', error);
+          } finally {
+            setIsLoading(false);
+          }
+        };
+        
+        loadLocalConversations();
       }
-      
-      setConversations(validConversations);
-    }
+    };
     
-    // Check if there was a current conversation
+    loadUserConversations();
+  }, [isAuthenticated, session?.user?.id, status]);
+
+  // Încarcă conversația curentă din localStorage sau ultima conversație
+  useEffect(() => {
+    if (isLoading) return;
+    
+    // Verifică dacă există un ID de conversație salvat
     const savedCurrentConversationId = localStorage.getItem('currentConversationId');
+    
     if (savedCurrentConversationId) {
-      setCurrentConversationId(savedCurrentConversationId);
+      // Verifică dacă conversația există în lista încărcată
+      const conversationExists = conversations.some(conv => conv.id === savedCurrentConversationId);
+      if (conversationExists) {
+        setCurrentConversationId(savedCurrentConversationId);
+      } else if (conversations.length > 0) {
+        // Dacă nu există, setează prima conversație din listă
+        setCurrentConversationId(conversations[0].id);
+      } else {
+        // Dacă nu există conversații, setează null
+        setCurrentConversationId(null);
+      }
+    } else if (conversations.length > 0) {
+      // Dacă nu există un ID salvat, setează prima conversație din listă
+      setCurrentConversationId(conversations[0].id);
     }
-  }, []);
+  }, [conversations, isLoading]);
 
   // Check if we should show the welcome page based on user preference
   useEffect(() => {
@@ -158,11 +215,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       localStorage.setItem('hasSeenWelcome', 'true');
     }
   }, [showWelcomePage]);
-
-  // Update localStorage when conversations change
-  useEffect(() => {
-    localStorage.setItem('conversations', JSON.stringify(conversations));
-  }, [conversations]);
 
   // Update localStorage when current conversation changes
   useEffect(() => {
@@ -189,6 +241,13 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       setMessages([]);
     }
   }, [currentConversationId, conversations]);
+
+  // Salvăm conversațiile în localStorage pentru utilizatorii neautentificați
+  useEffect(() => {
+    if (status === 'unauthenticated' && conversations.length > 0) {
+      localStorage.setItem('conversations', JSON.stringify(conversations));
+    }
+  }, [conversations, status]);
 
   // Get current therapist
   const currentTherapist = therapists[currentTherapistId];
@@ -219,14 +278,18 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   };
 
   // Add a message to the current conversation
-  const addMessage = (message: Message) => {
+  const addMessage = async (message: Message) => {
+    // Actualizăm mesajele în starea locală
     setMessages(prev => [...prev, message]);
     
     // Dacă nu există o conversație curentă și mesajul este de la utilizator
     if (!currentConversationId && message.role === 'user') {
+      const title = generateConversationTitle(message.content);
+      
+      // Creăm o nouă conversație
       const newConversation: Conversation = {
-        id: uuidv4(),
-        title: generateConversationTitle(message.content),
+        id: uuidv4(), // ID temporar, va fi înlocuit de serverul API pentru utilizatorii autentificați
+        title: title,
         therapistId: currentTherapistId,
         messages: [message],
         createdAt: Date.now(),
@@ -234,13 +297,48 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         isFavorite: false
       };
       
-      setConversations(prev => [...prev, newConversation]);
-      setCurrentConversationId(newConversation.id);
+      if (isAuthenticated) {
+        try {
+          // Pentru utilizatorii autentificați, salvăm în baza de date
+          console.log('Creating new conversation in database');
+          
+          const savedConversation = await conversationService.createConversation({
+            title: title,
+            therapistId: currentTherapistId,
+            messages: [message],
+            isFavorite: false
+          });
+          
+          if (savedConversation) {
+            console.log('Conversation created in database:', savedConversation.id);
+            
+            // Actualizăm starea cu conversația salvată (care include ID-ul generat de server)
+            setConversations(prev => [...prev, savedConversation]);
+            setCurrentConversationId(savedConversation.id);
+          } else {
+            // Fallback la localStorage dacă API call-ul eșuează
+            console.log('Falling back to local state for new conversation');
+            setConversations(prev => [...prev, newConversation]);
+            setCurrentConversationId(newConversation.id);
+          }
+        } catch (error) {
+          console.error('Error creating conversation in database:', error);
+          // Fallback la localStorage
+          setConversations(prev => [...prev, newConversation]);
+          setCurrentConversationId(newConversation.id);
+        }
+      } else {
+        // Pentru utilizatorii neautentificați, salvăm doar în starea locală
+        setConversations(prev => [...prev, newConversation]);
+        setCurrentConversationId(newConversation.id);
+      }
+      
       // Când se creează o conversație nouă, nu mai avem nevoie de titlu în așteptare
       setPendingConversationTitle(null);
     } 
     // Actualizăm conversația existentă
     else if (currentConversationId) {
+      // Actualizăm starea locală
       setConversations(prev => 
         prev.map(conv => 
           conv.id === currentConversationId
@@ -252,6 +350,16 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
             : conv
         )
       );
+      
+      if (isAuthenticated) {
+        try {
+          // Pentru utilizatorii autentificați, salvăm și în baza de date
+          console.log('Adding message to conversation in database:', currentConversationId);
+          await conversationService.addMessage(currentConversationId, message);
+        } catch (error) {
+          console.error('Error adding message to conversation in database:', error);
+        }
+      }
     }
   };
 
@@ -267,29 +375,65 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   };
 
   // Load an existing conversation
-  const loadConversation = (conversationId: string) => {
+  const loadConversation = async (conversationId: string) => {
     const conversation = conversations.find(c => c.id === conversationId);
+    
     if (conversation) {
       setCurrentConversationId(conversationId);
       setCurrentTherapistId(conversation.therapistId);
       setPendingConversationTitle(null); // Nu avem nevoie de titlu în așteptare pentru o conversație existentă
       setIsMenuOpen(false);
     }
+    
+    // Pentru utilizatorii autentificați, verificăm dacă sunt actualizări în baza de date
+    if (isAuthenticated && conversation) {
+      try {
+        const freshConversation = await conversationService.getConversation(conversationId);
+        
+        if (freshConversation) {
+          // Actualizăm starea locală cu datele proaspete
+          setConversations(prev => 
+            prev.map(conv => 
+              conv.id === conversationId ? freshConversation : conv
+            )
+          );
+        }
+      } catch (error) {
+        console.error('Error refreshing conversation from database:', error);
+      }
+    }
   };
 
   // Toggle favorite status for a conversation
-  const toggleFavorite = (conversationId: string) => {
-    setConversations(prev => 
-      prev.map(conv => 
-        conv.id === conversationId
-          ? { ...conv, isFavorite: !conv.isFavorite }
-          : conv
-      )
+  const toggleFavorite = async (conversationId: string) => {
+    // Actualizăm starea locală
+    const updatedConversations = conversations.map(conv => 
+      conv.id === conversationId
+        ? { ...conv, isFavorite: !conv.isFavorite }
+        : conv
     );
+    
+    setConversations(updatedConversations);
+    
+    // Obținem starea actualizată pentru conversația specifică
+    const updatedConversation = updatedConversations.find(c => c.id === conversationId);
+    
+    if (!updatedConversation) return;
+    
+    if (isAuthenticated) {
+      try {
+        // Pentru utilizatorii autentificați, actualizăm și în baza de date
+        console.log('Updating favorite status in database:', conversationId, updatedConversation.isFavorite);
+        await conversationService.toggleFavorite(conversationId, updatedConversation.isFavorite);
+      } catch (error) {
+        console.error('Error updating favorite status in database:', error);
+      }
+    }
   };
   
   // Rename a conversation
-  const renameConversation = (conversationId: string, newTitle: string) => {
+  const renameConversation = async (conversationId: string, newTitle: string) => {
+    // Actualizăm starea locală
     setConversations(prev => 
       prev.map(conv => 
         conv.id === conversationId
@@ -297,10 +441,21 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
           : conv
       )
     );
+    
+    if (isAuthenticated) {
+      try {
+        // Pentru utilizatorii autentificați, actualizăm și în baza de date
+        console.log('Renaming conversation in database:', conversationId, newTitle);
+        await conversationService.renameConversation(conversationId, newTitle);
+      } catch (error) {
+        console.error('Error renaming conversation in database:', error);
+      }
+    }
   };
   
   // Delete a conversation
-  const deleteConversation = (conversationId: string) => {
+  const deleteConversation = async (conversationId: string) => {
+    // Actualizăm starea locală
     setConversations(prev => prev.filter(conv => conv.id !== conversationId));
     
     // If we're deleting the current conversation, clear it
@@ -308,6 +463,16 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       setCurrentConversationId(null);
       setMessages([]);
       setPendingConversationTitle('Începe conversația...'); // Resetăm titlul în așteptare
+    }
+    
+    if (isAuthenticated) {
+      try {
+        // Pentru utilizatorii autentificați, ștergem și din baza de date
+        console.log('Deleting conversation from database:', conversationId);
+        await conversationService.deleteConversation(conversationId);
+      } catch (error) {
+        console.error('Error deleting conversation from database:', error);
+      }
     }
   };
 
