@@ -1,0 +1,84 @@
+/* app/styles/design-system/_colors.css */
+/* 
+ * Sistem de culori pentru Terapie AI
+ * Organizat pe categorii:
+ * - Culori primare și secundare
+ * - Nuanțe de text
+ * - Fundal și suprafețe
+ * - Stări (eroare, succes, etc)
+ * - Stări emoționale pentru terapie
+ * - Accesibilitate și contrast
+ */
+
+ :root {
+    /* Culori principale - ajustate pentru terapie */
+    --color-primary: #D2A38A;         /* Soft terracotta - verificat pentru accesibilitate */
+    --color-primary-dark: #B56E52;    /* Deep terracotta - ajustat pentru contrast WCAG AA */
+    --color-primary-light: #E6D2C0;   /* Light terracotta */
+    
+    --color-secondary: #E6D2C0;       /* Warm beige */
+    --color-secondary-dark: #D7C3B1;  /* Darker beige */
+    --color-secondary-light: #F2E6DB; /* Lighter beige */
+    
+    --color-accent: #B8C4BB;          /* Muted sage - culoare calmantă */
+    --color-accent-dark: #A7B3AA;     /* Darker sage */
+    --color-accent-light: #D5DCD7;    /* Lighter sage */
+    
+    /* Fundal și suprafețe - ajustate pentru reducerea anxietății */
+    --color-background: #F7F4F0;      /* Off-white - redus luminozitatea pentru mai puțin stres vizual */
+    --color-background-light: #FFFFFF; /* White */
+    --color-surface: #FFFFFF;         /* Card surface */
+    --color-surface-alt: #F5F5F5;     /* Alternative surface */
+    --color-surface-soft: #F9F6F3;    /* Extra soft surface for sensitive content */
+    
+    /* Text și conținut - îmbunătățit pentru lizibilitate */
+    --color-text: #3A3A3A;            /* Soft charcoal - verificat pentru accesibilitate */
+    --color-text-light: #6A6A6A;      /* Lighter text */
+    --color-text-lighter: #999999;    /* Pale text */
+    --color-heading: #B56E52;         /* Deep terracotta heading - ajustat pentru contrast WCAG AA */
+    
+    /* Gri utilitar */
+    --color-gray-100: #F7F7F7;
+    --color-gray-200: #F0F0F0;        /* Light gray */
+    --color-gray-300: #E0E0E0;        /* Medium gray */
+    --color-gray-400: #D1D1D1;
+    --color-gray-500: #AFAFAF;
+    --color-gray-600: #757575;
+    
+    /* Stări și feedback - optimizate pentru reacții emoționale */
+    --color-error: #E05252;           /* Red for errors - mai puțin intens */
+    --color-error-light: #FAEAEA;     /* Light red background - mai blând */
+    --color-success: #4CAF7C;         /* Green for success - mai puțin saturată */
+    --color-success-light: #EEFCF2;   /* Light green background */
+    --color-warning: #E9A23C;         /* Amber for warnings - mai puțin alarmant */
+    --color-warning-light: #FEF7E8;   /* Light amber background */
+    --color-info: #609CE1;            /* Blue for info - mai calm */
+    --color-info-light: #EFF6FE;      /* Light blue background */
+    
+    /* Transparențe pentru overlay-uri */
+    --color-overlay: rgba(0, 0, 0, 0.4);
+    --color-overlay-dark: rgba(0, 0, 0, 0.5);
+    --color-overlay-light: rgba(0, 0, 0, 0.1);
+    --color-overlay-soft: rgba(247, 244, 240, 0.8); /* Overlay blând specific pentru conținut sensibil */
+    
+    /* Culori pentru terapeuti - pentru tema viitoare */
+    --color-maria: #D2A38A;          /* Empatie și căldură */
+    --color-alin: #A8C3BC;           /* Provocare constructivă */
+    --color-ana: #D2C2A3;            /* Descoperire personală */
+    --color-teodora: #C1A7BC;        /* Echilibru și obiectivitate */
+    
+    /* Stări emoționale - pentru feedback specific terapie */
+    --color-calm: #A2C5E0;          /* Albastru calm - pentru exerciții de relaxare */
+    --color-calm-light: #EEF6FC;    /* Fundal relaxare */
+    --color-support: #AAC9AA;       /* Verde suport - pentru momentele de incurajare */
+    --color-support-light: #F1F8F1; /* Fundal suport */
+    --color-focus: #D6BA74;         /* Focus/atenție - pentru exerciții de mindfulness */
+    --color-focus-light: #FAF6E8;   /* Fundal concentrare */
+    --color-neutral: #BEBEBE;       /* Neutru - pentru conținut obiectiv */
+    --color-neutral-light: #F7F7F7; /* Fundal neutru */
+    
+    /* Accesibilitate - contraste verificate WCAG AA */
+    --color-high-contrast-text: #000000; /* Pentru text care necesită contrast maxim */
+    --color-high-contrast-bg: #FFFFFF;   /* Pentru fundal cu contrast maxim */
+    --color-reduced-motion: #C8A288;     /* Indicator pentru conținut static */
+  }

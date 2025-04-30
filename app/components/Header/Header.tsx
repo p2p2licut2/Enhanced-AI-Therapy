@@ -3,8 +3,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import { useApp } from '@/app/contexts/AppContext';
-import TherapistProfileModal from '../TherapistProfileModal/TherapistProfileModal';
-import ConfirmDialog from '../ConfirmDialog/ConfirmDialog';
+import TherapistProfileModal from '../TherapistProfileModal/TherapistProfileModal.module.css';
+import ConfirmDialog from '../ConfirmDialog/ConfirmDialog.module.css';
 
 export default function Header() {
   const {

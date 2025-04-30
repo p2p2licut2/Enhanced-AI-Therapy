@@ -1,231 +1,9 @@
 /* app/components/ConfirmDialog/ConfirmDialog.module.css */
 /*
  * CSS Module pentru componenta ConfirmDialog
- * Optimizat pentru considerații de sănătate mintală
+ * Importă design system pentru a folosi variabilele globale
  */
 
-<<<<<<< HEAD
- /* Overlay */
- .overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: var(--color-overlay-dark);
-    z-index: 2000;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity var(--transition-standard), visibility var(--transition-standard);
-    backdrop-filter: var(--backdrop-blur);
-  }
-  
-  .visibleOverlay {
-    opacity: 1;
-    visibility: visible;
-  }
-  
-  /* Versiune calmă a overlay-ului */
-  .calmOverlay {
-    background-color: var(--color-overlay-soft);
-    transition: opacity var(--transition-calm), visibility var(--transition-calm);
-  }
-  
-  /* Dialog container */
-  .dialog {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 90%;
-    max-width: 350px;
-    background-color: white;
-    border-radius: var(--border-radius-lg);
-    box-shadow: var(--shadow-modal);
-    z-index: 2100;
-    overflow: hidden;
-    animation: modalFadeIn var(--transition-slow) var(--ease-out);
-  }
-  
-  /* Versiune calmă a dialogului */
-  .calmDialog {
-    box-shadow: 0 5px 15px rgba(162, 197, 224, 0.2);
-    animation: gentleFadeInUp var(--transition-gentle) var(--ease-calm);
-    border: 1px solid rgba(162, 197, 224, 0.2);
-  }
-  
-  /* Header dialog */
-  .dialogHeader {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: var(--spacing-md) var(--spacing-lg);
-    background-color: var(--color-primary);
-    color: white;
-    font-weight: var(--font-weight-semibold);
-    font-size: var(--font-size-lg);
-  }
-  
-  .calmDialogHeader {
-    background-color: var(--color-calm);
-    transition: background-color var(--transition-calm);
-  }
-  
-  .closeButton {
-    cursor: pointer;
-    background: none;
-    border: none;
-    color: white;
-    width: var(--control-size-sm);
-    height: var(--control-size-sm);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: var(--border-radius-circle);
-    transition: background-color var(--transition-standard);
-  }
-  
-  .closeButton:hover {
-    background-color: rgba(255, 255, 255, 0.2);
-  }
-  
-  /* Conținut dialog */
-  .dialogContent {
-    padding: var(--spacing-lg);
-  }
-  
-  .dialogMessage {
-    margin-bottom: var(--spacing-lg);
-    line-height: var(--line-height-base);
-  }
-  
-  /* Butoane acțiuni - cu considerații emoționale */
-  .dialogActions {
-    display: flex;
-    justify-content: flex-end;
-    gap: var(--spacing-sm);
-  }
-  
-  .dialogButton {
-    padding: var(--spacing-sm) var(--spacing-lg);
-    border-radius: var(--border-radius-md);
-    font-weight: var(--font-weight-semibold);
-    cursor: pointer;
-    transition: all var(--transition-standard);
-    border: none;
-    font-size: var(--font-size-sm);
-  }
-  
-  .cancelButton {
-    background-color: var(--color-gray-300);
-    color: var(--color-text);
-  }
-  
-  .cancelButton:hover {
-    background-color: var(--color-gray-400);
-  }
-  
-  .confirmButton {
-    background-color: var(--color-primary);
-    color: white;
-  }
-  
-  .confirmButton:hover {
-    background-color: var(--color-primary-dark);
-  }
-  
-  .destructiveButton {
-    background-color: var(--color-error);
-  }
-  
-  .destructiveButton:hover {
-    background-color: #DC2626; /* Culoare hardcodată din globals original */
-  }
-  
-  /* Versiuni pentru calm mode */
-  .calmButton {
-    transition: all var(--transition-calm);
-    letter-spacing: 0.01em;
-  }
-  
-  .calmButton:hover {
-    transform: translateY(-1px);
-  }
-  
-  .calmButton.cancelButton {
-    background-color: var(--color-gray-200);
-  }
-  
-  .calmButton.cancelButton:hover {
-    background-color: var(--color-gray-300);
-  }
-  
-  .calmButton.confirmButton {
-    background-color: var(--color-calm);
-  }
-  
-  .calmButton.confirmButton:hover {
-    background-color: var(--color-calm);
-    opacity: 0.9;
-  }
-  
-  .calmButton.destructiveButton {
-    background-color: var(--color-error-light);
-    color: var(--color-error);
-    border: 1px solid var(--color-error);
-  }
-  
-  .calmButton.destructiveButton:hover {
-    background-color: var(--color-error-light);
-    color: var(--color-error);
-    border-color: #DC2626;
-  }
-  
-  /* Mesaj suport pentru decizii dificile */
-  .supportNote {
-    padding: var(--spacing-sm) var(--spacing-lg);
-    background-color: var(--color-calm-light);
-    color: var(--color-text);
-    font-size: var(--font-size-xs);
-    text-align: center;
-    border-top: 1px solid rgba(162, 197, 224, 0.2);
-  }
-  
-  /* Animații optimizate */
-  @keyframes gentleFadeInUp {
-    from {
-      opacity: 0;
-      transform: translate(-50%, -48%);
-    }
-    50% {
-      opacity: 0.5;
-      transform: translate(-50%, -49%);
-    }
-    to {
-      opacity: 1;
-      transform: translate(-50%, -50%);
-    }
-  }
-  
-  /* Media query pentru dispozitive mai mici */
-  @media (max-width: 640px) {
-    .dialog {
-      width: 95%;
-      max-width: 320px;
-    }
-  }
-  
-  /* Preferințe pentru reducerea mișcării */
-  @media (prefers-reduced-motion: reduce) {
-    .dialog {
-      animation: none;
-    }
-    
-    .calmButton:hover {
-      transform: none;
-    }
-  }
-=======
  @import '../../styles/design-system/index.css';
 
  /* Overlay */
@@ -248,12 +26,6 @@
    visibility: visible;
  }
  
- /* Versiune calmă a overlay-ului */
- .calmOverlay {
-   background-color: var(--color-overlay-soft);
-   transition: opacity var(--transition-calm), visibility var(--transition-calm);
- }
- 
  /* Dialog container */
  .dialog {
    position: fixed;
@@ -270,13 +42,6 @@
    animation: modalFadeIn var(--transition-slow) var(--ease-out);
  }
  
- /* Versiune calmă a dialogului */
- .calmDialog {
-   box-shadow: 0 5px 15px rgba(162, 197, 224, 0.2);
-   animation: gentleFadeInUp var(--transition-gentle) var(--ease-calm);
-   border: 1px solid rgba(162, 197, 224, 0.2);
- }
- 
  /* Header dialog */
  .dialogHeader {
    display: flex;
@@ -287,11 +52,6 @@
    color: white;
    font-weight: var(--font-weight-semibold);
    font-size: var(--font-size-lg);
- }
- 
- .calmDialogHeader {
-   background-color: var(--color-calm);
-   transition: background-color var(--transition-calm);
  }
  
  .closeButton {
@@ -322,7 +82,7 @@
    line-height: var(--line-height-base);
  }
  
- /* Butoane acțiuni - cu considerații emoționale */
+ /* Butoane acțiuni */
  .dialogActions {
    display: flex;
    justify-content: flex-end;
@@ -334,7 +94,7 @@
    border-radius: var(--border-radius-md);
    font-weight: var(--font-weight-semibold);
    cursor: pointer;
-   transition: all var(--transition-standard);
+   transition: background-color var(--transition-standard);
    border: none;
    font-size: var(--font-size-sm);
  }
@@ -365,87 +125,14 @@
    background-color: #DC2626; /* Culoare hardcodată din globals original */
  }
  
- /* Versiuni pentru calm mode */
- .calmButton {
-   transition: all var(--transition-calm);
-   letter-spacing: 0.01em;
- }
- 
- .calmButton:hover {
-   transform: translateY(-1px);
- }
- 
- .calmButton.cancelButton {
-   background-color: var(--color-gray-200);
- }
- 
- .calmButton.cancelButton:hover {
-   background-color: var(--color-gray-300);
- }
- 
- .calmButton.confirmButton {
-   background-color: var(--color-calm);
- }
- 
- .calmButton.confirmButton:hover {
-   background-color: var(--color-calm);
-   opacity: 0.9;
- }
- 
- .calmButton.destructiveButton {
-   background-color: var(--color-error-light);
-   color: var(--color-error);
-   border: 1px solid var(--color-error);
- }
- 
- .calmButton.destructiveButton:hover {
-   background-color: var(--color-error-light);
-   color: var(--color-error);
-   border-color: #DC2626;
- }
- 
- /* Mesaj suport pentru decizii dificile */
- .supportNote {
-   padding: var(--spacing-sm) var(--spacing-lg);
-   background-color: var(--color-calm-light);
-   color: var(--color-text);
-   font-size: var(--font-size-xs);
-   text-align: center;
-   border-top: 1px solid rgba(162, 197, 224, 0.2);
- }
- 
- /* Animații optimizate */
- @keyframes gentleFadeInUp {
+ /* Animație modal */
+ @keyframes modalFadeIn {
    from {
      opacity: 0;
      transform: translate(-50%, -48%);
-   }
-   50% {
-     opacity: 0.5;
-     transform: translate(-50%, -49%);
    }
    to {
      opacity: 1;
      transform: translate(-50%, -50%);
    }
  }
- 
- /* Media query pentru dispozitive mai mici */
- @media (max-width: 640px) {
-   .dialog {
-     width: 95%;
-     max-width: 320px;
-   }
- }
- 
- /* Preferințe pentru reducerea mișcării */
- @media (prefers-reduced-motion: reduce) {
-   .dialog {
-     animation: none;
-   }
-   
-   .calmButton:hover {
-     transform: none;
-   }
- }
->>>>>>> adbaa935ff9233ec4d232bbb04f7039876628c5e
