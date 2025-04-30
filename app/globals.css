@@ -1,88 +1,17 @@
 /* app/globals.css */
-/*
- * Punct de intrare principal pentru stilurile aplicației Terapie AI
- * Acest fișier importă toate layer-ele CSS necesare în ordinea corectă
- */
-
-/* Import Google Fonts - dacă nu folosim Nunito direct din Layout, putem să-l importăm aici */
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap');
 
-/* Integrarea cu Tailwind - framework-ul nostru de bază */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Design System - variabile și tokens */
+/* Import design system */
 @import './styles/design-system/index.css';
-
-/* Base Layer */
 @import './styles/base/_reset.css';
 @import './styles/base/_global.css';
 @import './styles/base/_typography.css';
 @import './styles/base/_forms.css';
-
-/* Layout Layer */
 @import './styles/layouts/_app-layout.css';
-
-/* Therapeutic Layer - componente specializate pentru sănătate mintală */
 @import './styles/mental-health/_therapeutic.css';
-
-/* Utilities Layer */
 @import './styles/utilities/_accessibility.css';
 @import './styles/utilities/_animations.css';
-
-/* 
- * NOTĂ: Stilurile componentelor specifice (ex: Header, Chat) NU sunt importate aici,
- * deoarece folosim CSS Modules care vor fi importate direct în componentele respective.
- * Acest lucru previne încărcarea de CSS neutilizat și oferă izolare la nivel de componentă.
- *
- * Exemplu de folosire în componente:
- * import styles from './ComponentName.module.css';
- * <div className={styles.container}>...</div>
- */
-
-/* 
- * Calcul corect pentru viewheight pe mobile, adăugat la JavaScript
- * pentru a actualiza variabila CSS --vh
- */
-:root {
-  --vh: 1vh;
-}
-
-/* 
- * Ajustări specifice pentru iOS și Safari care nu sunt acoperite în fișierele modulare
- * Aceste ajustări sunt pentru funcționalitatea de bază și nu specifice componentelor
- */
-
-/*
- * Considerații de accesibilitate specifice pentru aplicații de sănătate mintală:
- * 1. Folosim tranziții calme pentru utilizatorii cu anxietate
- * 2. Respectăm preferințele utilizatorilor pentru mișcare redusă
- * 3. Asigurăm contrast WCAG AA pentru lizibilitate optimă
- * 4. Oferim indicatori vizuali pentru stări emoționale
- */
- 
-@media (prefers-reduced-motion) {
-  /* Înlocuim animațiile cu alternative statice pentru utilizatorii cu sensibilitate la mișcare */
-  .breathing-animation {
-    animation: none !important;
-    border: 3px solid var(--color-calm);
-  }
-  
-  /* Dezactivăm efecte de hover care implică mișcare */
-  .messageBubble.highlightable:hover {
-    transform: none !important;
-    box-shadow: 0 0 0 2px var(--color-primary-light) !important;
-  }
-}
-
-/* Ajustăm contrastul pentru utilizatorii care preferă contrast ridicat */
-@media (prefers-contrast: more) {
-  :root {
-    --color-text: #000000;
-    --color-background: #FFFFFF;
-    --color-primary: #A85A3B;
-    --color-primary-dark: #8A4424;
-    --color-heading: #8A4424;
-  }
-}

@@ -1,18 +1,7 @@
 /* app/styles/design-system/index.css */
-/*
- * Punct de intrare pentru design system
- * Importă toate fișierele cu variabile și tokens
- */
-
- @import './_colors.css';
- @import './_typography.css';
- @import './_spacing.css';
- @import './_shadows.css';
- @import './_animations.css';
- @import './_breakpoints.css';
- 
- /*
-  * Notă: Acest fișier nu conține CSS actual - doar importuri
-  * Poate fi importat în fișierele CSS globale sau module
-  * Toate variabilele definite în fișierele importate vor fi disponibile
-  */
+@import './_colors.css';
+@import './_typography.css';
+@import './_spacing.css';
+@import './_shadows.css';
+@import './_animations.css';
+@import './_breakpoints.css';

@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { AppProvider } from './contexts/AppContext';
 import Chat from './components/Chat/Chat';
 import Header from './components/Header/Header';
-import LeftMenu from './components//LeftMenu/LeftMenu';
+import LeftMenu from './components/LeftMenu/LeftMenu';
 import TherapistSelector from './components/TherapistSelector/TherapistSelector';
 import InstallPrompt from './components/InstallPrompt/InstallPrompt';
 import WelcomePage from './components/WelcomePage/WelcomePage';

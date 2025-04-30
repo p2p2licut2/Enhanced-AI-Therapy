@@ -4,7 +4,6 @@
  * Importă design system pentru a folosi variabilele globale
  */
 
-
  /* Container element conversație */
  .conversationItem {
    padding: var(--spacing-md);

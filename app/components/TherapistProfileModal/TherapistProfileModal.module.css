@@ -4,8 +4,6 @@
  * Importă design system pentru a folosi variabilele globale
  */
 
- @import '../../styles/design-system/index.css';
-
  /* Overlay */
  .overlay {
    position: fixed;

@@ -5,7 +5,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useApp } from '@/app/contexts/AppContext';
 import { formatDistanceToNow } from 'date-fns';
 import { ro } from 'date-fns/locale';
-import ConfirmDialog from '../ConfirmDialog/ConfirmDialog.module.css';
+import ConfirmDialog from '../ConfirmDialog/ConfirmDialog';
 
 export default function LeftMenu() {
   const {

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef } from 'react';
-import FocusTrap from '../utils/FocusTrap';
+import FocusTrap from '../../utils/FocusTrap';
 
 interface ConfirmDialogProps {
   isOpen: boolean;
