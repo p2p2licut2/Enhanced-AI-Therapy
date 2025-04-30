@@ -63,7 +63,7 @@ export default function TherapistProfileModal({
     <FocusTrap isActive={isOpen}>
       {/* Backdrop overlay */}
       <div 
-        className={`custom-overlay visible`} 
+        className="custom-overlay visible" 
         onClick={onClose}
         aria-hidden="true"
       />
@@ -105,7 +105,7 @@ export default function TherapistProfileModal({
         
         <div className={styles.content}>
           <div className={styles.profileHeader}>
-            <div className={styles.avatarContainer}>
+            <div className={styles.avatarLarge}>
               <Image
                 src={therapist.avatarSrc}
                 alt={`Imagine de profil a terapeutului ${therapist.name}`}
@@ -115,7 +115,7 @@ export default function TherapistProfileModal({
               />
             </div>
             
-            <div className={styles.detailsContainer}>
+            <div className={styles.therapistDetails}>
               <h2 className={styles.therapistName}>{therapist.name}</h2>
               <div className={styles.therapistTitle}>{therapist.title}</div>
             </div>
@@ -143,10 +143,10 @@ function getTherapistDetails(therapistId: string) {
       <>
         <p className={styles.approachText}>Maria folosește o abordare bazată pe <strong>terapie cognitiv-comportamentală</strong> pentru a te ajuta să identifici și să modifici tiparele de gândire care îți creează dificultăți.</p>
         <ul className={styles.approachList} role="list">
-          <li className={styles.approachItem}>Ascultă cu empatie și înțelegere</li>
-          <li className={styles.approachItem}>Oferă observații valoroase</li>
-          <li className={styles.approachItem}>Te ghidează spre propriile concluzii</li>
-          <li className={styles.approachItem}>Menține un ton calm și încurajator</li>
+          <li className={styles.approachListItem}>Ascultă cu empatie și înțelegere</li>
+          <li className={styles.approachListItem}>Oferă observații valoroase</li>
+          <li className={styles.approachListItem}>Te ghidează spre propriile concluzii</li>
+          <li className={styles.approachListItem}>Menține un ton calm și încurajator</li>
         </ul>
       </>
     ),
@@ -154,10 +154,10 @@ function getTherapistDetails(therapistId: string) {
       <>
         <p className={styles.approachText}>Alin folosește metoda <strong>"dragoste dură"</strong> pentru a te provoca să ieși din zona de confort și să îți atingi potențialul maxim.</p>
         <ul className={styles.approachList} role="list">
-          <li className={styles.approachItem}>Pune întrebări provocatoare</li>
-          <li className={styles.approachItem}>Contestă presupunerile limitative</li>
-          <li className={styles.approachItem}>Folosește umor și energie pozitivă</li>
-          <li className={styles.approachItem}>Te motivează spre acțiune și schimbare</li>
+          <li className={styles.approachListItem}>Pune întrebări provocatoare</li>
+          <li className={styles.approachListItem}>Contestă presupunerile limitative</li>
+          <li className={styles.approachListItem}>Folosește umor și energie pozitivă</li>
+          <li className={styles.approachListItem}>Te motivează spre acțiune și schimbare</li>
         </ul>
       </>
     ),
@@ -165,10 +165,10 @@ function getTherapistDetails(therapistId: string) {
       <>
         <p className={styles.approachText}>Ana te ghidează într-o călătorie de <strong>descoperire personală</strong> și te ajută să îți înțelegi mai bine valorile și tiparele de gândire.</p>
         <ul className={styles.approachList} role="list">
-          <li className={styles.approachItem}>Utilizează întrebări reflective</li>
-          <li className={styles.approachItem}>Încurajează contemplația și meditația</li>
-          <li className={styles.approachItem}>Folosește metafore revelatorii</li>
-          <li className={styles.approachItem}>Creează un spațiu pentru introspecție profundă</li>
+          <li className={styles.approachListItem}>Utilizează întrebări reflective</li>
+          <li className={styles.approachListItem}>Încurajează contemplația și meditația</li>
+          <li className={styles.approachListItem}>Folosește metafore revelatorii</li>
+          <li className={styles.approachListItem}>Creează un spațiu pentru introspecție profundă</li>
         </ul>
       </>
     ),
@@ -176,10 +176,10 @@ function getTherapistDetails(therapistId: string) {
       <>
         <p className={styles.approachText}>Teodora te ajută să te concentrezi pe <strong>responsabilitatea personală</strong> și pe aspectele vieții tale pe care le poți controla și modifica.</p>
         <ul className={styles.approachList} role="list">
-          <li className={styles.approachItem}>Oferă perspective imparțiale și directe</li>
-          <li className={styles.approachItem}>Dezvoltă reziliența emoțională</li>
-          <li className={styles.approachItem}>Învață strategii de auto-control</li>
-          <li className={styles.approachItem}>Promovează abordări pragmatice pentru schimbare</li>
+          <li className={styles.approachListItem}>Oferă perspective imparțiale și directe</li>
+          <li className={styles.approachListItem}>Dezvoltă reziliența emoțională</li>
+          <li className={styles.approachListItem}>Învață strategii de auto-control</li>
+          <li className={styles.approachListItem}>Promovează abordări pragmatice pentru schimbare</li>
         </ul>
       </>
     )

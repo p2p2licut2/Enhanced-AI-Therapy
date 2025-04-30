@@ -67,8 +67,6 @@
   font-weight: 600;
   margin-bottom: 12px;
   color: var(--color-heading);
-  display: flex;
-  align-items: center;
 }
 
 .menuItem {
@@ -124,7 +122,7 @@
 
 .conversationDate {
   font-size: 12px;
-  color: var(--color-text);
+  color: var(--color-text-light);
   opacity: 0.7;
   margin-top: 4px;
 }
@@ -135,9 +133,6 @@
 }
 
 .favoriteIcon {
-  width: 18px;
-  height: 18px;
-  color: #FFD700;
   margin-right: 8px;
 }
 
@@ -150,6 +145,12 @@
   border-radius: 50%;
   cursor: pointer;
   transition: background-color 0.2s ease;
+  opacity: 0;
+}
+
+.conversationItem:hover .optionsButton,
+.currentConversation .optionsButton {
+  opacity: 1;
 }
 
 .optionsButton:hover {
@@ -217,13 +218,18 @@
   justify-content: flex-end;
 }
 
-.saveButton {
+.saveButton, .cancelButton {
   padding: 3px 8px;
   border-radius: 4px;
-  background-color: var(--color-primary);
-  color: white;
   cursor: pointer;
   transition: background-color 0.2s ease;
+  border: none;
+  font-size: 12px;
+}
+
+.saveButton {
+  background-color: var(--color-primary);
+  color: white;
 }
 
 .saveButton:hover {
@@ -231,15 +237,12 @@
 }
 
 .cancelButton {
-  padding: 3px 8px;
-  border-radius: 4px;
   background-color: var(--color-gray);
-  cursor: pointer;
-  transition: background-color 0.2s ease;
+  color: var(--color-text);
 }
 
 .cancelButton:hover {
-  background-color: #D1D1D1;
+  background-color: var(--color-gray-400);
 }
 
 /* Empty state */

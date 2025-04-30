@@ -5,8 +5,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useApp } from '@/app/contexts/AppContext';
 import { formatDistanceToNow } from 'date-fns';
 import { ro } from 'date-fns/locale';
-import styles from './LeftMenu.module.css';
 import ConfirmDialog from '../ConfirmDialog/ConfirmDialog';
+import styles from './LeftMenu.module.css';
 
 export default function LeftMenu() {
   const {
@@ -152,16 +152,16 @@ export default function LeftMenu() {
         onMouseLeave={() => setHoveredConversationId(null)}
       >
         {isCurrentlyRenaming ? (
-          <form onSubmit={handleRenameSubmit} className={styles.renameForm} onClick={e => e.stopPropagation()}>
+          <form onSubmit={handleRenameSubmit} className={styles.renameFormMenu} onClick={e => e.stopPropagation()}>
             <input
               ref={titleInputRef}
               type="text"
               value={newTitle}
               onChange={(e) => setNewTitle(e.target.value)}
-              className={styles.renameInput}
+              className={styles.renameInputMenu}
               placeholder="Introdu un nou titlu"
             />
-            <div className={styles.renameActions}>
+            <div className={styles.renameActionsMenu}>
               <button type="submit" className={styles.saveButton}>
                 Salvează
               </button>
@@ -177,8 +177,8 @@ export default function LeftMenu() {
         ) : (
           <>
             <div className={styles.conversationDetails}>
-              <div className={styles.conversationTitle}>{conversation.title}</div>
-              <div className={styles.conversationDate}>{formatDate(conversation.updatedAt)}</div>
+              <div className={styles.conversationItemTitle}>{conversation.title}</div>
+              <div className={styles.conversationItemDate}>{formatDate(conversation.updatedAt)}</div>
             </div>
 
             <div className={styles.conversationActions}>
@@ -187,7 +187,7 @@ export default function LeftMenu() {
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 24 24"
                   fill="currentColor"
-                  className={`w-4 h-4 text-yellow-500 mr-2 ${styles.favoriteIcon}`}
+                  className={styles.favoriteIcon}
                 >
                   <path
                     fillRule="evenodd"
@@ -285,7 +285,7 @@ export default function LeftMenu() {
         <div className={styles.menuHeader}>
           <span>Terapie AI</span>
           <button
-            className={styles.closeButton}
+            className={styles.menuClose}
             onClick={handleCloseMenu}
             aria-label="Close menu"
           >

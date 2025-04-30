@@ -1,26 +1,6 @@
 /* app/components/ConfirmDialog/ConfirmDialog.module.css */
 
-/* Overlay */
-.overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: var(--color-overlay-dark);
-  z-index: 2000;
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.3s ease, visibility 0.3s ease;
-  backdrop-filter: blur(2px);
-}
-
-.visibleOverlay {
-  opacity: 1;
-  visibility: visible;
-}
-
-/* Dialog container */
+/* Dialogul în sine - nu conține stilul pentru overlay, care rămâne global */
 .dialog {
   position: fixed;
   top: 50%;
@@ -96,7 +76,7 @@
   margin-top: 16px;
 }
 
-.dialogButton {
+.cancelButton {
   padding: 8px 16px;
   border-radius: 6px;
   font-weight: 600;
@@ -104,10 +84,7 @@
   transition: background-color 0.2s ease;
   border: none;
   font-size: 14px;
-}
-
-.cancelButton {
-  background-color: var(--color-gray);
+  background-color: var(--color-gray, #E0E0E0);
   color: var(--color-text);
 }
 
@@ -116,17 +93,23 @@
 }
 
 .confirmButton {
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  border: none;
+  font-size: 14px;
   background-color: var(--color-primary);
   color: white;
 }
 
 .confirmButton:hover {
-  background-color: var(--color-primary-dark);
+  background-color: var(--color-primary-dark, #C17F65);
 }
 
 .destructiveButton {
   background-color: #EF4444;
-  color: white;
 }
 
 .destructiveButton:hover {

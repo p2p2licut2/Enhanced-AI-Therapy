@@ -1,27 +1,5 @@
 /* app/components/Header/Header.module.css */
 
-.header {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 60px;
-  padding: 8px 1rem 0;
-  z-index: 1000;
-  background: var(--color-background);
-}
-
-.headerContent {
-  display: flex;
-  background: transparent;
-  align-items: center;
-  width: 100%;
-  max-width: 768px;
-  margin: 0 auto;
-  justify-content: space-between;
-  padding-bottom: 6px;
-}
-
 .headerLeft {
   display: flex;
   align-items: center;
@@ -33,11 +11,23 @@
   margin-right: 8px;
   width: 24px;
   height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: flex !important; /* Forțăm afișarea */
+  align-items: center !important;
+  justify-content: center !important;
   cursor: pointer;
   transform: translateY(-2px);
+  background: transparent;
+  border: none;
+  color: var(--color-text);
+  opacity: 1 !important;
+  z-index: 10;
+  padding: 0; /* Asigurăm că nu are padding care să deformeze */
+}
+
+.menuButton svg {
+  width: 24px;
+  height: 24px;
+  display: block !important;
 }
 
 .avatarContainer {
@@ -51,6 +41,7 @@
   overflow: hidden;
   transition: transform 0.2s ease;
   transform: translateY(-2px);
+  cursor: pointer;
 }
 
 .avatarContainer:hover {
@@ -75,6 +66,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   transition: opacity 0.2s ease;
+  cursor: pointer;
 }
 
 .therapistTitle:hover {
@@ -82,27 +74,6 @@
 }
 
 /* Scroll containers */
-.scrollContainer {
-  overflow-x: auto;
-  white-space: nowrap;
-  padding: 2px 0;
-  transition: background-color 0.2s ease;
-}
-
-.scrollContainer:hover {
-  background-color: rgba(210, 163, 138, 0.1);
-  border-radius: 3px;
-}
-
-.noScrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-
-.noScrollbar::-webkit-scrollbar {
-  display: none;
-}
-
 .scrollFade {
   position: relative;
 }
@@ -125,6 +96,28 @@
 
 .fadeHidden::after {
   opacity: 0;
+}
+
+.titleScroll {
+  overflow-x: auto;
+  white-space: nowrap;
+  padding: 2px 0;
+  transition: background-color 0.2s ease;
+  cursor: pointer;
+}
+
+.titleScroll:hover {
+  background-color: rgba(210, 163, 138, 0.1);
+  border-radius: 3px;
+}
+
+.titleScroll::-webkit-scrollbar {
+  display: none;
+}
+
+.titleScroll {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
 }
 
 .innerScroll {

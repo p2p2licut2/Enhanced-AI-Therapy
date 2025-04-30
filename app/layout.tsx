@@ -22,6 +22,8 @@ export const metadata: Metadata = {
   other: {
     'msapplication-TileColor': '#D2A38A',
     'theme-color': '#D2A38A',
+    // Adăugăm meta tag-ul care era recomandat în avertisment
+    'mobile-web-app-capable': 'yes'
   }
 };
 

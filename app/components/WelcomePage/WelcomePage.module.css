@@ -1,23 +1,6 @@
 /* app/components/WelcomePage/WelcomePage.module.css */
 
 /* Container pagină */
-.container {
-  position: relative;
-  height: 100vh;
-  width: 100vw;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  background-color: var(--color-background);
-}
-
-/* Fix iOS Safari scrolling issues */
-@supports (-webkit-touch-callout: none) {
-  .container {
-    height: -webkit-fill-available;
-  }
-}
-
-/* Conținut principal */
 .welcomePage {
   position: relative;
   min-height: auto;
@@ -58,7 +41,7 @@
   z-index: 0;
 }
 
-.title {
+.heroTitle {
   font-size: 2.2rem;
   color: var(--color-heading);
   font-weight: 700;
@@ -67,7 +50,7 @@
   z-index: 1;
 }
 
-.subtitle {
+.heroSubtitle {
   font-size: 1.1rem;
   max-width: 500px;
   margin: 0 auto;

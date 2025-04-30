@@ -12,6 +12,13 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Import-uri CSS pentru design system */
+@import './styles/design-system/index.css';
+@import './styles/base/_reset.css';
+@import './styles/base/_global.css';
+@import './styles/base/_typography.css';
+@import './styles/base/_forms.css';
+
 /* Variabile CSS globale */
 :root {
   /* Culorile primare și secundare */
@@ -171,6 +178,31 @@ textarea {
 .custom-overlay.visible {
   opacity: 1;
   visibility: visible;
+}
+
+/* Clase flexbox comune */
+.flex {
+  display: flex;
+}
+
+.flex-1 {
+  flex: 1;
+}
+
+.justify-start {
+  justify-content: flex-start;
+}
+
+.justify-end {
+  justify-content: flex-end;
+}
+
+.min-w-0 {
+  min-width: 0;
+}
+
+.pr-2 {
+  padding-right: 0.5rem;
 }
 
 /* Fix pentru iOS */

@@ -9,6 +9,7 @@ import TherapistSelector from './components/TherapistSelector/TherapistSelector'
 import InstallPrompt from './components/InstallPrompt/InstallPrompt';
 import WelcomePage from './components/WelcomePage/WelcomePage';
 import { useApp } from './contexts/AppContext';
+import styles from './page.module.css';
 
 // Wrapper component that uses the AppContext
 function AppContent() {
@@ -36,14 +37,14 @@ function AppContent() {
   return (
     <>
       {showWelcomePage ? (
-        <div className="welcome-page-container">
+        <div className={styles.welcomePageContainer}>
           <WelcomePage />
         </div>
       ) : (
-        <main className="flex min-h-screen overflow-hidden p-0 m-0">
+        <main className={styles.mainContainer}>
           <LeftMenu />
           <TherapistSelector />
-          <div className="app-container">
+          <div className={styles.appContainer}>
             <Header />
             <Chat />
           </div>

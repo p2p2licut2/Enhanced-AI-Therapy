@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useEffect, useRef } from 'react';
-import styles from './ConfirmDialog.module.css';
 import FocusTrap from '../../utils/FocusTrap';
+import styles from './ConfirmDialog.module.css';
 
 interface ConfirmDialogProps {
   isOpen: boolean;
@@ -80,7 +80,7 @@ export default function ConfirmDialog({
     <FocusTrap isActive={isOpen}>
       {/* Backdrop overlay */}
       <div 
-        className={`custom-overlay visible`} 
+        className="custom-overlay visible" 
         onClick={onClose} 
         aria-hidden="true"
       />

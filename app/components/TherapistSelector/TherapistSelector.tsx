@@ -101,7 +101,7 @@ export default function TherapistSelector() {
                     alt={therapist.name} 
                     width={64} 
                     height={64} 
-                    className={styles.avatarImage}
+                    className="rounded-full object-cover"
                   />
                 </div>
                 <div className={styles.therapistName}>{therapist.name}</div>

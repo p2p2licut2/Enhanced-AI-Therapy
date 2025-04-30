@@ -26,10 +26,10 @@ export default function ConversationItem({
 
   return (
     <div 
-      className={`${styles.conversationItem} ${isActive ? styles.active : ''}`}
+      className={`${styles.conversationItem} ${isActive ? styles.current : ''}`}
       onClick={() => onClick(conversation.id)}
     >
-      <div className={styles.content}>
+      <div className={styles.contentContainer}>
         <div className={styles.title}>{conversation.title}</div>
         <div className={styles.date}>{formatDate(conversation.updatedAt)}</div>
       </div>

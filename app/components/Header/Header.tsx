@@ -361,7 +361,7 @@ export default function Header() {
                   <div
                     ref={titleRef}
                     onClick={handleTitleClick}
-                    className={`${styles.titleScroll} ${styles.noScrollbar}`}
+                    className={styles.titleScroll}
                   >
                     {/* Elementul interior care are referința pentru scroll */}
                     <div

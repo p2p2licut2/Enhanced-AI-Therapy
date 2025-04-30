@@ -47,14 +47,33 @@ export default function Chat() {
     return () => window.removeEventListener('resize', updateInputHeight);
   }, [input, hasStartedConversation]);
 
-  // Auto-resize textarea
+  // Auto-resize textarea - ÎMBUNĂTĂȚIT
   useEffect(() => {
     if (textareaRef.current) {
-      textareaRef.current.style.height = '24px'; // Reset height
+      // Setăm height minim
+      textareaRef.current.style.height = '36px'; 
+      
+      // Verificăm dacă conținutul necesită mai mult spațiu
       const scrollHeight = textareaRef.current.scrollHeight;
-      textareaRef.current.style.height = `${Math.min(scrollHeight, 250)}px`;
+      
+      // Setăm înălțimea finală, dar nu mai puțin de 36px
+      textareaRef.current.style.height = `${Math.max(36, Math.min(scrollHeight, 250))}px`;
     }
   }, [input]);
+
+  // Reset textarea height when messages change (după răspunsul asistentului)
+  useEffect(() => {
+    if (textareaRef.current) {
+      // Forțăm resetarea la înălțimea minimă, apoi autosize
+      setTimeout(() => {
+        if (textareaRef.current) {
+          textareaRef.current.style.height = '36px';
+          const scrollHeight = textareaRef.current.scrollHeight;
+          textareaRef.current.style.height = `${Math.max(36, Math.min(scrollHeight, 250))}px`;
+        }
+      }, 0);
+    }
+  }, [messages]);
 
   // Set hasStartedConversation based on messages
   useEffect(() => {
@@ -196,6 +215,18 @@ export default function Chat() {
       // Scroll to the bottom
       scrollToBottom();
 
+      // Reset textarea height to default after receipt of message
+      if (textareaRef.current) {
+        setTimeout(() => {
+          if (textareaRef.current && isMountedRef.current) {
+            textareaRef.current.style.height = '36px';
+            // Trigger auto-resize again
+            const scrollHeight = textareaRef.current.scrollHeight;
+            textareaRef.current.style.height = `${Math.max(36, Math.min(scrollHeight, 250))}px`;
+          }
+        }, 100);
+      }
+
     } catch (error) {
       console.error('Error:', error);
 
@@ -231,15 +262,6 @@ export default function Chat() {
       
       // Clear the abort controller reference
       abortControllerRef.current = null;
-
-      // Ensure consistent input box height
-      if (textareaRef.current && isMountedRef.current) {
-        setTimeout(() => {
-          if (textareaRef.current && isMountedRef.current) {
-            textareaRef.current.style.height = '24px';
-          }
-        }, 0);
-      }
     }
   };
 
