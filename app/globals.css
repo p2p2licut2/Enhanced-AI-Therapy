@@ -1,29 +1,20 @@
-/* app/globals.css */
-/*
- * Stiluri globale pentru aplicația Terapie AI
- * Conține doar variabilele globale, resetarea și stilurile de bază
- */
-
-/* Import Google Fonts */
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap');
+
+/* Import-uri CSS pentru design system */
+@import './styles/design-system/index.css';
+@import './styles/base/index.css';
+@import './styles/utilities/index.css';
 
 /* Integrarea cu Tailwind */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Import-uri CSS pentru design system */
-@import './styles/design-system/index.css';
-@import './styles/base/_reset.css';
-@import './styles/base/_global.css';
-@import './styles/base/_typography.css';
-@import './styles/base/_forms.css';
-
 /* Variabile CSS globale */
 :root {
   /* Culorile primare și secundare */
   --color-primary: #D2A38A;     /* Soft terracotta */
-  --color-primary-dark: #B56E52;    /* Deep terracotta */
+  --color-primary-dark: #C17F65;    /* Deep terracotta */
   --color-primary-light: #E6D2C0;   /* Light terracotta */
   
   --color-secondary: #E6D2C0;   /* Warm beige */
@@ -42,7 +33,7 @@
   --color-text: #3A3A3A;        /* Soft charcoal */
   --color-text-light: #6A6A6A;      /* Lighter text */
   --color-text-lighter: #999999;    /* Pale text */
-  --color-heading: #B56E52;     /* Deep terracotta */
+  --color-heading: #C17F65;     /* Deep terracotta */
   
   /* Nuanțe de gri */
   --color-gray-100: #F7F7F7;

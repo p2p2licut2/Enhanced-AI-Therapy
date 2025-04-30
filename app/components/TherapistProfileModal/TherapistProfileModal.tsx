@@ -12,10 +12,10 @@ interface TherapistProfileModalProps {
   onClose: () => void;
 }
 
-export default function TherapistProfileModal({ 
-  therapist, 
-  isOpen, 
-  onClose 
+export default function TherapistProfileModal({
+  therapist,
+  isOpen,
+  onClose
 }: TherapistProfileModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
@@ -38,12 +38,12 @@ export default function TherapistProfileModal({
     if (isOpen) {
       document.addEventListener('mousedown', handleClickOutside);
       document.addEventListener('keydown', handleKeyDown);
-      
+
       // Focus the close button when modal opens
       if (closeButtonRef.current) {
         closeButtonRef.current.focus();
       }
-      
+
       // Prevent scrolling on body when modal is open
       document.body.style.overflow = 'hidden';
     }
@@ -51,7 +51,7 @@ export default function TherapistProfileModal({
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
       document.removeEventListener('keydown', handleKeyDown);
-      
+
       // Restore scrolling on body when modal closes
       document.body.style.overflow = '';
     };
@@ -62,14 +62,14 @@ export default function TherapistProfileModal({
   return (
     <FocusTrap isActive={isOpen}>
       {/* Backdrop overlay */}
-      <div 
-        className="custom-overlay visible" 
+      <div
+        className="custom-overlay visible"
         onClick={onClose}
         aria-hidden="true"
       />
-      
+
       {/* Modal */}
-      <div 
+      <div
         className={styles.modal}
         ref={modalRef}
         role="dialog"
@@ -79,30 +79,30 @@ export default function TherapistProfileModal({
       >
         <div className={styles.header}>
           <span id="profile-title">Profilul terapeutului</span>
-          <button 
+          <button
             ref={closeButtonRef}
             className={styles.closeButton}
-            onClick={onClose} 
+            onClick={onClose}
             aria-label="Închide profilul"
           >
-            <svg 
-              xmlns="http://www.w3.org/2000/svg" 
-              fill="none" 
-              viewBox="0 0 24 24" 
-              stroke="currentColor" 
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
               className="w-5 h-5"
               aria-hidden="true"
             >
-              <path 
-                strokeLinecap="round" 
-                strokeLinejoin="round" 
-                strokeWidth={2} 
-                d="M6 18L18 6M6 6l12 12" 
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
               />
             </svg>
           </button>
         </div>
-        
+
         <div className={styles.content}>
           <div className={styles.profileHeader}>
             <div className={styles.avatarLarge}>
@@ -114,17 +114,17 @@ export default function TherapistProfileModal({
                 className="rounded-full object-cover"
               />
             </div>
-            
+
             <div className={styles.therapistDetails}>
               <h2 className={styles.therapistName}>{therapist.name}</h2>
               <div className={styles.therapistTitle}>{therapist.title}</div>
             </div>
           </div>
-          
+
           <div id="profile-description" className={styles.descriptionContainer}>
             <h3 className={styles.descriptionHeading}>Abordare terapeutică</h3>
             <p className={styles.descriptionText}>{therapist.description}</p>
-            
+
             <div className={styles.approachContainer}>
               {getTherapistDetails(therapist.id)}
             </div>
@@ -184,7 +184,7 @@ function getTherapistDetails(therapistId: string) {
       </>
     )
   };
-  
+
   return details[therapistId] || (
     <p className={styles.approachText}>Acest terapeut te va ajuta să explorezi gândurile și emoțiile într-un mediu sigur și de susținere.</p>
   );

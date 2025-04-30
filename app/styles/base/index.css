@@ -1,0 +1,5 @@
+/* În styles/base/index.css */
+@import './_reset.css';
+@import './_global.css';
+@import './_typography.css';
+@import './_forms.css';
