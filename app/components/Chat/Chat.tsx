@@ -1,11 +1,19 @@
+<<<<<<< HEAD
 // Chat Component Redesign
+=======
+>>>>>>> adbaa935ff9233ec4d232bbb04f7039876628c5e
 'use client';
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useApp } from '@/app/contexts/AppContext';
 import { Message } from '@/app/types';
+<<<<<<< HEAD
 import TherapeuticExercise from '../TherapeuticExercises/TherapeuticExercise';
 import { motion, AnimatePresence } from 'framer-motion';
+=======
+import styles from './Chat.module.css';
+import TherapeuticExercise from '../TherapeuticExercises/TherapeuticExercise';
+>>>>>>> adbaa935ff9233ec4d232bbb04f7039876628c5e
 
 export default function Chat() {
   // Get state and functions from context
@@ -23,12 +31,19 @@ export default function Chat() {
   const [isAnimating, setIsAnimating] = useState<boolean>(false);
   const [hasStartedConversation, setHasStartedConversation] = useState<boolean>(false);
   const [inputHeight, setInputHeight] = useState<number>(0);
+<<<<<<< HEAD
+=======
+  // Stări adiționale pentru considerații terapeutice
+>>>>>>> adbaa935ff9233ec4d232bbb04f7039876628c5e
   const [calmMode, setCalmMode] = useState<boolean>(false);
   const [showBreathingExercise, setShowBreathingExercise] = useState<boolean>(false);
   const [currentEmotionalState, setCurrentEmotionalState] = useState<string>('neutral');
   const [showSupportMessage, setShowSupportMessage] = useState<boolean>(false);
+<<<<<<< HEAD
   const [showEmojiPicker, setShowEmojiPicker] = useState<boolean>(false);
   const [suggestedReplies, setSuggestedReplies] = useState<string[]>([]);
+=======
+>>>>>>> adbaa935ff9233ec4d232bbb04f7039876628c5e
 
   // Refs
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -38,10 +53,13 @@ export default function Chat() {
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
   const isMountedRef = useRef<boolean>(true);
+<<<<<<< HEAD
   const emojiPickerRef = useRef<HTMLDivElement>(null);
 
   // Sample emojis for the picker
   const emojis = ['😊', '😔', '😢', '😡', '😴', '😌', '🙏', '👍', '❤️', '🤔'];
+=======
+>>>>>>> adbaa935ff9233ec4d232bbb04f7039876628c5e
 
   // Calculate input container height
   useEffect(() => {
@@ -59,14 +77,22 @@ export default function Chat() {
     return () => window.removeEventListener('resize', updateInputHeight);
   }, [input, hasStartedConversation]);
 
+<<<<<<< HEAD
   // Auto-resize textarea
+=======
+  // Auto-resize textarea cu tranziție mai blândă
+>>>>>>> adbaa935ff9233ec4d232bbb04f7039876628c5e
   useEffect(() => {
     if (textareaRef.current) {
       textareaRef.current.style.height = '24px'; // Reset height
       const scrollHeight = textareaRef.current.scrollHeight;
       textareaRef.current.style.height = `${Math.min(scrollHeight, 250)}px`;
 
+<<<<<<< HEAD
       // Focus only if user has started typing
+=======
+      // Focusăm doar dacă utilizatorul a început deja să scrie
+>>>>>>> adbaa935ff9233ec4d232bbb04f7039876628c5e
       if (input.length > 0) {
         textareaRef.current.focus();
       }
@@ -97,6 +123,7 @@ export default function Chat() {
     };
   }, []);
 
+<<<<<<< HEAD
   // Close emoji picker when clicking outside
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -111,11 +138,17 @@ export default function Chat() {
     };
   }, []);
 
+=======
+>>>>>>> adbaa935ff9233ec4d232bbb04f7039876628c5e
   // Scroll to bottom function - memoize with useCallback
   const scrollToBottom = useCallback(() => {
     if (messagesEndRef.current) {
       if (calmMode) {
+<<<<<<< HEAD
         // Smoother scroll in calm mode
+=======
+        // Scroll mai blând în calm mode
+>>>>>>> adbaa935ff9233ec4d232bbb04f7039876628c5e
         messagesEndRef.current.scrollIntoView({ 
           behavior: 'smooth',
           block: 'end'
@@ -146,21 +179,33 @@ export default function Chat() {
         if (isMountedRef.current) {
           setIsAnimating(false);
           
+<<<<<<< HEAD
           // Detect potential needs for therapeutic exercises
+=======
+          // Detectează potențiale nevoi de exerciții terapeutice
+>>>>>>> adbaa935ff9233ec4d232bbb04f7039876628c5e
           const lastMessage = messages[messages.length - 1];
           if (lastMessage && lastMessage.role === 'assistant') {
             const content = lastMessage.content.toLowerCase();
             
+<<<<<<< HEAD
             // Generate suggested replies based on last message
             generateSuggestedReplies(lastMessage.content);
             
             // Detect need for breathing exercise
+=======
+            // Detectează nevoia unui exercițiu de respirație
+>>>>>>> adbaa935ff9233ec4d232bbb04f7039876628c5e
             if (content.includes('respiră') || content.includes('anxios') || 
                 content.includes('anxietate') || content.includes('calmează')) {
               setShowBreathingExercise(true);
             }
             
+<<<<<<< HEAD
             // Detect emotional state
+=======
+            // Detectează starea emoțională
+>>>>>>> adbaa935ff9233ec4d232bbb04f7039876628c5e
             if (content.includes('trist') || content.includes('supărat')) {
               setCurrentEmotionalState('sensitive');
               setShowSupportMessage(true);
@@ -175,12 +220,17 @@ export default function Chat() {
             }
           }
         }
+<<<<<<< HEAD
       }, calmMode ? 3000 : 2000); // More time for processing in calm mode
+=======
+      }, calmMode ? 3000 : 2000); // Mai mult timp pentru procesare în calm mode
+>>>>>>> adbaa935ff9233ec4d232bbb04f7039876628c5e
       
       return () => clearTimeout(timeoutId);
     }
   }, [isAnimating, messages, calmMode]);
 
+<<<<<<< HEAD
   // Generate suggested replies based on the assistant's message
   const generateSuggestedReplies = (message: string) => {
     // This is a simplified implementation - in a real app, you would use NLP or AI
@@ -202,11 +252,15 @@ export default function Chat() {
   };
 
   // Determine emotional class for messages
+=======
+  // Determină clasa emoțională pentru mesaje
+>>>>>>> adbaa935ff9233ec4d232bbb04f7039876628c5e
   const getMessageEmotionalClass = (content: string): string => {
     const lowerContent = content.toLowerCase();
     
     if (lowerContent.includes('respiră') || lowerContent.includes('calm') || 
         lowerContent.includes('liniștit')) {
+<<<<<<< HEAD
       return 'message-calming';
     } 
     else if (lowerContent.includes('poți') || lowerContent.includes('încearcă') || 
@@ -216,17 +270,33 @@ export default function Chat() {
     else if (lowerContent.includes('observă') || lowerContent.includes('atent') || 
             lowerContent.includes('concentrează')) {
       return 'message-focusing';
+=======
+      return styles.messageCalming;
+    } 
+    else if (lowerContent.includes('poți') || lowerContent.includes('încearcă') || 
+            lowerContent.includes('e normal')) {
+      return styles.messageSupportive;
+    } 
+    else if (lowerContent.includes('observă') || lowerContent.includes('atent') || 
+            lowerContent.includes('concentrează')) {
+      return styles.messageFocusing;
+>>>>>>> adbaa935ff9233ec4d232bbb04f7039876628c5e
     }
     
     return '';
   };
 
+<<<<<<< HEAD
   // Determine if a message has emotional content
+=======
+  // Determină dacă un mesaj are conținut emoțional
+>>>>>>> adbaa935ff9233ec4d232bbb04f7039876628c5e
   const getEmotionalContentClass = (content: string): string => {
     const lowerContent = content.toLowerCase();
     
     if (lowerContent.includes('fericit') || lowerContent.includes('bucurie') || 
         lowerContent.includes('succes')) {
+<<<<<<< HEAD
       return 'emotional-content positive';
     }
     else if (lowerContent.includes('trist') || lowerContent.includes('frică') || 
@@ -236,6 +306,17 @@ export default function Chat() {
     else if (lowerContent.includes('neutru') || lowerContent.includes('gândesc') || 
             lowerContent.includes('cred')) {
       return 'emotional-content neutral';
+=======
+      return `${styles.emotionalContent} ${styles.emotionPositive}`;
+    }
+    else if (lowerContent.includes('trist') || lowerContent.includes('frică') || 
+            lowerContent.includes('anxietate')) {
+      return `${styles.emotionalContent} ${styles.emotionSensitive}`;
+    }
+    else if (lowerContent.includes('neutru') || lowerContent.includes('gândesc') || 
+            lowerContent.includes('cred')) {
+      return `${styles.emotionalContent} ${styles.emotionNeutral}`;
+>>>>>>> adbaa935ff9233ec4d232bbb04f7039876628c5e
     }
     
     return '';
@@ -252,10 +333,16 @@ export default function Chat() {
       setHasStartedConversation(true);
     }
 
+<<<<<<< HEAD
     // Hide therapeutic exercises when user sends a new message
     setShowBreathingExercise(false);
     setShowSupportMessage(false);
     setSuggestedReplies([]);
+=======
+    // Ascunde exercițiile terapeutice când utilizatorul trimite un nou mesaj
+    setShowBreathingExercise(false);
+    setShowSupportMessage(false);
+>>>>>>> adbaa935ff9233ec4d232bbb04f7039876628c5e
 
     // Create user message
     const userMessage: Message = {
@@ -289,7 +376,11 @@ export default function Chat() {
         content: msg.content
       }));
 
+<<<<<<< HEAD
       // Call API
+=======
+      // Call API - don't pass the signal to avoid abort errors
+>>>>>>> adbaa935ff9233ec4d232bbb04f7039876628c5e
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: {
@@ -391,11 +482,16 @@ export default function Chat() {
     setCalmMode(prev => !prev);
   };
 
+<<<<<<< HEAD
   // Close breathing exercise
+=======
+  // Închide exercițiul de respirație
+>>>>>>> adbaa935ff9233ec4d232bbb04f7039876628c5e
   const handleCloseBreathingExercise = () => {
     setShowBreathingExercise(false);
   };
 
+<<<<<<< HEAD
   // Handle emoji selection
   const handleEmojiClick = (emoji: string) => {
     setInput(prev => prev + emoji);
@@ -435,13 +531,22 @@ export default function Chat() {
   return (
     <div 
       className={`chat-container ${calmMode ? 'calm-mode' : ''}`}
+=======
+  return (
+    <div 
+      className={`${styles.chatWindow} ${calmMode ? styles.calmMode : ''}`}
+>>>>>>> adbaa935ff9233ec4d232bbb04f7039876628c5e
       ref={chatWindowRef}
       aria-live="polite"
       aria-atomic="true"
     >
       {/* Calm mode toggle */}
       <button
+<<<<<<< HEAD
         className={`calm-mode-toggle ${calmMode ? 'active' : ''}`}
+=======
+        className={`${styles.calmModeButton} ${calmMode ? styles.calmModeActive : ''}`}
+>>>>>>> adbaa935ff9233ec4d232bbb04f7039876628c5e
         onClick={toggleCalmMode}
         aria-label={calmMode ? "Dezactivează modul calm" : "Activează modul calm"}
         title={calmMode ? "Dezactivează modul calm" : "Activează modul calm"}
@@ -451,6 +556,11 @@ export default function Chat() {
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
+<<<<<<< HEAD
+=======
+          className="w-5 h-5"
+          aria-hidden="true"
+>>>>>>> adbaa935ff9233ec4d232bbb04f7039876628c5e
         >
           <path
             strokeLinecap="round"
@@ -461,9 +571,15 @@ export default function Chat() {
         </svg>
       </button>
 
+<<<<<<< HEAD
       {/* Messages container */}
       <div
         className={`messages-container ${calmMode ? 'calm-messages' : ''}`}
+=======
+      {/* Messages */}
+      <div
+        className={`${styles.messagesContainer} ${calmMode ? styles.calmMessagesContainer : ''}`}
+>>>>>>> adbaa935ff9233ec4d232bbb04f7039876628c5e
         ref={messagesContainerRef}
         style={{
           height: `calc(100% - ${inputHeight}px - ${showBreathingExercise ? '220px' : '0px'})`,
@@ -473,6 +589,7 @@ export default function Chat() {
         aria-label="Chat messages"
       >
         {messages.length === 0 ? (
+<<<<<<< HEAD
           // Welcome message when no messages exist
           <div className={`welcome-message ${calmMode ? 'calm-welcome' : ''}`}>
             <div className="welcome-avatar-container">
@@ -484,11 +601,23 @@ export default function Chat() {
             </div>
             <h2 className="welcome-title">Bun venit la sesiunea ta cu {currentTherapist.name}</h2>
             <p className="welcome-description">
+=======
+          // Welcome message when no messages exist - cu versiune calmă
+          <div className={`${styles.welcomeContainer} ${calmMode ? styles.calmWelcomeContainer : ''}`}>
+            <div className={styles.welcomeIcon} aria-hidden="true">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-6 h-6 text-white">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+              </svg>
+            </div>
+            <h2 className={styles.welcomeTitle}>Bine ai venit la sesiunea ta de terapie</h2>
+            <p className={styles.welcomeText}>
+>>>>>>> adbaa935ff9233ec4d232bbb04f7039876628c5e
               {calmMode 
                 ? "Aici ai un spațiu sigur pentru a vorbi despre orice te preocupă. Respiră adânc și ia-ți timpul necesar."
                 : "Întreabă-mă despre dezvoltare personală, stabilirea obiectivelor sau orice provocări cu care te confrunți"
               }
             </p>
+<<<<<<< HEAD
             <div className="welcome-suggestions">
               <p className="suggestions-label">Poți începe cu:</p>
               <div className="suggestion-buttons">
@@ -616,10 +745,78 @@ export default function Chat() {
               <div className="loading-dot" aria-hidden="true" />
               <div className="loading-dot" aria-hidden="true" />
               <div className="loading-dot" aria-hidden="true" />
+=======
+          </div>
+        ) : (
+          // Message list
+          messages.map((message, index) => {
+            const isLastAssistantMessage = 
+              message.role === 'assistant' && 
+              index === messages.length - 1 && 
+              isAnimating;
+              
+            // Determină clasa emoțională
+            const emotionalClass = message.role === 'assistant' 
+              ? getMessageEmotionalClass(message.content)
+              : '';
+              
+            // Determină dacă mesajul are conținut emoțional
+            const emotionalContentClass = message.role === 'user'
+              ? getEmotionalContentClass(message.content)
+              : '';
+            
+            // Determină dacă mesajul include un exercițiu
+            const hasExercise = message.role === 'assistant' && 
+              (message.content.includes('exercițiu') || message.content.includes('respiră'));
+              
+            return (
+              <div
+                key={index}
+                className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                aria-label={`${message.role === 'user' ? 'Tu' : currentTherapist.name} a spus`}
+              >
+                <div 
+                  className={`${styles.messageBubble} 
+                             ${message.role === 'user' ? styles.userMessage : styles.assistantMessage}
+                             ${emotionalClass}
+                             ${emotionalContentClass}
+                             ${hasExercise ? styles.withExercise : ''}
+                             ${calmMode ? styles.calmBubble : ''}
+                             ${message.role === 'assistant' ? styles.highlightable : ''}`}
+                >
+                  {isLastAssistantMessage ? (
+                    // If it's the last assistant message and it's animating
+                    <div className={styles.typingAnimation}>
+                      <div className={calmMode ? styles.calmTypingText : styles.typingText}>
+                        {formatMessage(displayedText)}
+                      </div>
+                    </div>
+                  ) : (
+                    // Otherwise, display the message normally
+                    formatMessage(message.content)
+                  )}
+                </div>
+              </div>
+            );
+          })
+        )}
+
+        {/* Loading indicator - mai subtil în calm mode */}
+        {isLoading && (
+          <div className="flex justify-start">
+            <div 
+              className={`${styles.loadingIndicator} ${calmMode ? styles.calmLoadingIndicator : ''}`}
+              aria-label={`${currentTherapist.name} scrie...`}
+            >
+              <div className={styles.loadingDot} aria-hidden="true" />
+              <div className={styles.loadingDot} aria-hidden="true" />
+              <div className={styles.loadingDot} aria-hidden="true" />
+>>>>>>> adbaa935ff9233ec4d232bbb04f7039876628c5e
             </div>
           </div>
         )}
 
+<<<<<<< HEAD
         {/* Suggested replies */}
         {suggestedReplies.length > 0 && !isLoading && !showBreathingExercise && (
           <motion.div 
@@ -642,11 +839,17 @@ export default function Chat() {
           </motion.div>
         )}
 
+=======
+>>>>>>> adbaa935ff9233ec4d232bbb04f7039876628c5e
         {/* Reference for scrolling to bottom */}
         <div ref={messagesEndRef} />
       </div>
 
+<<<<<<< HEAD
       {/* Breathing exercise component */}
+=======
+      {/* Breathing exercise component - conditional */}
+>>>>>>> adbaa935ff9233ec4d232bbb04f7039876628c5e
       {showBreathingExercise && (
         <TherapeuticExercise
           type="breathing"
@@ -655,12 +858,21 @@ export default function Chat() {
         />
       )}
 
+<<<<<<< HEAD
       {/* Support message for emotional situations */}
       {showSupportMessage && (
         <div className={`support-message ${calmMode ? 'calm-support' : ''}`}>
           <p>Este perfect normal să simți emoții puternice. Ia-ți timp să procesezi ce simți.</p>
           {calmMode && (
             <button className="support-button" onClick={() => setShowBreathingExercise(true)}>
+=======
+      {/* Support message pentru situații emoționale */}
+      {showSupportMessage && (
+        <div className={`${styles.supportMessage} ${calmMode ? styles.calmSupportMessage : ''}`}>
+          <p>Este perfect normal să simți emoții puternice. Ia-ți timp să procesezi ce simți.</p>
+          {calmMode && (
+            <button className={styles.supportButton} onClick={() => setShowBreathingExercise(true)}>
+>>>>>>> adbaa935ff9233ec4d232bbb04f7039876628c5e
               Începe un exercițiu de respirație
             </button>
           )}
@@ -668,6 +880,7 @@ export default function Chat() {
       )}
 
       {/* Input form */}
+<<<<<<< HEAD
       <div className={`input-container ${calmMode ? 'calm-input' : ''}`} ref={inputContainerRef}>
         <div className="input-inner">
           <form onSubmit={handleSubmit} className="input-form">
@@ -701,6 +914,15 @@ export default function Chat() {
               )}
               
               <textarea
+=======
+      <div className={`${styles.inputContainer} ${calmMode ? styles.calmInputContainer : ''}`} ref={inputContainerRef}>
+        <div className={styles.innerInputContainer}>
+          <form onSubmit={handleSubmit} className={styles.inputGrid}>
+            <div className={styles.textareaContainer}>
+              <label htmlFor="message-input" className="sr-only">Scrie un mesaj</label>
+              <textarea
+                id="message-input"
+>>>>>>> adbaa935ff9233ec4d232bbb04f7039876628c5e
                 ref={textareaRef}
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
@@ -708,6 +930,7 @@ export default function Chat() {
                 disabled={isLoading}
                 rows={1}
                 aria-label="Mesaj către terapeut"
+<<<<<<< HEAD
                 className={calmMode ? 'calm-textarea' : ''}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' && !e.shiftKey) {
@@ -715,6 +938,13 @@ export default function Chat() {
                     if (input.trim()) {
                       handleSubmit(e as unknown as React.FormEvent<HTMLFormElement>);
                     }
+=======
+                className={calmMode ? styles.calmTextarea : ''}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSubmit(e as unknown as React.FormEvent<HTMLFormElement>);
+>>>>>>> adbaa935ff9233ec4d232bbb04f7039876628c5e
                   }
                 }}
               />
@@ -723,24 +953,42 @@ export default function Chat() {
             <button
               type="submit"
               disabled={isLoading || !input.trim()}
+<<<<<<< HEAD
               className={`send-button ${calmMode ? 'calm-send' : ''}`}
+=======
+              className={`${styles.sendButton} ${calmMode ? styles.calmSendButton : ''}`}
+>>>>>>> adbaa935ff9233ec4d232bbb04f7039876628c5e
               aria-label="Trimite mesaj"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
+<<<<<<< HEAD
                 stroke="currentColor"
               >
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+=======
+                stroke="white"
+                className="w-4 h-4"
+                aria-hidden="true"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14M12 5l7 7-7 7" />
+>>>>>>> adbaa935ff9233ec4d232bbb04f7039876628c5e
               </svg>
             </button>
           </form>
         </div>
 
+<<<<<<< HEAD
         {/* Disclaimer text */}
         {!hasStartedConversation && (
           <div className={`disclaimer-text ${!hasStartedConversation ? '' : 'hidden'} ${calmMode ? 'calm-disclaimer' : ''}`}>
+=======
+        {/* Disclaimer text - with therapeutic considerations */}
+        {!hasStartedConversation && (
+          <div className={`${styles.disclaimerText} ${!hasStartedConversation ? '' : styles.hidden} ${calmMode ? styles.calmDisclaimerText : ''}`}>
+>>>>>>> adbaa935ff9233ec4d232bbb04f7039876628c5e
             {calmMode 
               ? `${currentTherapist.name} este aici pentru a te sprijini. Confidențialitatea și confortul tău sunt prioritare.`
               : `${currentTherapist.name} este un instrument de suport, nu un înlocuitor pentru terapia profesională.`
@@ -748,6 +996,14 @@ export default function Chat() {
           </div>
         )}
       </div>
+<<<<<<< HEAD
+=======
+
+      {/* Emotional state indicator pentru debug
+      <div className={styles.emotionalStateDebug}>
+        State: {currentEmotionalState}
+      </div> */}
+>>>>>>> adbaa935ff9233ec4d232bbb04f7039876628c5e
     </div>
   );
 }

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /* LeftMenu.module.css */
 
 /* Overlay */
@@ -647,3 +648,447 @@
     transform: none !important;
   }
 }
+=======
+/* app/components/LeftMenu/LeftMenu.module.css */
+/*
+ * CSS Module pentru componenta LeftMenu
+ * Importă design system pentru a folosi variabilele globale
+ * Optimizat pentru considerații terapeutice
+ */
+
+ @import '../../styles/design-system/index.css';
+
+ /* Overlay pentru fundal - cu tranziții blânde pentru reducerea anxietății */
+ .overlay {
+   position: fixed;
+   top: 0;
+   left: 0;
+   right: 0;
+   bottom: 0;
+   background-color: var(--color-overlay);
+   z-index: 1500;
+   opacity: 0;
+   visibility: hidden;
+   transition: opacity var(--transition-slow) var(--ease-calm), 
+               visibility var(--transition-slow) var(--ease-calm);
+ }
+ 
+ .visibleOverlay {
+   opacity: 1;
+   visibility: visible;
+ }
+ 
+ /* Versiune mai blândă pentru modul calm */
+ .calmOverlay {
+   background-color: var(--color-overlay-soft);
+   backdrop-filter: blur(2px);
+   transition: opacity var(--transition-gentle) var(--ease-predictable),
+               visibility var(--transition-gentle) var(--ease-predictable);
+ }
+ 
+ /* Menu lateral principal - cu considerații pentru confort vizual */
+ .sideMenu {
+   position: fixed;
+   left: 0;
+   top: 0;
+   bottom: 0;
+   width: 300px;
+   background-color: white;
+   box-shadow: var(--shadow-menu);
+   transform: translateX(-100%);
+   transition: transform var(--transition-supporting);
+   z-index: 2000;
+   overflow-y: auto;
+   padding: var(--spacing-base);
+ }
+ 
+ .openMenu {
+   transform: translateX(0);
+ }
+ 
+ /* Versiune pentru mod calm */
+ .calmModeMenu {
+   background-color: var(--color-calm-light);
+   box-shadow: none;
+   border-right: 1px solid rgba(162, 197, 224, 0.3);
+   transition: transform var(--transition-calm);
+ }
+ 
+ /* Header meniu - cu elemente interactive */
+ .menuHeader {
+   font-size: var(--font-size-xl);
+   font-weight: var(--font-weight-bold);
+   color: var(--color-heading);
+   margin-bottom: var(--spacing-xl);
+   padding-top: var(--spacing-lg);
+   display: flex;
+   align-items: center;
+   justify-content: space-between;
+ }
+ 
+ .headerActions {
+   display: flex;
+   align-items: center;
+   gap: var(--spacing-sm);
+ }
+ 
+ .closeButton, .menuClose {
+   cursor: pointer;
+   width: var(--control-size-sm);
+   height: var(--control-size-sm);
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   border-radius: 50%;
+   transition: background-color var(--transition-calm);
+ }
+ 
+ .closeButton:hover, .menuClose:hover {
+   background-color: var(--color-gray-200);
+ }
+ 
+ /* Calm mode toggle button */
+ .calmModeToggle {
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   width: var(--control-size-sm);
+   height: var(--control-size-sm);
+   border-radius: 50%;
+   color: var(--color-text-light);
+   transition: all var(--transition-calm);
+ }
+ 
+ .calmModeToggle:hover {
+   background-color: var(--color-calm-light);
+   color: var(--color-calm);
+ }
+ 
+ .calmModeActive {
+   color: var(--color-calm);
+   background-color: var(--color-calm-light);
+ }
+ 
+ /* Secțiuni meniu - restructurate pentru lizibilitate */
+ .menuSection {
+   margin-bottom: var(--spacing-xl);
+ }
+ 
+ .sectionTitle {
+   font-size: var(--font-size-md);
+   font-weight: var(--font-weight-semibold);
+   margin-bottom: var(--spacing-md);
+   color: var(--color-heading);
+   display: flex;
+   align-items: center;
+ }
+ 
+ .sectionIcon {
+   width: 1rem;
+   height: 1rem;
+   margin-right: var(--spacing-sm);
+ }
+ 
+ .menuItem {
+   padding: var(--spacing-md);
+   border-radius: var(--border-radius-md);
+   cursor: pointer;
+   transition: background-color var(--transition-standard);
+ }
+ 
+ .menuItem:hover {
+   background-color: var(--color-gray-200);
+ }
+ 
+ /* Varianta calmă pentru elementele meniului */
+ .calmMenuItem {
+   transition: background-color var(--transition-calm);
+ }
+ 
+ .calmMenuItem:hover {
+   background-color: rgba(162, 197, 224, 0.2);
+ }
+ 
+ .menuDivider {
+   height: 1px;
+   background-color: var(--color-gray-300);
+   margin: var(--spacing-lg) 0;
+ }
+ 
+ /* Lista de conversații */
+ .conversationsList {
+   display: flex;
+   flex-direction: column;
+   gap: var(--spacing-xs);
+ }
+ 
+ /* Element conversație - cu semnalizare emoțională */
+ .conversationItem {
+   padding: var(--spacing-md);
+   border-radius: var(--border-radius-md);
+   margin-bottom: var(--spacing-sm);
+   cursor: pointer;
+   display: flex;
+   align-items: center;
+   justify-content: space-between;
+   transition: background-color var(--transition-standard), 
+               transform var(--transition-standard);
+   position: relative;
+ }
+ 
+ .conversationItem:hover {
+   background-color: var(--color-gray-200);
+ }
+ 
+ .currentConversation {
+   background-color: rgba(210, 163, 138, 0.1);
+   position: relative;
+ }
+ 
+ /* Versiuni emoționale pentru conversații */
+ .positiveConversation {
+   border-left: 3px solid var(--color-success);
+ }
+ 
+ .calmingConversation {
+   border-left: 3px solid var(--color-calm);
+ }
+ 
+ /* Mod calm pentru elementele conversației */
+ .calmModeItem {
+   transition: all var(--transition-calm);
+ }
+ 
+ .calmModeItem:hover {
+   background-color: rgba(162, 197, 224, 0.15);
+   transform: translateY(-1px);
+ }
+ 
+ .conversationDetails {
+   flex: 1;
+   overflow: hidden;
+ }
+ 
+ .conversationTitle {
+   font-weight: var(--font-weight-semibold);
+   font-size: var(--font-size-sm);
+   white-space: nowrap;
+   overflow: hidden;
+   text-overflow: ellipsis;
+   display: flex;
+   align-items: center;
+ }
+ 
+ .conversationDate {
+   font-size: var(--font-size-xs);
+   color: var(--color-text);
+   opacity: 0.7;
+   margin-top: 4px;
+ }
+ 
+ .conversationActions {
+   display: flex;
+   align-items: center;
+ }
+ 
+ /* Indicatori stare emoțională */
+ .moodIndicator {
+   display: inline-block;
+   width: 8px;
+   height: 8px;
+   border-radius: 50%;
+   margin-right: 8px;
+ }
+ 
+ .moodPositive {
+   background-color: var(--color-success);
+ }
+ 
+ .moodCalm {
+   background-color: var(--color-calm);
+ }
+ 
+ .moodFocus {
+   background-color: var(--color-focus);
+ }
+ 
+ .moodNeutral {
+   background-color: var(--color-neutral);
+ }
+ 
+ /* Buton opțiuni - cu tranziție mai blândă */
+ .optionsButton {
+   width: 28px;
+   height: 28px;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   border-radius: var(--border-radius-circle);
+   cursor: pointer;
+   transition: background-color var(--transition-calm);
+ }
+ 
+ .optionsButton:hover {
+   background-color: var(--color-overlay-light);
+ }
+ 
+ /* Menu opțiuni conversație - mai calm și predictibil */
+ .conversationOptions {
+   position: absolute;
+   top: 0;
+   right: 40px;
+   width: 150px;
+   background-color: white;
+   border-radius: var(--border-radius-md);
+   box-shadow: var(--shadow-dropdown);
+   z-index: 2100;
+   overflow: hidden;
+   animation: gentleFadeInUp var(--transition-calm) forwards;
+ }
+ 
+ .conversationOption {
+   padding: var(--spacing-sm) var(--spacing-md);
+   font-size: var(--font-size-sm);
+   display: flex;
+   align-items: center;
+   cursor: pointer;
+   transition: background-color var(--transition-calm);
+ }
+ 
+ .conversationOption:hover {
+   background-color: var(--color-gray-200);
+ }
+ 
+ .deleteOption {
+   color: var(--color-error);
+ }
+ 
+ .deleteOption:hover {
+   background-color: var(--color-error-light);
+ }
+ 
+ /* Formular redenumire - optimizat pentru lizibilitate */
+ .renameForm {
+   width: 100%;
+   padding: var(--spacing-xs);
+ }
+ 
+ .renameInput {
+   width: 100%;
+   padding: 6px 8px;
+   border: 1px solid var(--color-gray-300);
+   border-radius: var(--border-radius-sm);
+   font-size: var(--font-size-sm);
+   margin-bottom: var(--spacing-sm);
+   outline: none;
+   transition: border-color var(--transition-calm);
+ }
+ 
+ .renameInput:focus {
+   border-color: var(--color-primary);
+   box-shadow: 0 0 0 2px var(--color-primary-light);
+ }
+ 
+ .renameActions {
+   display: flex;
+   gap: var(--spacing-sm);
+   font-size: var(--font-size-xs);
+   justify-content: flex-end;
+ }
+ 
+ .saveButton, .cancelButton {
+   padding: 3px 8px;
+   border-radius: var(--border-radius-sm);
+   cursor: pointer;
+   transition: background-color var(--transition-calm);
+ }
+ 
+ .saveButton {
+   background-color: var(--color-primary);
+   color: white;
+ }
+ 
+ .saveButton:hover {
+   background-color: var(--color-primary-dark);
+ }
+ 
+ .cancelButton {
+   background-color: var(--color-gray-300);
+ }
+ 
+ .cancelButton:hover {
+   background-color: var(--color-gray-400);
+ }
+ 
+ /* Text gol - mai prietenos */
+ .emptyText {
+   padding: var(--spacing-sm) var(--spacing-lg);
+   color: var(--color-text-light);
+   font-size: var(--font-size-sm);
+   text-align: center;
+   font-style: italic;
+ }
+ 
+ /* Support section - nouă pentru resurse de sănătate mintală */
+ .supportSection {
+   margin-top: var(--spacing-xl);
+   padding: var(--spacing-md);
+   background-color: var(--color-support-light);
+   border-radius: var(--border-radius-md);
+   border-left: 3px solid var(--color-support);
+ }
+ 
+ .calmSupportSection {
+   background-color: var(--color-calm-light);
+   border-left: 3px solid var(--color-calm);
+ }
+ 
+ .supportText {
+   font-size: var(--font-size-sm);
+   margin-bottom: var(--spacing-sm);
+ }
+ 
+ .supportLink {
+   display: inline-block;
+   color: var(--color-primary-dark);
+   font-size: var(--font-size-sm);
+   font-weight: var(--font-weight-semibold);
+   text-decoration: underline;
+   transition: color var(--transition-calm);
+ }
+ 
+ .supportLink:hover {
+   color: var(--color-primary);
+ }
+ 
+ /* Media queries */
+ @media (max-width: 640px) {
+   .sideMenu {
+     width: 85%;
+   }
+ }
+ 
+ /* Animații - mai blânde și controlate */
+ @keyframes gentleFadeInUp {
+   from {
+     opacity: 0;
+     transform: translateY(var(--amplitude-subtle));
+   }
+   to {
+     opacity: 1;
+     transform: translateY(0);
+   }
+ }
+ 
+ /* Preferințe pentru reducerea mișcării */
+ @media (prefers-reduced-motion: reduce) {
+   .conversationItem:hover,
+   .calmModeItem:hover {
+     transform: none;
+   }
+   
+   .conversationOptions {
+     animation: none;
+   }
+ }
+>>>>>>> adbaa935ff9233ec4d232bbb04f7039876628c5e

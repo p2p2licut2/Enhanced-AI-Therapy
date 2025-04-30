@@ -1,4 +1,7 @@
+<<<<<<< HEAD
 // LeftMenu Component Redesign
+=======
+>>>>>>> adbaa935ff9233ec4d232bbb04f7039876628c5e
 'use client';
 
 import { Conversation } from '@/app/types';
@@ -7,7 +10,11 @@ import { useApp } from '@/app/contexts/AppContext';
 import { formatDistanceToNow } from 'date-fns';
 import { ro } from 'date-fns/locale';
 import ConfirmDialog from '../ConfirmDialog/ConfirmDialog';
+<<<<<<< HEAD
 import { motion, AnimatePresence } from 'framer-motion';
+=======
+import styles from './LeftMenu.module.css';
+>>>>>>> adbaa935ff9233ec4d232bbb04f7039876628c5e
 
 export default function LeftMenu() {
   const {
@@ -28,6 +35,7 @@ export default function LeftMenu() {
   const [editingItemId, setEditingItemId] = useState<string | null>(null);
   const [conversationToDelete, setConversationToDelete] = useState<string | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+<<<<<<< HEAD
   const [activeSection, setActiveSection] = useState<'favorites' | 'recent' | null>(null);
   const [hoveredConversationId, setHoveredConversationId] = useState<string | null>(null);
   const [calmMode, setCalmMode] = useState(false);
@@ -37,6 +45,13 @@ export default function LeftMenu() {
   const optionsRef = useRef<HTMLDivElement>(null);
   const titleInputRef = useRef<HTMLInputElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
+=======
+  const optionsRef = useRef<HTMLDivElement>(null);
+  const titleInputRef = useRef<HTMLInputElement>(null);
+  const [hoveredConversationId, setHoveredConversationId] = useState<string | null>(null);
+  // Stare pentru activarea modului calm
+  const [calmMode, setCalmMode] = useState(false);
+>>>>>>> adbaa935ff9233ec4d232bbb04f7039876628c5e
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -54,11 +69,16 @@ export default function LeftMenu() {
   }, []);
 
   useEffect(() => {
+<<<<<<< HEAD
+=======
+    // Focus the input when renaming starts with o mică întârziere pentru a reduce anxietatea
+>>>>>>> adbaa935ff9233ec4d232bbb04f7039876628c5e
     if (isRenaming && titleInputRef.current) {
       const focusTimer = setTimeout(() => {
         if (titleInputRef.current) {
           titleInputRef.current.focus();
         }
+<<<<<<< HEAD
       }, calmMode ? 300 : 100);
       
       return () => clearTimeout(focusTimer);
@@ -96,6 +116,19 @@ export default function LeftMenu() {
     setShowOptionsFor(null);
     setIsRenaming(false);
     setSearchQuery('');
+=======
+      }, 100);
+      
+      return () => clearTimeout(focusTimer);
+    }
+  }, [isRenaming]);
+
+  const handleCloseMenu = () => {
+    // Tranziție mai calmă la închidere
+    setIsMenuOpen(false);
+    setShowOptionsFor(null);
+    setIsRenaming(false);
+>>>>>>> adbaa935ff9233ec4d232bbb04f7039876628c5e
   };
 
   const handleNewConversation = () => {
@@ -123,10 +156,18 @@ export default function LeftMenu() {
     if (compositeId.endsWith('-favorite') || compositeId.endsWith('-recent')) {
       return compositeId.substring(0, compositeId.lastIndexOf('-'));
     }
+<<<<<<< HEAD
     return compositeId;
   };
 
   const handleRename = (conversationId: string, section: 'favorite' | 'recent') => {
+=======
+    return compositeId; // Safety case
+  };
+
+  const handleRename = (conversationId: string, section: 'favorite' | 'recent') => {
+    // Find the conversation to get its current title
+>>>>>>> adbaa935ff9233ec4d232bbb04f7039876628c5e
     const conversation = [...favoriteConversations, ...recentConversations]
       .find(c => c.id === conversationId);
 
@@ -139,6 +180,10 @@ export default function LeftMenu() {
   };
 
   const handleDelete = (conversationId: string) => {
+<<<<<<< HEAD
+=======
+    // Use the custom dialog instead of window.confirm
+>>>>>>> adbaa935ff9233ec4d232bbb04f7039876628c5e
     setConversationToDelete(conversationId);
     setShowDeleteConfirm(true);
     setShowOptionsFor(null);
@@ -166,16 +211,25 @@ export default function LeftMenu() {
     setEditingItemId(null);
   };
 
+<<<<<<< HEAD
   // Format date
+=======
+  // Format date to readable string
+>>>>>>> adbaa935ff9233ec4d232bbb04f7039876628c5e
   const formatDate = (timestamp: number): string => {
     return formatDistanceToNow(new Date(timestamp), { addSuffix: true, locale: ro });
   };
 
+<<<<<<< HEAD
   // Toggle calm mode
+=======
+  // Toggle calm mode pentru utilizatorii cu anxietate
+>>>>>>> adbaa935ff9233ec4d232bbb04f7039876628c5e
   const toggleCalmMode = () => {
     setCalmMode(prev => !prev);
   };
 
+<<<<<<< HEAD
   // Toggle section
   const toggleSection = (section: 'favorites' | 'recent') => {
     setActiveSection(prev => prev === section ? null : section);
@@ -194,6 +248,8 @@ export default function LeftMenu() {
   const filteredRecent = filterConversations(recentConversations);
 
   // Conversation list rendering
+=======
+>>>>>>> adbaa935ff9233ec4d232bbb04f7039876628c5e
   const renderConversationItem = (
     conversation: Conversation,
     isCurrent: boolean = false,
@@ -201,13 +257,20 @@ export default function LeftMenu() {
   ) => {
     const itemId = `${conversation.id}-${section}`;
     const isCurrentlyRenaming = isRenaming && editingItemId === itemId;
+<<<<<<< HEAD
     const isHovered = hoveredConversationId === conversation.id;
     
     // Identify emotional type of conversation
+=======
+    const showOptionButtons = isCurrent || hoveredConversationId === conversation.id;
+
+    // Identificăm tipul emoțional al conversației pentru personalizare
+>>>>>>> adbaa935ff9233ec4d232bbb04f7039876628c5e
     const isPositiveConversation = conversation.title.toLowerCase().includes('bine') || 
                                   conversation.title.toLowerCase().includes('progres');
     const isCalmingConversation = conversation.title.toLowerCase().includes('calm') || 
                                  conversation.title.toLowerCase().includes('relaxare');
+<<<<<<< HEAD
     const isFocusConversation = conversation.title.toLowerCase().includes('focus') || 
                                conversation.title.toLowerCase().includes('atenție');
 
@@ -230,23 +293,54 @@ export default function LeftMenu() {
       >
         {isCurrentlyRenaming ? (
           <form onSubmit={handleRenameSubmit} className="rename-form" onClick={e => e.stopPropagation()}>
+=======
+
+    return (
+      <div
+        key={`${conversation.id}-${section}`}
+        className={`${styles.conversationItem} 
+                   ${isCurrent ? styles.currentConversation : ''} 
+                   ${isPositiveConversation ? styles.positiveConversation : ''}
+                   ${isCalmingConversation ? styles.calmingConversation : ''}
+                   ${calmMode ? styles.calmModeItem : ''}`}
+        onClick={() => handleConversationClick(conversation.id)}
+        onMouseEnter={() => setHoveredConversationId(conversation.id)}
+        onMouseLeave={() => setHoveredConversationId(null)}
+        aria-current={isCurrent ? 'true' : 'false'}
+      >
+        {isCurrentlyRenaming ? (
+          <form onSubmit={handleRenameSubmit} className={styles.renameForm} onClick={e => e.stopPropagation()}>
+>>>>>>> adbaa935ff9233ec4d232bbb04f7039876628c5e
             <input
               ref={titleInputRef}
               type="text"
               value={newTitle}
               onChange={(e) => setNewTitle(e.target.value)}
+<<<<<<< HEAD
               className="rename-input"
               placeholder="Introdu un nou titlu"
               aria-label="Numele conversației"
             />
             <div className="rename-actions">
               <button type="submit" className="rename-save">
+=======
+              className={styles.renameInput}
+              placeholder="Introdu un nou titlu"
+              aria-label="Numele conversației"
+            />
+            <div className={styles.renameActions}>
+              <button type="submit" className={styles.saveButton}>
+>>>>>>> adbaa935ff9233ec4d232bbb04f7039876628c5e
                 Salvează
               </button>
               <button
                 type="button"
                 onClick={handleRenameCancel}
+<<<<<<< HEAD
                 className="rename-cancel"
+=======
+                className={styles.cancelButton}
+>>>>>>> adbaa935ff9233ec4d232bbb04f7039876628c5e
               >
                 Anulează
               </button>
@@ -254,6 +348,7 @@ export default function LeftMenu() {
           </form>
         ) : (
           <>
+<<<<<<< HEAD
             <div className="conversation-content">
               {/* Emotional indicator for conversation */}
               {(isPositiveConversation || isCalmingConversation || isFocusConversation) && (
@@ -291,6 +386,45 @@ export default function LeftMenu() {
               {(isHovered || isCurrent) && (
                 <button
                   className="options-button"
+=======
+            <div className={styles.conversationDetails}>
+              <div className={styles.conversationTitle}>
+                {/* Indicator emoțional pentru conversație */}
+                {isPositiveConversation && (
+                  <span className={`${styles.moodIndicator} ${styles.moodPositive}`} 
+                        aria-label="Conversație pozitivă"></span>
+                )}
+                {isCalmingConversation && (
+                  <span className={`${styles.moodIndicator} ${styles.moodCalm}`}
+                        aria-label="Conversație calmantă"></span>
+                )}
+                {conversation.title}
+              </div>
+              <div className={styles.conversationDate}>{formatDate(conversation.updatedAt)}</div>
+            </div>
+
+            <div className={styles.conversationActions}>
+              {conversation.isFavorite && (
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  className={styles.favoriteIcon}
+                  aria-label="Conversație favorită"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              )}
+
+              {/* Show options button when hovering or when it's the current conversation */}
+              {showOptionButtons && (
+                <button
+                  className={styles.optionsButton}
+>>>>>>> adbaa935ff9233ec4d232bbb04f7039876628c5e
                   onClick={(e) => handleOptionsClick(e, conversation.id, section)}
                   aria-label="Opțiuni pentru conversație"
                 >
@@ -299,6 +433,11 @@ export default function LeftMenu() {
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
+<<<<<<< HEAD
+=======
+                    className="w-5 h-5"
+                    aria-hidden="true"
+>>>>>>> adbaa935ff9233ec4d232bbb04f7039876628c5e
                   >
                     <path
                       strokeLinecap="round"
@@ -311,9 +450,15 @@ export default function LeftMenu() {
               )}
 
               {showOptionsFor === itemId && (
+<<<<<<< HEAD
                 <div className="options-menu" ref={optionsRef} onClick={e => e.stopPropagation()}>
                   <div
                     className="option-item"
+=======
+                <div className={styles.conversationOptions} ref={optionsRef} onClick={e => e.stopPropagation()}>
+                  <div
+                    className={styles.conversationOption}
+>>>>>>> adbaa935ff9233ec4d232bbb04f7039876628c5e
                     onClick={() => handleRename(conversation.id, section)}
                   >
                     <svg
@@ -321,6 +466,11 @@ export default function LeftMenu() {
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
+<<<<<<< HEAD
+=======
+                      className="w-4 h-4 mr-2"
+                      aria-hidden="true"
+>>>>>>> adbaa935ff9233ec4d232bbb04f7039876628c5e
                     >
                       <path
                         strokeLinecap="round"
@@ -329,10 +479,17 @@ export default function LeftMenu() {
                         d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
                       />
                     </svg>
+<<<<<<< HEAD
                     <span>Redenumește</span>
                   </div>
                   <div
                     className="option-item delete"
+=======
+                    Redenumește
+                  </div>
+                  <div
+                    className={`${styles.conversationOption} ${styles.deleteOption}`}
+>>>>>>> adbaa935ff9233ec4d232bbb04f7039876628c5e
                     onClick={() => handleDelete(conversation.id)}
                   >
                     <svg
@@ -340,6 +497,11 @@ export default function LeftMenu() {
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
+<<<<<<< HEAD
+=======
+                      className="w-4 h-4 mr-2"
+                      aria-hidden="true"
+>>>>>>> adbaa935ff9233ec4d232bbb04f7039876628c5e
                     >
                       <path
                         strokeLinecap="round"
@@ -348,13 +510,18 @@ export default function LeftMenu() {
                         d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
                       />
                     </svg>
+<<<<<<< HEAD
                     <span>Șterge</span>
+=======
+                    Șterge
+>>>>>>> adbaa935ff9233ec4d232bbb04f7039876628c5e
                   </div>
                 </div>
               )}
             </div>
           </>
         )}
+<<<<<<< HEAD
       </motion.div>
     );
   };
@@ -727,6 +894,191 @@ export default function LeftMenu() {
       </AnimatePresence>
 
       {/* Delete Confirmation Dialog */}
+=======
+      </div>
+    );
+  };
+
+  return (
+    <>
+      {/* Backdrop overlay with calm transition */}
+      <div
+        className={`${styles.overlay} ${isMenuOpen ? styles.visibleOverlay : ''} ${calmMode ? styles.calmOverlay : ''}`}
+        onClick={handleCloseMenu}
+        aria-hidden="true"
+      />
+
+      {/* Side menu panel with therapeutic considerations */}
+      <div className={`${styles.sideMenu} ${isMenuOpen ? styles.openMenu : ''} ${calmMode ? styles.calmModeMenu : ''}`}>
+        <div className={styles.menuHeader}>
+          <span>Terapie AI</span>
+          <div className={styles.headerActions}>
+            {/* Buton pentru modul calm - nou adăugat */}
+            <button 
+              className={`${styles.calmModeToggle} ${calmMode ? styles.calmModeActive : ''}`}
+              onClick={toggleCalmMode}
+              aria-label={calmMode ? "Dezactivează modul calm" : "Activează modul calm"}
+              aria-pressed={calmMode}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                className="w-5 h-5"
+                aria-hidden="true"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
+                />
+              </svg>
+            </button>
+            <button
+              className={styles.menuClose}
+              onClick={handleCloseMenu}
+              aria-label="Închide meniul"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                className="w-6 h-6"
+                aria-hidden="true"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        {/* New conversation option with soothing hover */}
+        <div className={styles.menuSection}>
+          <div
+            className={`${styles.menuItem} ${calmMode ? styles.calmMenuItem : ''}`}
+            onClick={handleNewConversation}
+            role="button"
+            aria-label="Începe o nouă conversație"
+          >
+            <div className="flex items-center">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                className="w-5 h-5 mr-3"
+                aria-hidden="true"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 4v16m8-8H4"
+                />
+              </svg>
+              <span>Începe o nouă conversație</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Divider */}
+        <div className={styles.menuDivider} />
+
+        {/* Favorite conversations */}
+        {favoriteConversations.length > 0 && (
+          <div className={styles.menuSection}>
+            <div className={styles.sectionTitle}>
+              <div className="flex items-center">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  className={styles.sectionIcon}
+                  aria-hidden="true"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                <span>Conversații Favorite</span>
+              </div>
+            </div>
+
+            <div className={styles.conversationsList} role="list" aria-label="Conversații favorite">
+              {favoriteConversations.map(conversation =>
+                renderConversationItem(
+                  conversation,
+                  conversation.id === currentConversation?.id,
+                  'favorite'
+                )
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Recent conversations */}
+        <div className={styles.menuSection}>
+          <div className={styles.sectionTitle}>
+            <div className="flex items-center">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                className={styles.sectionIcon}
+                aria-hidden="true"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              <span>Istoricul conversațiilor</span>
+            </div>
+          </div>
+
+          <div className={styles.conversationsList} role="list" aria-label="Istoricul conversațiilor">
+            {recentConversations.length > 0 ? (
+              recentConversations.map(conversation =>
+                renderConversationItem(
+                  conversation,
+                  conversation.id === currentConversation?.id,
+                  'recent'
+                )
+              )
+            ) : (
+              <div className={styles.emptyText}>
+                Nu există conversații în istoric
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Secțiune nouă pentru suport emoțional */}
+        <div className={`${styles.supportSection} ${calmMode ? styles.calmSupportSection : ''}`}>
+          <p className={styles.supportText}>
+            Este important să ții minte că ai resurse la dispoziție în orice moment.
+          </p>
+          <a href="#" className={styles.supportLink}>
+            Resurse pentru sănătate mintală
+          </a>
+        </div>
+      </div>
+
+      {/* Custom Delete Confirmation Dialog - cu tranziții blânde */}
+>>>>>>> adbaa935ff9233ec4d232bbb04f7039876628c5e
       <ConfirmDialog
         isOpen={showDeleteConfirm}
         onClose={() => setShowDeleteConfirm(false)}
