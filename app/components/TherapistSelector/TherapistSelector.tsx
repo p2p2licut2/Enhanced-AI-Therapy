@@ -1,9 +1,9 @@
-// app/components/TherapistSelector.tsx
 'use client';
 
 import Image from 'next/image';
 import { useApp } from '@/app/contexts/AppContext';
 import { TherapistId } from '@/app/types';
+import styles from './TherapistSelector.module.css';
 
 // Define therapists data
 const therapists = [
@@ -53,16 +53,16 @@ export default function TherapistSelector() {
     <>
       {/* Backdrop overlay */}
       <div 
-        className={`overlay ${isTherapistSelectorOpen ? 'visible' : ''}`} 
+        className={`${styles.overlay} ${isTherapistSelectorOpen ? styles.visible : ''}`}
         onClick={handleClose}
       />
       
       {/* Therapist selector panel */}
-      <div className={`side-menu ${isTherapistSelectorOpen ? 'open' : ''}`}>
-        <div className="menu-header">
+      <div className={`${styles.sideMenu} ${isTherapistSelectorOpen ? styles.open : ''}`}>
+        <div className={styles.menuHeader}>
           <span>Alege terapeutul</span>
           <button 
-            className="menu-close" 
+            className={styles.menuClose}
             onClick={handleClose}
             aria-label="Close therapist selector"
           >
@@ -83,29 +83,29 @@ export default function TherapistSelector() {
           </button>
         </div>
         
-        <div className="px-4 py-3">
-          <p className="text-sm text-gray-600 mb-4">
+        <div className={styles.content}>
+          <p className={styles.infoText}>
             Alege terapeutul potrivit pentru nevoile tale. Fiecare are un stil diferit de abordare.
           </p>
           
-          <div className="therapist-grid">
+          <div className={styles.therapistGrid}>
             {therapists.map(therapist => (
               <div 
                 key={therapist.id}
-                className="therapist-card"
+                className={styles.therapistCard}
                 onClick={() => handleSelectTherapist(therapist.id)}
               >
-                <div className="therapist-avatar">
+                <div className={styles.therapistAvatar}>
                   <Image 
                     src={therapist.avatarSrc} 
                     alt={therapist.name} 
                     width={64} 
                     height={64} 
-                    className="rounded-full object-cover"
+                    className={styles.avatarImage}
                   />
                 </div>
-                <div className="therapist-name">{therapist.name}</div>
-                <div className="therapist-description">{therapist.description}</div>
+                <div className={styles.therapistName}>{therapist.name}</div>
+                <div className={styles.therapistDescription}>{therapist.description}</div>
               </div>
             ))}
           </div>

@@ -1,17 +1,181 @@
 /* app/globals.css */
+/*
+ * Stiluri globale pentru aplicația Terapie AI
+ * Conține doar variabilele globale, resetarea și stilurile de bază
+ */
+
+/* Import Google Fonts */
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap');
 
+/* Integrarea cu Tailwind */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Import design system */
-@import './styles/design-system/index.css';
-@import './styles/base/_reset.css';
-@import './styles/base/_global.css';
-@import './styles/base/_typography.css';
-@import './styles/base/_forms.css';
-@import './styles/layouts/_app-layout.css';
-@import './styles/mental-health/_therapeutic.css';
-@import './styles/utilities/_accessibility.css';
-@import './styles/utilities/_animations.css';
+/* Variabile CSS globale */
+:root {
+  /* Culorile primare și secundare */
+  --color-primary: #D2A38A;     /* Soft terracotta */
+  --color-primary-dark: #B56E52;    /* Deep terracotta */
+  --color-primary-light: #E6D2C0;   /* Light terracotta */
+  
+  --color-secondary: #E6D2C0;   /* Warm beige */
+  --color-secondary-dark: #D7C3B1;  /* Darker beige */
+  --color-secondary-light: #F2E6DB; /* Lighter beige */
+  
+  --color-accent: #B8C4BB;      /* Muted sage */
+  --color-accent-dark: #A7B3AA;     /* Darker sage */
+  --color-accent-light: #D5DCD7;    /* Lighter sage */
+  
+  /* Fundaluri și suprafețe */
+  --color-background: #F7F4F0;  /* Off-white */
+  --color-input-bg: #FFFFFF;    /* White background for input */
+  
+  /* Text și conținut */
+  --color-text: #3A3A3A;        /* Soft charcoal */
+  --color-text-light: #6A6A6A;      /* Lighter text */
+  --color-text-lighter: #999999;    /* Pale text */
+  --color-heading: #B56E52;     /* Deep terracotta */
+  
+  /* Nuanțe de gri */
+  --color-gray-100: #F7F7F7;
+  --color-gray-200: #F0F0F0;        /* Light gray */
+  --color-gray-300: #E0E0E0;        /* Medium gray */
+  --color-gray-400: #D1D1D1;
+  --color-gray: #E0E0E0;
+  --color-gray-light: #F0F0F0;
+  
+  /* Transparențe pentru overlay-uri */
+  --color-overlay: rgba(0, 0, 0, 0.4);
+  --color-overlay-dark: rgba(0, 0, 0, 0.5);
+  --color-overlay-light: rgba(0, 0, 0, 0.1);
+  
+  /* Alte variabile */
+  --vh: 1vh;
+  
+  /* Tranziții */
+  --transition-standard: 0.3s;
+  --transition-fast: 0.15s;
+  --transition-slow: 0.5s;
+}
+
+/* Resetare și stiluri de bază */
+html, body {
+  overflow: hidden;
+  height: 100vh;
+  width: 100vw;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  color: var(--color-text);
+  background-color: var(--color-background);
+  font-family: 'Nunito', sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: var(--color-heading);
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+}
+
+/* Scrollbar personalizat */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+  display: block;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgba(210, 163, 138, 0.4);
+  border-radius: 20px;
+}
+
+/* Ascunde scrollbar pentru textarea */
+textarea::-webkit-scrollbar {
+  display: none;
+}
+
+textarea {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  resize: none;
+}
+
+/* Ascunde scrollbar dar păstrează funcționalitatea */
+.no-scrollbar {
+  -ms-overflow-style: none;      /* IE / Edge */
+  scrollbar-width: none;         /* Firefox */
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;                 /* Chrome / Safari / Opera */
+}
+
+/* Container principal */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  height: calc(var(--vh, 1vh) * 100);
+  width: 100%;
+  max-width: 768px;
+  margin: 0 auto;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Header global - comun tuturor paginilor */
+.global-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  padding: 8px 1rem 0;
+  z-index: 1000;
+  background: var(--color-background);
+}
+
+.header-content {
+  display: flex;
+  background: transparent;
+  align-items: center;
+  width: 100%;
+  max-width: 768px;
+  margin: 0 auto;
+  justify-content: space-between;
+  padding-bottom: 6px;
+}
+
+/* Custom overlay pentru modals cu efect de blur */
+.custom-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 2000;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+  backdrop-filter: blur(2px);
+}
+
+.custom-overlay.visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Fix pentru iOS */
+@supports (-webkit-touch-callout: none) {
+  .full-height {
+    height: -webkit-fill-available;
+  }
+}

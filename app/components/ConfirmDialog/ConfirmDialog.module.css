@@ -1,138 +1,141 @@
 /* app/components/ConfirmDialog/ConfirmDialog.module.css */
-/*
- * CSS Module pentru componenta ConfirmDialog
- * Importă design system pentru a folosi variabilele globale
- */
 
- @import '../../styles/design-system/index.css';
+/* Overlay */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--color-overlay-dark);
+  z-index: 2000;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+  backdrop-filter: blur(2px);
+}
 
- /* Overlay */
- .overlay {
-   position: fixed;
-   top: 0;
-   left: 0;
-   right: 0;
-   bottom: 0;
-   background-color: var(--color-overlay-dark);
-   z-index: 2000;
-   opacity: 0;
-   visibility: hidden;
-   transition: opacity var(--transition-standard), visibility var(--transition-standard);
-   backdrop-filter: var(--backdrop-blur);
- }
- 
- .visibleOverlay {
-   opacity: 1;
-   visibility: visible;
- }
- 
- /* Dialog container */
- .dialog {
-   position: fixed;
-   top: 50%;
-   left: 50%;
-   transform: translate(-50%, -50%);
-   width: 90%;
-   max-width: 350px;
-   background-color: white;
-   border-radius: var(--border-radius-lg);
-   box-shadow: var(--shadow-modal);
-   z-index: 2100;
-   overflow: hidden;
-   animation: modalFadeIn var(--transition-slow) var(--ease-out);
- }
- 
- /* Header dialog */
- .dialogHeader {
-   display: flex;
-   align-items: center;
-   justify-content: space-between;
-   padding: var(--spacing-md) var(--spacing-lg);
-   background-color: var(--color-primary);
-   color: white;
-   font-weight: var(--font-weight-semibold);
-   font-size: var(--font-size-lg);
- }
- 
- .closeButton {
-   cursor: pointer;
-   background: none;
-   border: none;
-   color: white;
-   width: var(--control-size-sm);
-   height: var(--control-size-sm);
-   display: flex;
-   align-items: center;
-   justify-content: center;
-   border-radius: var(--border-radius-circle);
-   transition: background-color var(--transition-standard);
- }
- 
- .closeButton:hover {
-   background-color: rgba(255, 255, 255, 0.2);
- }
- 
- /* Conținut dialog */
- .dialogContent {
-   padding: var(--spacing-lg);
- }
- 
- .dialogMessage {
-   margin-bottom: var(--spacing-lg);
-   line-height: var(--line-height-base);
- }
- 
- /* Butoane acțiuni */
- .dialogActions {
-   display: flex;
-   justify-content: flex-end;
-   gap: var(--spacing-sm);
- }
- 
- .dialogButton {
-   padding: var(--spacing-sm) var(--spacing-lg);
-   border-radius: var(--border-radius-md);
-   font-weight: var(--font-weight-semibold);
-   cursor: pointer;
-   transition: background-color var(--transition-standard);
-   border: none;
-   font-size: var(--font-size-sm);
- }
- 
- .cancelButton {
-   background-color: var(--color-gray-300);
-   color: var(--color-text);
- }
- 
- .cancelButton:hover {
-   background-color: var(--color-gray-400);
- }
- 
- .confirmButton {
-   background-color: var(--color-primary);
-   color: white;
- }
- 
- .confirmButton:hover {
-   background-color: var(--color-primary-dark);
- }
- 
- .destructiveButton {
-   background-color: var(--color-error);
- }
- 
- .destructiveButton:hover {
-   background-color: #DC2626; /* Culoare hardcodată din globals original */
- }
- 
- /* Animație modal */
- @keyframes modalFadeIn {
-   from {
-     opacity: 0;
-     transform: translate(-50%, -48%);
-   }
-   to {
-     opacity: 1;
-     transform: translate(-50%, -50%);
-   }
- }
+.visibleOverlay {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Dialog container */
+.dialog {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90%;
+  max-width: 350px;
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  z-index: 2100;
+  overflow: hidden;
+  animation: modalFadeIn 0.3s ease;
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -48%);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
+}
+
+/* Header dialog */
+.dialogHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  background-color: var(--color-primary);
+  color: white;
+  font-weight: 600;
+  font-size: 18px;
+}
+
+.closeButton {
+  cursor: pointer;
+  background: none;
+  border: none;
+  color: white;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background-color 0.2s ease;
+}
+
+.closeButton:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Dialog content */
+.dialogContent {
+  padding: 20px;
+}
+
+.dialogMessage {
+  margin-bottom: 20px;
+  line-height: 1.5;
+  color: var(--color-text);
+}
+
+/* Action buttons */
+.dialogActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.dialogButton {
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  border: none;
+  font-size: 14px;
+}
+
+.cancelButton {
+  background-color: var(--color-gray);
+  color: var(--color-text);
+}
+
+.cancelButton:hover {
+  background-color: #D1D1D1;
+}
+
+.confirmButton {
+  background-color: var(--color-primary);
+  color: white;
+}
+
+.confirmButton:hover {
+  background-color: var(--color-primary-dark);
+}
+
+.destructiveButton {
+  background-color: #EF4444;
+  color: white;
+}
+
+.destructiveButton:hover {
+  background-color: #DC2626;
+}
+
+/* Media queries for smaller screens */
+@media (max-width: 480px) {
+  .dialog {
+    width: 95%;
+  }
+}

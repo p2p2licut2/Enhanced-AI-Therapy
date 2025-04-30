@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { useApp } from '@/app/contexts/AppContext';
 import TherapistProfileModal from '../TherapistProfileModal/TherapistProfileModal';
 import ConfirmDialog from '../ConfirmDialog/ConfirmDialog';
+import styles from './Header.module.css';
 
 export default function Header() {
   const {
@@ -67,9 +68,9 @@ export default function Header() {
     const updateFade = () => {
       // if we're at (or almost at) the end, hide the fade
       if (el.scrollLeft + el.clientWidth >= el.scrollWidth - 1) {
-        el.classList.add('fade-hidden');
+        el.classList.add(styles.fadeHidden);
       } else {
-        el.classList.remove('fade-hidden');
+        el.classList.remove(styles.fadeHidden);
       }
     };
 
@@ -308,9 +309,9 @@ export default function Header() {
     <>
       <div className="global-header">
         <div className="header-content">
-          <div className="header-left flex items-center flex-1 min-w-0">
+          <div className={styles.headerLeft}>
             <button
-              className="header-menu-button"
+              className={styles.menuButton}
               onClick={handleMenuClick}
               aria-label="Open menu"
             >
@@ -331,7 +332,7 @@ export default function Header() {
             </button>
 
             <div
-              className="header-icon cursor-pointer"
+              className={styles.avatarContainer}
               onClick={handleTherapistClick}
               title="Vezi profilul terapeutului"
             >
@@ -344,9 +345,9 @@ export default function Header() {
               />
             </div>
 
-            <div className="header-title-container flex flex-col min-w-0">
+            <div className={styles.titleContainer}>
               <div
-                className="header-title truncate cursor-pointer"
+                className={styles.therapistTitle}
                 onClick={handleTherapistClick}
                 title="Vezi profilul terapeutului"
               >
@@ -355,19 +356,19 @@ export default function Header() {
 
               {/* Afișăm titlul conversației curente sau titlul provizoriu */}
               {(currentConversation || pendingConversationTitle) && !isRenaming && (
-                <div className="scroll-fade flex-1 min-w-0 pr-2">
+                <div className={`${styles.scrollFade} flex-1 min-w-0 pr-2`}>
                   {/* Fix: Folosim două elemente diferite cu referințe separate */}
                   <div
                     ref={titleRef}
                     onClick={handleTitleClick}
-                    className="overflow-x-auto whitespace-nowrap no-scrollbar cursor-pointer"
+                    className={`${styles.titleScroll} ${styles.noScrollbar}`}
                   >
                     {/* Elementul interior care are referința pentru scroll */}
                     <div
                       ref={titleScrollRef}
                       onMouseEnter={handleTitleMouseEnter}
                       onMouseLeave={handleTitleMouseLeave}
-                      className={`inline-block ${isAutoScrolling ? 'auto-scrolling' : ''}`}
+                      className={`${styles.innerScroll} ${isAutoScrolling ? styles.autoScrolling : ''}`}
                     >
                       {currentConversation ? currentConversation.title : pendingConversationTitle}
                       {currentConversation && (
@@ -394,7 +395,7 @@ export default function Header() {
               {currentConversation && isRenaming && (
                 <form 
                   onSubmit={handleRenameSubmit} 
-                  className="rename-form"
+                  className={styles.renameForm}
                   onClick={(e) => e.stopPropagation()} // Prevenim propagarea
                 >
                   <input
@@ -402,17 +403,17 @@ export default function Header() {
                     type="text"
                     value={newTitle}
                     onChange={(e) => setNewTitle(e.target.value)}
-                    className="rename-input flex-1 min-w-0 truncate"
+                    className={styles.renameInput}
                     placeholder="Introdu un nou titlu"
                   />
-                  <div className="rename-actions">
-                    <button type="submit" className="rename-save-btn">
+                  <div className={styles.renameActions}>
+                    <button type="submit" className={styles.saveButton}>
                       Salvează
                     </button>
                     <button
                       type="button"
                       onClick={handleRenameCancel}
-                      className="rename-cancel-btn"
+                      className={styles.cancelButton}
                     >
                       Anulează
                     </button>
@@ -423,12 +424,12 @@ export default function Header() {
               {/* Afișăm meniul de opțiuni doar pentru conversații reale */}
               {showOptions && currentConversation && (
                 <div 
-                  className="title-options" 
+                  className={styles.titleOptions} 
                   ref={optionsRef}
                   onClick={(e) => e.stopPropagation()} // Prevenim propagarea
                 >
                   <div 
-                    className="title-option" 
+                    className={styles.titleOption} 
                     onClick={handleRename}
                   >
                     <svg
@@ -448,7 +449,7 @@ export default function Header() {
                     Redenumește
                   </div>
                   <div 
-                    className="title-option title-option-delete" 
+                    className={`${styles.titleOption} ${styles.deleteOption}`}
                     onClick={handleDelete}
                   >
                     <svg
@@ -474,7 +475,7 @@ export default function Header() {
 
           {currentConversation && (
             <button
-              className="favorite-button"
+              className={styles.favoriteButton}
               onClick={handleFavoriteClick}
               aria-label={isCurrentConversationFavorite ? "Remove from favorites" : "Add to favorites"}
             >

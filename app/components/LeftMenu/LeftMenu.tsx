@@ -5,6 +5,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useApp } from '@/app/contexts/AppContext';
 import { formatDistanceToNow } from 'date-fns';
 import { ro } from 'date-fns/locale';
+import styles from './LeftMenu.module.css';
 import ConfirmDialog from '../ConfirmDialog/ConfirmDialog';
 
 export default function LeftMenu() {
@@ -145,29 +146,29 @@ export default function LeftMenu() {
     return (
       <div
         key={`${conversation.id}-${section}`}
-        className={`conversation-item ${isCurrent ? 'current-conversation' : ''}`}
+        className={`${styles.conversationItem} ${isCurrent ? styles.currentConversation : ''}`}
         onClick={() => handleConversationClick(conversation.id)}
         onMouseEnter={() => setHoveredConversationId(conversation.id)}
         onMouseLeave={() => setHoveredConversationId(null)}
       >
         {isCurrentlyRenaming ? (
-          <form onSubmit={handleRenameSubmit} className="rename-form-menu" onClick={e => e.stopPropagation()}>
+          <form onSubmit={handleRenameSubmit} className={styles.renameForm} onClick={e => e.stopPropagation()}>
             <input
               ref={titleInputRef}
               type="text"
               value={newTitle}
               onChange={(e) => setNewTitle(e.target.value)}
-              className="rename-input-menu"
+              className={styles.renameInput}
               placeholder="Introdu un nou titlu"
             />
-            <div className="rename-actions-menu">
-              <button type="submit" className="rename-save-btn">
+            <div className={styles.renameActions}>
+              <button type="submit" className={styles.saveButton}>
                 Salvează
               </button>
               <button
                 type="button"
                 onClick={handleRenameCancel}
-                className="rename-cancel-btn"
+                className={styles.cancelButton}
               >
                 Anulează
               </button>
@@ -175,18 +176,18 @@ export default function LeftMenu() {
           </form>
         ) : (
           <>
-            <div className="conversation-details">
-              <div className="conversation-item-title">{conversation.title}</div>
-              <div className="conversation-item-date">{formatDate(conversation.updatedAt)}</div>
+            <div className={styles.conversationDetails}>
+              <div className={styles.conversationTitle}>{conversation.title}</div>
+              <div className={styles.conversationDate}>{formatDate(conversation.updatedAt)}</div>
             </div>
 
-            <div className="conversation-actions">
+            <div className={styles.conversationActions}>
               {conversation.isFavorite && (
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 24 24"
                   fill="currentColor"
-                  className="w-4 h-4 text-yellow-500 mr-2"
+                  className={`w-4 h-4 text-yellow-500 mr-2 ${styles.favoriteIcon}`}
                 >
                   <path
                     fillRule="evenodd"
@@ -199,7 +200,7 @@ export default function LeftMenu() {
               {/* Show options button when hovering or when it's the current conversation */}
               {showOptionButtons && (
                 <button
-                  className="options-button"
+                  className={styles.optionsButton}
                   onClick={(e) => handleOptionsClick(e, conversation.id, section)}
                   aria-label="Options"
                 >
@@ -221,9 +222,9 @@ export default function LeftMenu() {
               )}
 
               {showOptionsFor === itemId && (
-                <div className="conversation-options" ref={optionsRef} onClick={e => e.stopPropagation()}>
+                <div className={styles.conversationOptions} ref={optionsRef} onClick={e => e.stopPropagation()}>
                   <div
-                    className="conversation-option"
+                    className={styles.conversationOption}
                     onClick={() => handleRename(conversation.id, section)}
                   >
                     <svg
@@ -243,7 +244,7 @@ export default function LeftMenu() {
                     Redenumește
                   </div>
                   <div
-                    className="conversation-option conversation-option-delete"
+                    className={`${styles.conversationOption} ${styles.deleteOption}`}
                     onClick={() => handleDelete(conversation.id)}
                   >
                     <svg
@@ -275,16 +276,16 @@ export default function LeftMenu() {
     <>
       {/* Backdrop overlay */}
       <div
-        className={`overlay ${isMenuOpen ? 'visible' : ''}`}
+        className={`${styles.overlay} ${isMenuOpen ? styles.visible : ''}`}
         onClick={handleCloseMenu}
       />
 
       {/* Side menu panel */}
-      <div className={`side-menu ${isMenuOpen ? 'open' : ''}`}>
-        <div className="menu-header">
+      <div className={`${styles.sideMenu} ${isMenuOpen ? styles.open : ''}`}>
+        <div className={styles.menuHeader}>
           <span>Terapie AI</span>
           <button
-            className="menu-close"
+            className={styles.closeButton}
             onClick={handleCloseMenu}
             aria-label="Close menu"
           >
@@ -306,9 +307,9 @@ export default function LeftMenu() {
         </div>
 
         {/* New conversation option */}
-        <div className="menu-section">
+        <div className={styles.menuSection}>
           <div
-            className="menu-item"
+            className={styles.menuItem}
             onClick={handleNewConversation}
           >
             <div className="flex items-center">
@@ -332,12 +333,12 @@ export default function LeftMenu() {
         </div>
 
         {/* Divider */}
-        <div className="menu-divider" />
+        <div className={styles.menuDivider} />
 
         {/* Favorite conversations */}
         {favoriteConversations.length > 0 && (
-          <div className="menu-section">
-            <div className="menu-section-title">
+          <div className={styles.menuSection}>
+            <div className={styles.sectionTitle}>
               <div className="flex items-center">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -366,8 +367,8 @@ export default function LeftMenu() {
         )}
 
         {/* Recent conversations */}
-        <div className="menu-section">
-          <div className="menu-section-title">
+        <div className={styles.menuSection}>
+          <div className={styles.sectionTitle}>
             <div className="flex items-center">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -396,7 +397,7 @@ export default function LeftMenu() {
               )
             )
           ) : (
-            <div className="px-4 py-2 text-gray-500 text-sm">
+            <div className={styles.emptyText}>
               Nu există conversații în istoric
             </div>
           )}

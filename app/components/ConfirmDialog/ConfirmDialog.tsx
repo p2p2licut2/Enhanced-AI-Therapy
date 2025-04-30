@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef } from 'react';
+import styles from './ConfirmDialog.module.css';
 import FocusTrap from '../../utils/FocusTrap';
 
 interface ConfirmDialogProps {
@@ -53,7 +54,7 @@ export default function ConfirmDialog({
         if (confirmButtonRef.current && !isDestructive) {
           confirmButtonRef.current.focus();
         } else if (dialogRef.current) {
-          const cancelButton = dialogRef.current.querySelector('.cancel-button') as HTMLButtonElement;
+          const cancelButton = dialogRef.current.querySelector(`.${styles.cancelButton}`) as HTMLButtonElement;
           if (cancelButton) {
             cancelButton.focus();
           }
@@ -79,24 +80,24 @@ export default function ConfirmDialog({
     <FocusTrap isActive={isOpen}>
       {/* Backdrop overlay */}
       <div 
-        className="custom-overlay visible" 
+        className={`custom-overlay visible`} 
         onClick={onClose} 
         aria-hidden="true"
       />
       
       {/* Dialog */}
       <div 
-        className="confirm-dialog" 
+        className={styles.dialog} 
         ref={dialogRef}
         role="alertdialog"
         aria-modal="true"
         aria-labelledby="dialog-title"
         aria-describedby="dialog-message"
       >
-        <div className="dialog-header">
+        <div className={styles.dialogHeader}>
           <span id="dialog-title">{title}</span>
           <button 
-            className="modal-close" 
+            className={styles.closeButton} 
             onClick={onClose} 
             aria-label="Închide dialogul"
           >
@@ -118,14 +119,14 @@ export default function ConfirmDialog({
           </button>
         </div>
         
-        <div className="dialog-content">
-          <div id="dialog-message" className="dialog-message" style={{ color: 'var(--color-text)' }}>
+        <div className={styles.dialogContent}>
+          <div id="dialog-message" className={styles.dialogMessage}>
             {message}
           </div>
           
-          <div className="dialog-actions">
+          <div className={styles.dialogActions}>
             <button 
-              className="dialog-button cancel-button" 
+              className={styles.cancelButton} 
               onClick={onClose}
             >
               {cancelText}
@@ -133,7 +134,7 @@ export default function ConfirmDialog({
             
             <button 
               ref={confirmButtonRef}
-              className={`dialog-button confirm-button ${isDestructive ? 'destructive-button' : ''}`} 
+              className={`${styles.confirmButton} ${isDestructive ? styles.destructiveButton : ''}`} 
               onClick={() => {
                 onConfirm();
                 onClose();

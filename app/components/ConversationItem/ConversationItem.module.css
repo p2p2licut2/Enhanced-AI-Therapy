@@ -1,56 +1,186 @@
 /* app/components/ConversationItem/ConversationItem.module.css */
-/*
- * CSS Module pentru componenta ConversationItem
- * Importă design system pentru a folosi variabilele globale
- */
 
- /* Container element conversație */
- .conversationItem {
-   padding: var(--spacing-md);
-   border-radius: var(--border-radius-md);
-   margin-bottom: var(--spacing-sm);
-   cursor: pointer;
-   display: flex;
-   align-items: center;
-   justify-content: space-between;
-   transition: background-color var(--transition-standard);
-   position: relative;
- }
- 
- .conversationItem:hover {
-   background-color: var(--color-gray-200);
- }
- 
- .current {
-   background-color: rgba(210, 163, 138, 0.1);
- }
- 
- /* Detalii conversație */
- .content {
-   display: flex;
-   flex-direction: column;
-   overflow: hidden;
- }
- 
- .title {
-   font-weight: var(--font-weight-semibold);
-   font-size: var(--font-size-sm);
-   white-space: nowrap;
-   overflow: hidden;
-   text-overflow: ellipsis;
- }
- 
- .date {
-   font-size: var(--font-size-xs);
-   color: var(--color-text);
-   opacity: 0.7;
-   margin-top: 4px;
- }
- 
- /* Icon favorite */
- .favoriteIcon {
-   width: 1rem;
-   height: 1rem;
-   color: #FFD700; /* Culoare originală pentru stele favorite */
-   margin-left: var(--spacing-sm);
- }
+.conversationItem {
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: background-color 0.2s ease;
+  position: relative;
+}
+
+.conversationItem:hover {
+  background-color: var(--color-gray-light);
+}
+
+.current {
+  background-color: rgba(210, 163, 138, 0.1);
+}
+
+.contentContainer {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.title {
+  font-weight: 600;
+  font-size: 15px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--color-text);
+}
+
+.date {
+  font-size: 12px;
+  color: var(--color-text-light);
+  opacity: 0.7;
+  margin-top: 4px;
+}
+
+.favoriteIcon {
+  width: 16px;
+  height: 16px;
+  color: #FFD700; /* Gold color for favorite star */
+  margin-left: 8px;
+  flex-shrink: 0;
+}
+
+/* Options popup */
+.optionsContainer {
+  position: absolute;
+  top: 0;
+  right: 40px;
+  width: 150px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+  overflow: hidden;
+}
+
+.optionItem {
+  padding: 10px 14px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.optionItem:hover {
+  background-color: var(--color-gray-light);
+}
+
+.deleteOption {
+  color: #EF4444; /* Red color */
+}
+
+.deleteOption:hover {
+  background-color: #FEE2E2; /* Light red */
+}
+
+.optionsButton {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  opacity: 0;
+}
+
+.conversationItem:hover .optionsButton,
+.showOptions .optionsButton {
+  opacity: 1;
+}
+
+.optionsButton:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* Rename form */
+.renameForm {
+  width: 100%;
+  padding: 4px;
+}
+
+.renameInput {
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid var(--color-gray);
+  border-radius: 4px;
+  font-size: 14px;
+  margin-bottom: 8px;
+  outline: none;
+}
+
+.renameInput:focus {
+  border-color: var(--color-primary);
+}
+
+.renameActions {
+  display: flex;
+  gap: 8px;
+  font-size: 12px;
+  justify-content: flex-end;
+}
+
+.saveButton,
+.cancelButton {
+  padding: 3px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  border: none;
+}
+
+.saveButton {
+  background-color: var(--color-primary);
+  color: white;
+}
+
+.saveButton:hover {
+  background-color: var(--color-primary-dark);
+}
+
+.cancelButton {
+  background-color: var(--color-gray);
+  color: var(--color-text);
+}
+
+.cancelButton:hover {
+  background-color: var(--color-gray-400);
+}
+
+/* Mood indicators */
+.moodIndicator {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+
+.moodPositive {
+  background-color: #10B981; /* Green */
+}
+
+.moodCalm {
+  background-color: #3B82F6; /* Blue */
+}
+
+.moodFocus {
+  background-color: #F59E0B; /* Amber */
+}
+
+.moodNeutral {
+  background-color: #6B7280; /* Gray */
+}

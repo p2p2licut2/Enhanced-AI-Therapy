@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useApp } from '@/app/contexts/AppContext';
 import { Message } from '@/app/types';
+import styles from './Chat.module.css';
 
 export default function Chat() {
   // Get state and functions from context
@@ -155,7 +156,7 @@ export default function Chat() {
         content: msg.content
       }));
 
-      // Call API - don't pass the signal to avoid abort errors
+      // Call API
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: {
@@ -254,14 +255,14 @@ export default function Chat() {
 
   return (
     <div 
-      className="chat-window" 
+      className={styles.chatWindow}
       ref={chatWindowRef}
       aria-live="polite"
       aria-atomic="true"
     >
       {/* Messages */}
       <div
-        className="messages-container"
+        className={styles.messagesContainer}
         ref={messagesContainerRef}
         style={{
           height: `calc(100% - ${inputHeight}px)`,
@@ -272,14 +273,14 @@ export default function Chat() {
       >
         {messages.length === 0 ? (
           // Welcome message when no messages exist
-          <div className="welcome-container">
-            <div className="welcome-icon" aria-hidden="true">
+          <div className={styles.welcomeContainer}>
+            <div className={styles.welcomeIcon} aria-hidden="true">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-6 h-6 text-white">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
               </svg>
             </div>
-            <h2 className="welcome-title">Bine ai venit la sesiunea ta de terapie</h2>
-            <p className="welcome-text">
+            <h2 className={styles.welcomeTitle}>Bine ai venit la sesiunea ta de terapie</h2>
+            <p className={styles.welcomeText}>
               Întreabă-mă despre dezvoltare personală, stabilirea obiectivelor sau orice provocări cu care te confrunți
             </p>
           </div>
@@ -298,12 +299,12 @@ export default function Chat() {
                 aria-label={`${message.role === 'user' ? 'Tu' : currentTherapist.name} a spus`}
               >
                 <div 
-                  className={`message-bubble ${message.role === 'user' ? 'message-user' : 'message-assistant'}`}
+                  className={`${styles.messageBubble} ${message.role === 'user' ? styles.messageUser : styles.messageAssistant}`}
                 >
                   {isLastAssistantMessage ? (
                     // If it's the last assistant message and it's animating
-                    <div className="typing-animation-container">
-                      <div className="typing-animation">
+                    <div className={styles.typingAnimationContainer}>
+                      <div className={styles.typingAnimation}>
                         {formatMessage(displayedText)}
                       </div>
                     </div>
@@ -321,12 +322,12 @@ export default function Chat() {
         {isLoading && (
           <div className="flex justify-start">
             <div 
-              className="message-bubble message-assistant loading-indicator"
+              className={`${styles.messageBubble} ${styles.messageAssistant} ${styles.loadingIndicator}`}
               aria-label={`${currentTherapist.name} scrie...`}
             >
-              <div className="loading-dot" aria-hidden="true" />
-              <div className="loading-dot" aria-hidden="true" />
-              <div className="loading-dot" aria-hidden="true" />
+              <div className={styles.loadingDot} aria-hidden="true" />
+              <div className={styles.loadingDot} aria-hidden="true" />
+              <div className={styles.loadingDot} aria-hidden="true" />
             </div>
           </div>
         )}
@@ -336,10 +337,10 @@ export default function Chat() {
       </div>
 
       {/* Input form */}
-      <div className="input-container-wrapper" ref={inputContainerRef}>
-        <div className="input-container">
-          <form onSubmit={handleSubmit} className="input-grid">
-            <div className="textarea-container">
+      <div className={styles.inputContainerWrapper} ref={inputContainerRef}>
+        <div className={styles.inputContainer}>
+          <form onSubmit={handleSubmit} className={styles.inputGrid}>
+            <div className={styles.textareaContainer}>
               <label htmlFor="message-input" className="sr-only">Scrie un mesaj</label>
               <textarea
                 id="message-input"
@@ -349,6 +350,7 @@ export default function Chat() {
                 placeholder="Scrie un mesaj..."
                 disabled={isLoading}
                 rows={1}
+                className={styles.textarea}
                 aria-label="Mesaj către terapeut"
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' && !e.shiftKey) {
@@ -362,7 +364,7 @@ export default function Chat() {
             <button
               type="submit"
               disabled={isLoading || !input.trim()}
-              className="send-button"
+              className={styles.sendButton}
               aria-label="Trimite mesaj"
             >
               <svg
@@ -381,7 +383,7 @@ export default function Chat() {
 
         {/* Disclaimer text - only shown before first message */}
         {!hasStartedConversation && (
-          <div className={`disclaimer-text ${!hasStartedConversation ? '' : 'hidden'}`}>
+          <div className={`${styles.disclaimerText} ${hasStartedConversation ? styles.hidden : ''}`}>
             {currentTherapist.name} este un instrument de suport, nu un înlocuitor pentru terapia profesională.
           </div>
         )}

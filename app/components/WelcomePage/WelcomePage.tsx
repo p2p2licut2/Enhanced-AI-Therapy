@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useApp } from '@/app/contexts/AppContext';
 import { TherapistId } from '@/app/types';
-import { motion } from 'framer-motion';
+import styles from './WelcomePage.module.css';
 
 // Define therapists data - matches what's in TherapistSelector
 const therapists = [
@@ -100,76 +100,37 @@ export default function WelcomePage() {
     };
   }, []);
 
-  // Animation variants for Framer Motion
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-      },
-    },
-    exit: {
-      opacity: 0,
-      transition: {
-        duration: 0.5,
-      },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: {
-        duration: 0.5,
-      },
-    },
-  };
-
   return (
-    <div className={`welcome-page ${isAnimating ? 'fade-out' : ''}`}>
+    <div className={`${styles.welcomePage} ${isAnimating ? styles.fadeOut : ''}`}>
       {/* Hero Section */}
-      <motion.div 
-        className="welcome-hero"
-        initial="hidden"
-        animate="visible"
-        exit="exit"
-        variants={containerVariants}
-      >
-        <motion.h1 variants={itemVariants} className="welcome-title">
+      <div className={styles.hero}>
+        <h1 className={styles.heroTitle}>
           Bine ai venit!
-        </motion.h1>
+        </h1>
         
-        <motion.p variants={itemVariants} className="welcome-subtitle">
+        <p className={styles.heroSubtitle}>
           Un spațiu sigur pentru conversații semnificative și sprijin emoțional
-        </motion.p>
-      </motion.div>
+        </p>
+      </div>
 
       {/* Therapist Selection Section */}
-      <motion.div 
-        className="welcome-section"
-        initial="hidden"
-        animate="visible"
-        variants={containerVariants}
-      >
-        <motion.h2 variants={itemVariants} className="section-title">
+      <div className={styles.section}>
+        <h2 className={styles.sectionTitle}>
           Alege-ți terapeutul
-        </motion.h2>
+        </h2>
         
-        <motion.p variants={itemVariants} className="section-description">
+        <p className={styles.sectionDescription}>
           Fiecare terapeut are propria abordare unică. Selectează-l pe cel care ți se potrivește cel mai bine.
-        </motion.p>
+        </p>
         
-        <motion.div variants={itemVariants} className="therapist-grid-welcome">
+        <div className={styles.therapistGrid}>
           {therapists.map((therapist) => (
             <div
               key={therapist.id}
-              className={`therapist-card-welcome ${selectedTherapist === therapist.id ? 'selected' : ''}`}
+              className={`${styles.therapistCard} ${selectedTherapist === therapist.id ? styles.selected : ''}`}
               onClick={() => handleSelectTherapist(therapist.id)}
             >
-              <div className="therapist-avatar-welcome">
+              <div className={styles.therapistAvatar}>
                 <Image
                   src={therapist.avatarSrc}
                   alt={therapist.name}
@@ -178,52 +139,42 @@ export default function WelcomePage() {
                   className="rounded-full object-cover"
                 />
               </div>
-              <div className="therapist-info">
-                <h3 className="therapist-name-welcome">{therapist.name}</h3>
-                <div className="therapist-specialty">{therapist.specialty}</div>
-                <p className="therapist-description-welcome">{therapist.description}</p>
+              <div className={styles.therapistInfo}>
+                <h3 className={styles.therapistName}>{therapist.name}</h3>
+                <div className={styles.therapistSpecialty}>{therapist.specialty}</div>
+                <p className={styles.therapistDescription}>{therapist.description}</p>
               </div>
             </div>
           ))}
-        </motion.div>
-      </motion.div>
+        </div>
+      </div>
 
       {/* Benefits Section */}
-      <motion.div 
-        className="welcome-section benefits-section"
-        initial="hidden"
-        animate="visible"
-        variants={containerVariants}
-      >
-        <motion.h2 variants={itemVariants} className="section-title">
+      <div className={`${styles.section} ${styles.benefitsSection}`}>
+        <h2 className={styles.sectionTitle}>
           Beneficiile Terapie AI
-        </motion.h2>
+        </h2>
         
-        <motion.div variants={itemVariants} className="benefits-grid">
+        <div className={styles.benefitsGrid}>
           {benefits.map((benefit, index) => (
-            <div key={index} className="benefit-card">
-              <div className="benefit-icon">
+            <div key={index} className={styles.benefitCard}>
+              <div className={styles.benefitIcon}>
                 {benefit.icon}
               </div>
-              <h3 className="benefit-title">{benefit.title}</h3>
-              <p className="benefit-description">{benefit.description}</p>
+              <h3 className={styles.benefitTitle}>{benefit.title}</h3>
+              <p className={styles.benefitDescription}>{benefit.description}</p>
             </div>
           ))}
-        </motion.div>
-      </motion.div>
+        </div>
+      </div>
 
       {/* Disclaimer */}
-      <motion.div 
-        className="welcome-disclaimer"
-        initial="hidden"
-        animate="visible"
-        variants={containerVariants}
-      >
-        <motion.p variants={itemVariants}>
+      <div className={styles.disclaimer}>
+        <p>
           Terapie AI este un instrument de suport, nu un înlocuitor pentru ajutor profesional.
           Pentru situații de urgență, contactează un specialist în sănătate mintală.
-        </motion.p>
-      </motion.div>
+        </p>
+      </div>
     </div>
   );
 }

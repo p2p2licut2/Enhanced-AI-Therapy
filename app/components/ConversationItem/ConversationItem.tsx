@@ -1,16 +1,21 @@
-// app/components/ConversationItem.tsx
 'use client';
 
 import { Conversation } from '@/app/types';
 import { formatDistanceToNow } from 'date-fns';
 import { ro } from 'date-fns/locale';
+import styles from './ConversationItem.module.css';
 
 interface ConversationItemProps {
   conversation: Conversation;
   onClick: (id: string) => void;
+  isActive?: boolean;
 }
 
-export default function ConversationItem({ conversation, onClick }: ConversationItemProps) {
+export default function ConversationItem({ 
+  conversation, 
+  onClick,
+  isActive = false
+}: ConversationItemProps) {
   // Format date to readable string
   const formatDate = (timestamp: number): string => {
     return formatDistanceToNow(new Date(timestamp), { 
@@ -21,12 +26,12 @@ export default function ConversationItem({ conversation, onClick }: Conversation
 
   return (
     <div 
-      className="conversation-item"
+      className={`${styles.conversationItem} ${isActive ? styles.active : ''}`}
       onClick={() => onClick(conversation.id)}
     >
-      <div>
-        <div className="conversation-item-title">{conversation.title}</div>
-        <div className="conversation-item-date">{formatDate(conversation.updatedAt)}</div>
+      <div className={styles.content}>
+        <div className={styles.title}>{conversation.title}</div>
+        <div className={styles.date}>{formatDate(conversation.updatedAt)}</div>
       </div>
       
       {conversation.isFavorite && (
@@ -34,7 +39,7 @@ export default function ConversationItem({ conversation, onClick }: Conversation
           xmlns="http://www.w3.org/2000/svg" 
           viewBox="0 0 24 24" 
           fill="currentColor" 
-          className="w-4 h-4 text-yellow-500"
+          className={styles.favoriteIcon}
         >
           <path 
             fillRule="evenodd" 

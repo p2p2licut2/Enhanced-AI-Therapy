@@ -4,6 +4,7 @@ import React, { useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { Therapist } from '@/app/types';
 import FocusTrap from '../../utils/FocusTrap';
+import styles from './TherapistProfileModal.module.css';
 
 interface TherapistProfileModalProps {
   therapist: Therapist;
@@ -62,25 +63,25 @@ export default function TherapistProfileModal({
     <FocusTrap isActive={isOpen}>
       {/* Backdrop overlay */}
       <div 
-        className="custom-overlay visible" 
+        className={`custom-overlay visible`} 
         onClick={onClose}
         aria-hidden="true"
       />
       
       {/* Modal */}
       <div 
-        className="therapist-profile-modal" 
+        className={styles.modal}
         ref={modalRef}
         role="dialog"
         aria-modal="true"
         aria-labelledby="profile-title"
         aria-describedby="profile-description"
       >
-        <div className="modal-header">
+        <div className={styles.header}>
           <span id="profile-title">Profilul terapeutului</span>
           <button 
             ref={closeButtonRef}
-            className="modal-close" 
+            className={styles.closeButton}
             onClick={onClose} 
             aria-label="Închide profilul"
           >
@@ -102,9 +103,9 @@ export default function TherapistProfileModal({
           </button>
         </div>
         
-        <div className="modal-content">
-          <div className="therapist-profile-header">
-            <div className="therapist-avatar-large">
+        <div className={styles.content}>
+          <div className={styles.profileHeader}>
+            <div className={styles.avatarContainer}>
               <Image
                 src={therapist.avatarSrc}
                 alt={`Imagine de profil a terapeutului ${therapist.name}`}
@@ -114,17 +115,17 @@ export default function TherapistProfileModal({
               />
             </div>
             
-            <div className="therapist-details">
-              <h2 className="therapist-name-large">{therapist.name}</h2>
-              <div className="therapist-title-badge">{therapist.title}</div>
+            <div className={styles.detailsContainer}>
+              <h2 className={styles.therapistName}>{therapist.name}</h2>
+              <div className={styles.therapistTitle}>{therapist.title}</div>
             </div>
           </div>
           
-          <div id="profile-description" className="therapist-description-container">
-            <h3 className="description-heading">Abordare terapeutică</h3>
-            <p className="therapist-description-text">{therapist.description}</p>
+          <div id="profile-description" className={styles.descriptionContainer}>
+            <h3 className={styles.descriptionHeading}>Abordare terapeutică</h3>
+            <p className={styles.descriptionText}>{therapist.description}</p>
             
-            <div className="therapist-approach">
+            <div className={styles.approachContainer}>
               {getTherapistDetails(therapist.id)}
             </div>
           </div>
@@ -140,51 +141,51 @@ function getTherapistDetails(therapistId: string) {
   const details: Record<string, React.ReactNode> = {
     maria: (
       <>
-        <p>Maria folosește o abordare bazată pe <strong>terapie cognitiv-comportamentală</strong> pentru a te ajuta să identifici și să modifici tiparele de gândire care îți creează dificultăți.</p>
-        <ul className="approach-list" role="list">
-          <li>Ascultă cu empatie și înțelegere</li>
-          <li>Oferă observații valoroase</li>
-          <li>Te ghidează spre propriile concluzii</li>
-          <li>Menține un ton calm și încurajator</li>
+        <p className={styles.approachText}>Maria folosește o abordare bazată pe <strong>terapie cognitiv-comportamentală</strong> pentru a te ajuta să identifici și să modifici tiparele de gândire care îți creează dificultăți.</p>
+        <ul className={styles.approachList} role="list">
+          <li className={styles.approachItem}>Ascultă cu empatie și înțelegere</li>
+          <li className={styles.approachItem}>Oferă observații valoroase</li>
+          <li className={styles.approachItem}>Te ghidează spre propriile concluzii</li>
+          <li className={styles.approachItem}>Menține un ton calm și încurajator</li>
         </ul>
       </>
     ),
     alin: (
       <>
-        <p>Alin folosește metoda <strong>"dragoste dură"</strong> pentru a te provoca să ieși din zona de confort și să îți atingi potențialul maxim.</p>
-        <ul className="approach-list" role="list">
-          <li>Pune întrebări provocatoare</li>
-          <li>Contestă presupunerile limitative</li>
-          <li>Folosește umor și energie pozitivă</li>
-          <li>Te motivează spre acțiune și schimbare</li>
+        <p className={styles.approachText}>Alin folosește metoda <strong>"dragoste dură"</strong> pentru a te provoca să ieși din zona de confort și să îți atingi potențialul maxim.</p>
+        <ul className={styles.approachList} role="list">
+          <li className={styles.approachItem}>Pune întrebări provocatoare</li>
+          <li className={styles.approachItem}>Contestă presupunerile limitative</li>
+          <li className={styles.approachItem}>Folosește umor și energie pozitivă</li>
+          <li className={styles.approachItem}>Te motivează spre acțiune și schimbare</li>
         </ul>
       </>
     ),
     ana: (
       <>
-        <p>Ana te ghidează într-o călătorie de <strong>descoperire personală</strong> și te ajută să îți înțelegi mai bine valorile și tiparele de gândire.</p>
-        <ul className="approach-list" role="list">
-          <li>Utilizează întrebări reflective</li>
-          <li>Încurajează contemplația și meditația</li>
-          <li>Folosește metafore revelatorii</li>
-          <li>Creează un spațiu pentru introspecție profundă</li>
+        <p className={styles.approachText}>Ana te ghidează într-o călătorie de <strong>descoperire personală</strong> și te ajută să îți înțelegi mai bine valorile și tiparele de gândire.</p>
+        <ul className={styles.approachList} role="list">
+          <li className={styles.approachItem}>Utilizează întrebări reflective</li>
+          <li className={styles.approachItem}>Încurajează contemplația și meditația</li>
+          <li className={styles.approachItem}>Folosește metafore revelatorii</li>
+          <li className={styles.approachItem}>Creează un spațiu pentru introspecție profundă</li>
         </ul>
       </>
     ),
     teodora: (
       <>
-        <p>Teodora te ajută să te concentrezi pe <strong>responsabilitatea personală</strong> și pe aspectele vieții tale pe care le poți controla și modifica.</p>
-        <ul className="approach-list" role="list">
-          <li>Oferă perspective imparțiale și directe</li>
-          <li>Dezvoltă reziliența emoțională</li>
-          <li>Învață strategii de auto-control</li>
-          <li>Promovează abordări pragmatice pentru schimbare</li>
+        <p className={styles.approachText}>Teodora te ajută să te concentrezi pe <strong>responsabilitatea personală</strong> și pe aspectele vieții tale pe care le poți controla și modifica.</p>
+        <ul className={styles.approachList} role="list">
+          <li className={styles.approachItem}>Oferă perspective imparțiale și directe</li>
+          <li className={styles.approachItem}>Dezvoltă reziliența emoțională</li>
+          <li className={styles.approachItem}>Învață strategii de auto-control</li>
+          <li className={styles.approachItem}>Promovează abordări pragmatice pentru schimbare</li>
         </ul>
       </>
     )
   };
   
   return details[therapistId] || (
-    <p>Acest terapeut te va ajuta să explorezi gândurile și emoțiile într-un mediu sigur și de susținere.</p>
+    <p className={styles.approachText}>Acest terapeut te va ajuta să explorezi gândurile și emoțiile într-un mediu sigur și de susținere.</p>
   );
 }

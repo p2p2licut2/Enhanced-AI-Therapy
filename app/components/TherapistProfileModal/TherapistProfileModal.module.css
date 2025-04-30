@@ -1,195 +1,208 @@
 /* app/components/TherapistProfileModal/TherapistProfileModal.module.css */
-/*
- * CSS Module pentru componenta TherapistProfileModal
- * Importă design system pentru a folosi variabilele globale
- */
 
- /* Overlay */
- .overlay {
-   position: fixed;
-   top: 0;
-   left: 0;
-   right: 0;
-   bottom: 0;
-   background-color: var(--color-overlay-dark);
-   z-index: 2000;
-   opacity: 0;
-   visibility: hidden;
-   transition: opacity var(--transition-standard), visibility var(--transition-standard);
-   backdrop-filter: var(--backdrop-blur);
- }
- 
- .visibleOverlay {
-   opacity: 1;
-   visibility: visible;
- }
- 
- /* Modal container */
- .modal {
-   position: fixed;
-   top: 50%;
-   left: 50%;
-   transform: translate(-50%, -50%);
-   width: 90%;
-   max-width: 400px;
-   background-color: white;
-   border-radius: var(--border-radius-lg);
-   box-shadow: var(--shadow-modal);
-   z-index: 2100;
-   overflow: hidden;
-   max-height: 90vh;
-   display: flex;
-   flex-direction: column;
-   animation: modalFadeIn var(--transition-slow) var(--ease-out);
- }
- 
- /* Header modal */
- .modalHeader {
-   display: flex;
-   align-items: center;
-   justify-content: space-between;
-   padding: var(--spacing-md) var(--spacing-lg);
-   background-color: var(--color-primary);
-   color: white;
-   font-weight: var(--font-weight-semibold);
-   font-size: var(--font-size-lg);
- }
- 
- .closeButton {
-   cursor: pointer;
-   background: none;
-   border: none;
-   color: white;
-   width: var(--control-size-sm);
-   height: var(--control-size-sm);
-   display: flex;
-   align-items: center;
-   justify-content: center;
-   border-radius: var(--border-radius-circle);
-   transition: background-color var(--transition-standard);
- }
- 
- .closeButton:hover {
-   background-color: rgba(255, 255, 255, 0.2);
- }
- 
- /* Conținut modal */
- .modalContent {
-   padding: 0;
-   overflow-y: auto;
-   overscroll-behavior: contain;
-   -webkit-overflow-scrolling: touch;
- }
- 
- /* Profil header */
- .profileHeader {
-   display: flex;
-   align-items: center;
-   padding: var(--spacing-lg);
-   border-bottom: 1px solid var(--color-gray-300);
-   background-color: var(--color-background);
- }
- 
- .avatarLarge {
-   width: var(--avatar-size-2xl);
-   height: var(--avatar-size-2xl);
-   border-radius: var(--border-radius-circle);
-   overflow: hidden;
-   margin-right: var(--spacing-lg);
-   box-shadow: var(--shadow-avatar);
-   border: var(--border-width-thicker) solid white;
- }
- 
- .therapistDetails {
-   flex: 1;
- }
- 
- .therapistName {
-   font-size: var(--font-size-2xl);
-   font-weight: var(--font-weight-bold);
-   color: var(--color-heading);
-   margin-bottom: var(--spacing-sm);
- }
- 
- .therapistTitle {
-   display: inline-block;
-   padding: 4px 12px;
-   background-color: var(--color-secondary);
-   border-radius: 16px;
-   font-size: var(--font-size-sm);
-   color: var(--color-text);
- }
- 
- /* Descriere terapeut */
- .descriptionContainer {
-   padding: var(--spacing-lg);
-   background-color: white;
- }
- 
- .descriptionHeading {
-   font-size: var(--font-size-lg);
-   font-weight: var(--font-weight-semibold);
-   color: var(--color-heading);
-   margin-bottom: var(--spacing-md);
- }
- 
- .descriptionText {
-   margin-bottom: var(--spacing-lg);
-   line-height: var(--line-height-base);
- }
- 
- .approachContainer {
-   background-color: var(--color-background);
-   padding: var(--spacing-lg);
-   border-radius: var(--border-radius-md);
-   margin-top: var(--spacing-lg);
-   font-size: var(--font-size-sm);
- }
- 
- /* Listă abordare */
- .approachList {
-   margin-top: var(--spacing-sm);
-   padding-left: var(--spacing-lg);
- }
- 
- .approachItem {
-   margin-bottom: 6px;
-   position: relative;
-   padding-left: 6px;
- }
- 
- .approachItem::before {
-   content: "•";
-   position: absolute;
-   left: -12px;
-   color: var(--color-heading);
- }
- 
- /* Variații de terapeuți pentru stilizare viitoare */
- .maria .modalHeader {
-   background-color: var(--color-maria, var(--color-primary));
- }
- 
- .alin .modalHeader {
-   background-color: var(--color-alin, var(--color-accent-dark));
- }
- 
- .ana .modalHeader {
-   background-color: var(--color-ana, var(--color-secondary-dark));
- }
- 
- .teodora .modalHeader {
-   background-color: var(--color-teodora, var(--color-primary-dark));
- }
- 
- /* Animație modal */
- @keyframes modalFadeIn {
-   from {
-     opacity: 0;
-     transform: translate(-50%, -48%);
-   }
-   to {
-     opacity: 1;
-     transform: translate(-50%, -50%);
-   }
- }
+/* Overlay */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 2000;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+  backdrop-filter: blur(2px);
+}
+
+.visibleOverlay {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Modal container */
+.modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90%;
+  max-width: 400px;
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  z-index: 2100;
+  overflow: hidden;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  animation: modalFadeIn 0.3s ease;
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -48%);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
+}
+
+/* Header modal */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  background-color: var(--color-primary);
+  color: white;
+  font-weight: 600;
+  font-size: 18px;
+}
+
+.closeButton {
+  cursor: pointer;
+  background: none;
+  border: none;
+  color: white;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background-color 0.2s ease;
+}
+
+.closeButton:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Content container */
+.content {
+  padding: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Profile header */
+.profileHeader {
+  display: flex;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 1px solid var(--color-gray);
+  background-color: var(--color-background);
+}
+
+.avatarLarge {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin-right: 20px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  border: 3px solid white;
+}
+
+.therapistDetails {
+  flex: 1;
+}
+
+.therapistName {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--color-heading);
+  margin-bottom: 8px;
+}
+
+.therapistTitle {
+  display: inline-block;
+  padding: 4px 12px;
+  background-color: var(--color-secondary);
+  border-radius: 16px;
+  font-size: 14px;
+  color: var(--color-text);
+}
+
+/* Description container */
+.descriptionContainer {
+  padding: 20px;
+  background-color: white;
+}
+
+.descriptionHeading {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--color-heading);
+  margin-bottom: 12px;
+}
+
+.descriptionText {
+  margin-bottom: 16px;
+  line-height: 1.5;
+}
+
+/* Approach section */
+.approachContainer {
+  background-color: var(--color-background);
+  padding: 16px;
+  border-radius: 8px;
+  margin-top: 16px;
+  font-size: 15px;
+}
+
+.approachList {
+  margin-top: 10px;
+  padding-left: 20px;
+}
+
+.approachListItem {
+  margin-bottom: 6px;
+  position: relative;
+  padding-left: 6px;
+}
+
+.approachListItem::before {
+  content: "•";
+  position: absolute;
+  left: -12px;
+  color: var(--color-heading);
+}
+
+/* Therapist variant styles - pentru stilizare pe ID */
+.maria .header {
+  background-color: var(--color-primary);
+}
+
+.alin .header {
+  background-color: var(--color-accent);
+}
+
+.ana .header {
+  background-color: var(--color-secondary-dark);
+}
+
+.teodora .header {
+  background-color: var(--color-primary-dark);
+}
+
+/* Media queries pentru responsivitate */
+@media (max-width: 480px) {
+  .modal {
+    width: 95%;
+  }
+  
+  .profileHeader {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  
+  .avatarLarge {
+    margin-right: 0;
+    margin-bottom: 16px;
+  }
+}
