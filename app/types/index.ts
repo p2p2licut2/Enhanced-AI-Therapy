@@ -43,6 +43,8 @@ export interface Conversation {
   createdAt: number;
   updatedAt: number;
   isFavorite: boolean;
+  journalEntryId?: string; // Reference to journal entry if conversation was started from journal
+  explorationPointId?: string; // Reference to exploration point if conversation was started from point
 }
 
 /**
@@ -91,4 +93,79 @@ export interface EventHandlers {
   onKeyDown?: (e: React.KeyboardEvent<HTMLElement>) => void;
   onMouseEnter?: (e: React.MouseEvent<HTMLElement, MouseEvent>) => void;
   onMouseLeave?: (e: React.MouseEvent<HTMLElement, MouseEvent>) => void;
+}
+
+/**
+ * Journal template types
+ */
+export type JournalTemplateId = 'daily' | 'gratitude' | 'affirmation' | 'reflection';
+
+/**
+ * Journal template interface
+ */
+export interface JournalTemplate {
+  id: JournalTemplateId;
+  name: string;
+  description: string;
+  icon: string;
+  prompts: string[];
+  color: string;
+}
+
+/**
+ * Exploration point interface - points extracted from journal entries for further exploration
+ */
+export interface ExplorationPoint {
+  id: string;
+  content: string;
+  isExplored: boolean;
+  conversationId?: string;
+  summary?: string;
+  createdAt: number;
+}
+
+/**
+ * Journal entry interface
+ */
+export interface JournalEntry {
+  id: string;
+  templateId: JournalTemplateId;
+  title: string;
+  content: string;
+  createdAt: number;
+  updatedAt: number;
+  explorationPoints: ExplorationPoint[];
+  isAnalyzed: boolean;
+}
+
+/**
+ * API request for analyzing a journal entry
+ */
+export interface AnalyzeJournalRequest {
+  journalEntryId: string;
+  content: string;
+  templateId: JournalTemplateId;
+}
+
+/**
+ * API response for journal analysis
+ */
+export interface AnalyzeJournalResponse {
+  explorationPoints: Omit<ExplorationPoint, 'id' | 'createdAt'>[];
+}
+
+/**
+ * API request for summarizing a conversation from exploration point
+ */
+export interface SummarizeConversationRequest {
+  conversationId: string;
+  journalEntryId: string;
+  explorationPointId: string;
+}
+
+/**
+ * API response for conversation summary
+ */
+export interface SummarizeConversationResponse {
+  summary: string;
 }

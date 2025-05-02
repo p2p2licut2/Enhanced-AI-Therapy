@@ -65,7 +65,7 @@ function validateInput(data: any): { valid: true } | { valid: false, error: ApiE
     };
   }
 
-  const { messages, therapistId } = data;
+  const { messages, therapistId } : { messages: any[], therapistId?: TherapistId } = data;
 
   if (!messages) {
     return {
@@ -97,7 +97,7 @@ function validateInput(data: any): { valid: true } | { valid: false, error: ApiE
     };
   }
 
-  if (therapistId && !['maria', 'alin', 'ana', 'teodora'].includes(therapistId)) {
+  if (therapistId && !['maria', 'alin', 'ana', 'teodora'].includes(therapistId as string)) {
     return {
       valid: false,
       error: {
@@ -160,10 +160,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { messages, therapistId = 'maria' } = data;
+    const { messages, therapistId = 'maria' as TherapistId } = data;
     
     // Get the appropriate system prompt based on therapist
-    const therapistPrompt = therapistPrompts[therapistId as TherapistId] || therapistPrompts.maria;
+    // Cast therapistId to TherapistId to ensure it can be used as a key
+    const safeTherapistId = (therapistId || 'maria') as TherapistId;
+    const therapistPrompt = therapistPrompts[safeTherapistId] || therapistPrompts.maria;
     const systemPrompt = `${baseSystemPrompt}\n\n${therapistPrompt}`;
 
     // Set up a timeout for the API call

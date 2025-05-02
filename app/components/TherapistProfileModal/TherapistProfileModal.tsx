@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef } from 'react';
 import Image from 'next/image';
-import { Therapist } from '@/app/types';
+import { Therapist, TherapistId } from '@/app/types';
 import FocusTrap from '../../utils/FocusTrap';
 import styles from './TherapistProfileModal.module.css';
 
@@ -136,9 +136,9 @@ export default function TherapistProfileModal({
 }
 
 // Helper function to get detailed therapist information based on ID
-function getTherapistDetails(therapistId: string) {
+function getTherapistDetails(therapistId: TherapistId) {
   // Custom details for each therapist
-  const details: Record<string, React.ReactNode> = {
+  const details: Record<TherapistId, React.ReactNode> = {
     maria: (
       <>
         <p className={styles.approachText}>Maria folosește o abordare bazată pe <strong>terapie cognitiv-comportamentală</strong> pentru a te ajuta să identifici și să modifici tiparele de gândire care îți creează dificultăți.</p>

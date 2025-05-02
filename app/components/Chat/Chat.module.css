@@ -4,8 +4,7 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  height: calc(var(--vh, 1vh) * 100 - 60px);
-  margin-top: 60px;
+  height: auto;
   overflow: hidden;
   position: relative;
 }
@@ -289,5 +288,11 @@
 @media (max-width: 640px) {
   .messageBubble {
     max-width: 90%;
+  }
+}
+
+@supports (-webkit-touch-callout: none) {
+  .chatWindow {
+    height: calc(var(--vh, 1vh) * 100 - 60px - env(safe-area-inset-bottom, 0px) - var(--journaling-height, 0px));
   }
 }

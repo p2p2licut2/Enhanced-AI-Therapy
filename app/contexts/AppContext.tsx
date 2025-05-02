@@ -1,7 +1,17 @@
 'use client';
 
+// app/contexts/AppContext.tsx
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { Therapist, TherapistId, Conversation, Message } from '../types';
+import { 
+  Therapist, 
+  TherapistId, 
+  Conversation, 
+  Message, 
+  JournalEntry, 
+  JournalTemplate,
+  JournalTemplateId,
+  ExplorationPoint
+} from '../types';
 import { v4 as uuidv4 } from 'uuid';
 
 // Define therapists data
@@ -54,6 +64,66 @@ const therapists: Record<TherapistId, Therapist> = {
   }
 };
 
+// Define journal templates
+const journalTemplates: JournalTemplate[] = [
+  {
+    id: 'daily',
+    name: 'Jurnal zilnic',
+    description: 'Reflectează asupra zilei tale și notează gândurile, emoțiile și evenimentele importante',
+    icon: 'calendar',
+    color: 'var(--color-primary)',
+    prompts: [
+      'Cum te-ai simțit astăzi, în general?',
+      'Ce momente ți-au adus bucurie sau satisfacție?',
+      'Ce provocări ai întâmpinat și cum le-ai gestionat?',
+      'Ce ai învățat azi despre tine sau despre alții?',
+      'Ce așteptări ai pentru ziua de mâine?'
+    ]
+  },
+  {
+    id: 'gratitude',
+    name: 'Jurnal de recunoștință',
+    description: 'Notează lucrurile pentru care ești recunoscător și cultivă o perspectivă pozitivă',
+    icon: 'heart',
+    color: 'var(--color-accent)',
+    prompts: [
+      'Enumeră 3 lucruri pentru care ești recunoscător astăzi',
+      'A fost cineva care te-a ajutat astăzi? Ce apreciezi la acea persoană?',
+      'Ce moment mic din ziua de azi ți-a adus bucurie?',
+      'Ce ai în viața ta acum și pentru care ai visat în trecut?',
+      'Ce aspect al sănătății tale îți e recunoscător corpul tău?'
+    ]
+  },
+  {
+    id: 'affirmation',
+    name: 'Jurnal de afirmații',
+    description: 'Creează și reflectează asupra afirmațiilor pozitive care să te susțină în atingerea obiectivelor',
+    icon: 'star',
+    color: 'var(--color-secondary-dark)',
+    prompts: [
+      'Scrie 3 afirmații pozitive despre tine',
+      'Ce crezi despre tine și ai vrea să schimbi?',
+      'Ce afirmație te-ar putea ajuta când te confrunți cu îndoieli?',
+      'Ce afirmație te-ar putea ajuta să îți atingi obiectivele?',
+      'Ce calitate ai vrea să cultivi mai mult și cum o poți afirma?'
+    ]
+  },
+  {
+    id: 'reflection',
+    name: 'Jurnal de reflecție',
+    description: 'Analizează experiențele din trecut și identifică lecții și modele de comportament',
+    icon: 'moon',
+    color: 'var(--color-primary-dark)',
+    prompts: [
+      'Ce pattern-uri ai observat în comportamentul tău recent?',
+      'Care a fost o situație dificilă din ultima perioadă și cum ai gestionat-o?',
+      'Ce ți-ai dori să fi făcut diferit și de ce?',
+      'Ce ai învățat despre tine în ultimul timp?',
+      'Cum te-au schimbat experiențele recente?'
+    ]
+  }
+];
+
 // Generate a random title based on user's first message
 const generateConversationTitle = (firstUserMessage: string): string => {
   if (!firstUserMessage) return 'Conversație nouă';
@@ -68,6 +138,39 @@ const generateConversationTitle = (firstUserMessage: string): string => {
   }
   
   return title;
+};
+
+// Generate title for journal entry
+const generateJournalTitle = (templateId: JournalTemplateId, content: string): string => {
+  const date = new Date();
+  const formattedDate = date.toLocaleDateString('ro-RO', { 
+    day: 'numeric', 
+    month: 'long', 
+    year: 'numeric' 
+  });
+  
+  const template = journalTemplates.find(t => t.id === templateId);
+  const templateName = template ? template.name : 'Jurnal';
+  
+  if (!content || content.trim().length === 0) {
+    return `${templateName} - ${formattedDate}`;
+  }
+  
+  // If there's content, try to extract first line or first few words
+  const firstLine = content.split('\n')[0].trim();
+  if (firstLine.length === 0) {
+    return `${templateName} - ${formattedDate}`;
+  }
+  
+  // Use first line if short enough, otherwise truncate
+  if (firstLine.length <= 30) {
+    return `${firstLine} - ${formattedDate}`;
+  } else {
+    const words = firstLine.split(' ');
+    const titleWords = words.slice(0, Math.min(4, words.length));
+    const titleStart = titleWords.join(' ');
+    return `${titleStart}... - ${formattedDate}`;
+  }
 };
 
 // Define context type
@@ -94,6 +197,23 @@ interface AppContextType {
   pendingConversationTitle: string | null;
   showWelcomePage: boolean;
   setShowWelcomePage: (show: boolean) => void;
+  
+  // Journal functionality
+  journals: JournalEntry[];
+  currentJournal: JournalEntry | null;
+  setCurrentJournal: (journalId: string | null) => void;
+  journalTemplates: JournalTemplate[];
+  createNewJournal: (templateId: JournalTemplateId) => string;
+  updateJournal: (journalId: string, content: string) => void;
+  deleteJournal: (journalId: string) => void;
+  addExplorationPoint: (journalId: string, point: Omit<ExplorationPoint, 'id' | 'createdAt'>) => string;
+  updateExplorationPoint: (journalId: string, pointId: string, updates: Partial<ExplorationPoint>) => void;
+  startConversationFromJournal: (journalId: string, therapistId: TherapistId) => string;
+  startConversationFromPoint: (journalId: string, pointId: string, therapistId: TherapistId) => string;
+  isJournalModalOpen: boolean;
+  setIsJournalModalOpen: (isOpen: boolean) => void;
+  recentJournals: JournalEntry[];
+  markJournalAsAnalyzed: (journalId: string) => void;
 }
 
 // Create context with default values
@@ -114,6 +234,11 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [showWelcomePage, setShowWelcomePage] = useState<boolean>(true);
   // Titlul pentru conversația neîncepută încă
   const [pendingConversationTitle, setPendingConversationTitle] = useState<string | null>('Începe conversația...');
+  
+  // Journal states
+  const [journals, setJournals] = useState<JournalEntry[]>([]);
+  const [currentJournalId, setCurrentJournalId] = useState<string | null>(null);
+  const [isJournalModalOpen, setIsJournalModalOpen] = useState(false);
 
   // Load conversations from localStorage on initial load
   useEffect(() => {
@@ -137,6 +262,18 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     const savedCurrentConversationId = localStorage.getItem('currentConversationId');
     if (savedCurrentConversationId) {
       setCurrentConversationId(savedCurrentConversationId);
+    }
+    
+    // Load journals from localStorage
+    const savedJournals = localStorage.getItem('journals');
+    if (savedJournals) {
+      setJournals(JSON.parse(savedJournals));
+    }
+    
+    // Check if there was a current journal
+    const savedCurrentJournalId = localStorage.getItem('currentJournalId');
+    if (savedCurrentJournalId) {
+      setCurrentJournalId(savedCurrentJournalId);
     }
   }, []);
 
@@ -163,6 +300,11 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   useEffect(() => {
     localStorage.setItem('conversations', JSON.stringify(conversations));
   }, [conversations]);
+  
+  // Update localStorage when journals change
+  useEffect(() => {
+    localStorage.setItem('journals', JSON.stringify(journals));
+  }, [journals]);
 
   // Update localStorage when current conversation changes
   useEffect(() => {
@@ -176,6 +318,15 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       setPendingConversationTitle('Începe conversația...');
     }
   }, [currentConversationId]);
+  
+  // Update localStorage when current journal changes
+  useEffect(() => {
+    if (currentJournalId) {
+      localStorage.setItem('currentJournalId', currentJournalId);
+    } else {
+      localStorage.removeItem('currentJournalId');
+    }
+  }, [currentJournalId]);
 
   // Load messages when current conversation changes
   useEffect(() => {
@@ -198,12 +349,22 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     ? conversations.find(c => c.id === currentConversationId) || null
     : null;
     
+  // Get current journal
+  const currentJournal = currentJournalId
+    ? journals.find(j => j.id === currentJournalId) || null
+    : null;
+    
   // Derived state for favorites and recent conversations
   const favoriteConversations = conversations
     .filter(c => c.isFavorite)
     .sort((a, b) => b.updatedAt - a.updatedAt);
     
   const recentConversations = conversations
+    .sort((a, b) => b.updatedAt - a.updatedAt)
+    .slice(0, 10);
+    
+  // Recent journals
+  const recentJournals = journals
     .sort((a, b) => b.updatedAt - a.updatedAt)
     .slice(0, 10);
     
@@ -310,6 +471,214 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       setPendingConversationTitle('Începe conversația...'); // Resetăm titlul în așteptare
     }
   };
+  
+  // Create a new journal entry
+  const createNewJournal = (templateId: JournalTemplateId): string => {
+    const newJournal: JournalEntry = {
+      id: uuidv4(),
+      templateId,
+      title: generateJournalTitle(templateId, ''),
+      content: '',
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+      explorationPoints: [],
+      isAnalyzed: false
+    };
+    
+    setJournals(prev => [...prev, newJournal]);
+    setCurrentJournalId(newJournal.id);
+    setIsJournalModalOpen(true);
+    
+    return newJournal.id;
+  };
+  
+  // Update a journal entry
+  const updateJournal = (journalId: string, content: string) => {
+    setJournals(prev => 
+      prev.map(journal => 
+        journal.id === journalId
+          ? { 
+              ...journal, 
+              content,
+              title: generateJournalTitle(journal.templateId, content),
+              updatedAt: Date.now()
+            }
+          : journal
+      )
+    );
+  };
+  
+  // Mark journal as analyzed
+  const markJournalAsAnalyzed = (journalId: string) => {
+    setJournals(prev => 
+      prev.map(journal => 
+        journal.id === journalId
+          ? { ...journal, isAnalyzed: true }
+          : journal
+      )
+    );
+  };
+  
+  // Delete a journal entry
+  const deleteJournal = (journalId: string) => {
+    setJournals(prev => prev.filter(journal => journal.id !== journalId));
+    
+    // If we're deleting the current journal, clear it
+    if (currentJournalId === journalId) {
+      setCurrentJournalId(null);
+    }
+  };
+  
+  // Add an exploration point to a journal
+  const addExplorationPoint = (journalId: string, point: Omit<ExplorationPoint, 'id' | 'createdAt'>): string => {
+    const pointId = uuidv4();
+    const newPoint: ExplorationPoint = {
+      ...point,
+      id: pointId,
+      createdAt: Date.now()
+    };
+    
+    setJournals(prev => 
+      prev.map(journal => 
+        journal.id === journalId
+          ? { 
+              ...journal, 
+              explorationPoints: [...journal.explorationPoints, newPoint],
+              updatedAt: Date.now()
+            }
+          : journal
+      )
+    );
+    
+    return pointId;
+  };
+  
+  // Update an exploration point
+  const updateExplorationPoint = (journalId: string, pointId: string, updates: Partial<ExplorationPoint>) => {
+    setJournals(prev => 
+      prev.map(journal => 
+        journal.id === journalId
+          ? { 
+              ...journal, 
+              explorationPoints: journal.explorationPoints.map(point => 
+                point.id === pointId
+                  ? { ...point, ...updates }
+                  : point
+              ),
+              updatedAt: Date.now()
+            }
+          : journal
+      )
+    );
+  };
+  
+  // Start a conversation from a journal entry
+  const startConversationFromJournal = (journalId: string, therapistId: TherapistId): string => {
+    const journal = journals.find(j => j.id === journalId);
+    if (!journal) {
+      throw new Error('Journal not found');
+    }
+    
+    const template = journalTemplates.find(t => t.id === journal.templateId);
+    
+    // Create initial messages
+    const initialMessages: Message[] = [
+      {
+        role: 'user',
+        content: `Bună, mi-am scris jurnalul despre ${template?.name.toLowerCase() || 'ziua mea'} și aș dori să discut despre asta:\n\n${journal.content}`,
+        displayed: true,
+        timestamp: Date.now()
+      }
+    ];
+    
+    // Create the conversation
+    const newConversation: Conversation = {
+      id: uuidv4(),
+      title: `Discuție despre: ${journal.title}`,
+      therapistId,
+      messages: initialMessages,
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+      isFavorite: false,
+      journalEntryId: journalId
+    };
+    
+    // Add the conversation to the list
+    setConversations(prev => [...prev, newConversation]);
+    
+    // Set the current conversation
+    setCurrentConversationId(newConversation.id);
+    setCurrentTherapistId(therapistId);
+    setMessages(initialMessages);
+    setPendingConversationTitle(null);
+    setIsMenuOpen(false);
+    setIsJournalModalOpen(false);
+    
+    return newConversation.id;
+  };
+  
+  // Start a conversation from an exploration point
+  const startConversationFromPoint = (journalId: string, pointId: string, therapistId: TherapistId): string => {
+    const journal = journals.find(j => j.id === journalId);
+    if (!journal) {
+      throw new Error('Journal not found');
+    }
+    
+    const point = journal.explorationPoints.find(p => p.id === pointId);
+    if (!point) {
+      throw new Error('Exploration point not found');
+    }
+    
+    // Create initial messages
+    const initialMessages: Message[] = [
+      {
+        role: 'user',
+        content: `În jurnalul meu am menționat următorul aspect pe care aș vrea să-l explorez mai mult:\n\n${point.content}\n\nContextul din jurnal a fost:\n\n${journal.content}`,
+        displayed: true,
+        timestamp: Date.now()
+      }
+    ];
+    
+    // Create the conversation
+    const newConversation: Conversation = {
+      id: uuidv4(),
+      title: `Explorare: ${point.content.substring(0, 30)}...`,
+      therapistId,
+      messages: initialMessages,
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+      isFavorite: false,
+      journalEntryId: journalId,
+      explorationPointId: pointId
+    };
+    
+    // Add the conversation to the list
+    setConversations(prev => [...prev, newConversation]);
+    
+    // Mark the exploration point as explored
+    updateExplorationPoint(journalId, pointId, { 
+      isExplored: true,
+      conversationId: newConversation.id
+    });
+    
+    // Set the current conversation
+    setCurrentConversationId(newConversation.id);
+    setCurrentTherapistId(therapistId);
+    setMessages(initialMessages);
+    setPendingConversationTitle(null);
+    setIsMenuOpen(false);
+    setIsJournalModalOpen(false);
+    
+    return newConversation.id;
+  };
+  
+  // Set current journal
+  const setCurrentJournal = (journalId: string | null) => {
+    setCurrentJournalId(journalId);
+    if (journalId) {
+      setIsJournalModalOpen(true);
+    }
+  };
 
   return (
     <AppContext.Provider
@@ -335,7 +704,24 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         deleteConversation,
         pendingConversationTitle,
         showWelcomePage,
-        setShowWelcomePage
+        setShowWelcomePage,
+        
+        // Journal functionality
+        journals,
+        currentJournal,
+        setCurrentJournal,
+        journalTemplates,
+        createNewJournal,
+        updateJournal,
+        deleteJournal,
+        addExplorationPoint,
+        updateExplorationPoint,
+        startConversationFromJournal,
+        startConversationFromPoint,
+        isJournalModalOpen,
+        setIsJournalModalOpen,
+        recentJournals,
+        markJournalAsAnalyzed
       }}
     >
       {children}

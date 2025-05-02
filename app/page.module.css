@@ -35,71 +35,10 @@
   overflow: hidden;
 }
 
-/* Journal Modal Styles */
-.journalModal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 2000;
+.contentContainer {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 1rem;
-}
-
-.journalOverlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(3px);
-  animation: fadeIn 0.3s ease-out;
-}
-
-.journalContainer {
-  position: relative;
-  z-index: 2001;
-  width: 100%;
-  max-width: 800px;
-  height: 90vh; 
-  max-height: 800px;
-  animation: slideUp 0.4s ease-out;
-}
-
-/* Animations */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Media queries */
-@media (max-width: 768px) {
-  .journalContainer {
-    height: 100vh;
-    max-height: none;
-    border-radius: 0;
-  }
-  
-  .journalModal {
-    padding: 0;
-  }
+  flex-direction: column;
+  flex: 1;
+  overflow-y: auto;
+  padding-top: 60px; /* Header height */
 }

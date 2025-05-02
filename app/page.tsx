@@ -1,6 +1,6 @@
-// app/page.tsx
 'use client';
 
+// app/page.tsx
 import { useState, useEffect } from 'react';
 import { AppProvider } from './contexts/AppContext';
 import Chat from './components/Chat/Chat';
@@ -9,15 +9,14 @@ import LeftMenu from './components/LeftMenu/LeftMenu';
 import TherapistSelector from './components/TherapistSelector/TherapistSelector';
 import InstallPrompt from './components/InstallPrompt/InstallPrompt';
 import WelcomePage from './components/WelcomePage/WelcomePage';
-import JournalEntry from './components/JournalEntry/JournalEntry';
+import JournalingSection from './components/Journaling/JournalingSection';
+import JournalModal from './components/Journaling/JournalModal';
 import { useApp } from './contexts/AppContext';
 import styles from './page.module.css';
 
 // Wrapper component that uses the AppContext
 function AppContent() {
   const { showWelcomePage } = useApp();
-  const [showJournal, setShowJournal] = useState<boolean>(false);
-  const [journalType, setJournalType] = useState<'gratitude' | 'reflection'>('gratitude');
   
   // Set scrolling behavior based on current view
   useEffect(() => {
@@ -37,19 +36,6 @@ function AppContent() {
       document.documentElement.style.overflow = '';
     };
   }, [showWelcomePage]);
-
-  // Handle journal opening
-  const handleOpenJournal = (type: 'gratitude' | 'reflection') => {
-    setJournalType(type);
-    setShowJournal(true);
-  };
-
-  // Handle journal saving
-  const handleSaveJournal = (content: string, title: string) => {
-    // In a real app, this would save to a database or localStorage
-    console.log('Saving journal entry:', { title, content, type: journalType });
-    // Here you could implement the actual saving logic
-  };
   
   return (
     <>
@@ -63,24 +49,14 @@ function AppContent() {
           <TherapistSelector />
           <div className={styles.appContainer}>
             <Header />
-            <Chat />
+            <div className={styles.contentContainer}>
+              <JournalingSection />
+              <Chat />
+            </div>
           </div>
           <InstallPrompt />
+          <JournalModal />
         </main>
-      )}
-
-      {/* Journal Entry Modal - This would be shown when user selects a journal option */}
-      {showJournal && (
-        <div className={styles.journalModal}>
-          <div className={styles.journalOverlay} onClick={() => setShowJournal(false)}></div>
-          <div className={styles.journalContainer}>
-            <JournalEntry 
-              type={journalType} 
-              onClose={() => setShowJournal(false)}
-              onSave={handleSaveJournal}
-            />
-          </div>
-        </div>
       )}
     </>
   );
