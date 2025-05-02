@@ -1,14 +1,14 @@
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap');
 
-/* Import-uri CSS pentru design system */
-@import './styles/design-system/index.css';
-@import './styles/base/index.css';
-@import './styles/utilities/index.css';
-
 /* Integrarea cu Tailwind */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Import-uri CSS pentru design system */
+@import './styles/design-system/index.css';
+@import './styles/base/index.css';
+@import './styles/utilities/index.css';
 
 /* Variabile CSS globale */
 :root {

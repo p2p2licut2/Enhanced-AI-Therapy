@@ -44,16 +44,17 @@
 
 .closeButton {
   cursor: pointer;
-  background: none;
+  background: none !important;
   border: none;
   color: white;
-  width: 28px;
-  height: 28px;
-  display: flex;
+  padding: 3px;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 50%;
-  transition: background-color 0.2s ease;
+  border-radius: 0;
+  width: auto;
+  height: auto;
+  transition: none;
 }
 
 .closeButton:hover {

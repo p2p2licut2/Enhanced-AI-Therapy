@@ -1,0 +1,266 @@
+/* app/styles/mental-health/_therapeutic.css */
+/*
+ * Componente specializate pentru intervenții terapeutice
+ * Acest modul adaugă clase și utilități specifice pentru:
+ * - Intervenții terapeutice
+ * - Exerciții de respirație și mindfulness
+ * - Managementul anxietății
+ * - Securitate emoțională
+ */
+
+/* Containere pentru intervenții terapeutice */
+.therapeutic-container {
+    border-radius: var(--border-radius-lg);
+    padding: var(--spacing-lg);
+    margin: var(--spacing-lg) 0;
+    background-color: var(--color-background-light);
+    border-left: 4px solid;
+    transition: background-color var(--transition-calm);
+  }
+  
+  .therapeutic-container.mindfulness {
+    border-color: var(--color-focus);
+    background-color: var(--color-focus-light);
+  }
+  
+  .therapeutic-container.relaxation {
+    border-color: var(--color-calm);
+    background-color: var(--color-calm-light);
+  }
+  
+  .therapeutic-container.support {
+    border-color: var(--color-support);
+    background-color: var(--color-support-light);
+  }
+  
+  .therapeutic-container.neutral {
+    border-color: var(--color-neutral);
+    background-color: var(--color-neutral-light);
+  }
+  
+  /* Animație pentru exerciții de respirație */
+  .breathing-animation {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background-color: var(--color-calm);
+    margin: 2rem auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: breathe 5s infinite ease-in-out;
+    box-shadow: 0 0 0 rgba(162, 197, 224, 0.4);
+  }
+  
+  .breathing-animation.inhale {
+    animation-duration: 4s;
+  }
+  
+  .breathing-animation.exhale {
+    animation-duration: 6s;
+  }
+  
+  .breathing-label {
+    color: white;
+    font-weight: var(--font-weight-semibold);
+    text-align: center;
+    font-size: var(--font-size-lg);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Progress tracker pentru exerciții */
+  .progress-tracker {
+    display: flex;
+    justify-content: space-between;
+    margin: var(--spacing-lg) 0;
+    position: relative;
+  }
+  
+  .progress-tracker::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background-color: var(--color-gray-300);
+    z-index: 1;
+  }
+  
+  .progress-tracker-step {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background-color: var(--color-background-light);
+    border: 2px solid var(--color-gray-300);
+    z-index: 2;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition-standard);
+  }
+  
+  .progress-tracker-step.active {
+    background-color: var(--color-primary);
+    border-color: var(--color-primary);
+    color: white;
+  }
+  
+  .progress-tracker-step.completed {
+    background-color: var(--color-success);
+    border-color: var(--color-success);
+    color: white;
+  }
+  
+  /* Gradient pentru indicatori stare de calm */
+  .calm-gradient {
+    background: linear-gradient(to right, var(--color-calm-light), var(--color-calm));
+    background-size: 200% 100%;
+    animation: calm-shift 10s infinite alternate ease-in-out;
+  }
+  
+  @keyframes calm-shift {
+    0% {
+      background-position: 0% 50%;
+    }
+    100% {
+      background-position: 100% 50%;
+    }
+  }
+  
+  /* Controlul stimulilor vizuali pentru utilizatori sensibili */
+  .stimulus-control {
+    transition: filter var(--transition-calm);
+    filter: brightness(0.95);
+  }
+  
+  .stimulus-control:hover {
+    filter: brightness(1);
+  }
+  
+  .stimulus-reduced {
+    filter: brightness(0.9) saturate(0.9);
+  }
+  
+  /* Safe space indicator */
+  .safe-space {
+    border-radius: var(--border-radius-lg);
+    padding: var(--spacing-sm);
+    background-color: rgba(255, 255, 255, 0.5);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    backdrop-filter: blur(4px);
+    font-size: var(--font-size-sm);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+  }
+  
+  .safe-space-icon {
+    color: var(--color-support);
+  }
+  
+  /* Focused content pentru momentele care necesită atenție sporită */
+  .focused-content {
+    max-width: 90%;
+    margin: 0 auto;
+    padding: var(--spacing-lg);
+    background-color: white;
+    border-radius: var(--border-radius-lg);
+    box-shadow: 0 0 0 1000px rgba(0, 0, 0, 0.15);
+    position: relative;
+    z-index: 10;
+  }
+  
+  /* Containere pentru mesaje în contextul terapiei */
+  .message-therapeutic {
+    position: relative;
+    padding: var(--spacing-md) var(--spacing-lg);
+    border-radius: var(--border-radius-lg);
+    margin-bottom: var(--spacing-md);
+    transition: all var(--transition-calm);
+  }
+  
+  .message-therapeutic::before {
+    content: "";
+    position: absolute;
+    left: -5px;
+    top: 15px;
+    height: 15px;
+    width: 15px;
+    border-radius: 2px;
+    transform: rotate(45deg);
+    z-index: -1;
+  }
+  
+  .message-therapeutic.supportive {
+    background-color: var(--color-support-light);
+    border-left: 3px solid var(--color-support);
+  }
+  
+  .message-therapeutic.supportive::before {
+    background-color: var(--color-support-light);
+    border-left: 3px solid var(--color-support);
+  }
+  
+  .message-therapeutic.calming {
+    background-color: var(--color-calm-light);
+    border-left: 3px solid var(--color-calm);
+  }
+  
+  .message-therapeutic.calming::before {
+    background-color: var(--color-calm-light);
+    border-left: 3px solid var(--color-calm);
+  }
+  
+  .message-therapeutic.focusing {
+    background-color: var(--color-focus-light);
+    border-left: 3px solid var(--color-focus);
+  }
+  
+  .message-therapeutic.focusing::before {
+    background-color: var(--color-focus-light);
+    border-left: 3px solid var(--color-focus);
+  }
+  
+  /* Timer pentru exerciții de mindfulness */
+  .mindfulness-timer {
+    font-size: var(--font-size-4xl);
+    text-align: center;
+    font-weight: var(--font-weight-bold);
+    color: var(--color-focus);
+    margin: var(--spacing-xl) 0;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.05em;
+  }
+  
+  /* Indicator stres visual, pentru reducerea complexității */
+  .stress-reduction {
+    letter-spacing: 0.03em;
+    line-height: 1.8;
+    margin-bottom: var(--spacing-lg);
+    font-size: var(--font-size-md);
+  }
+  
+  .stress-reduction p {
+    margin-bottom: var(--spacing-md);
+  }
+  
+  /* Conținut ponderat emoțional - marchează conținutul potențial delicațiv */
+  .emotionally-weighted {
+    position: relative;
+    padding-left: var(--spacing-md);
+    margin-left: var(--spacing-sm);
+  }
+  
+  .emotionally-weighted::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background-color: var(--color-warning);
+    border-radius: var(--border-radius-pill);
+    opacity: 0.5;
+  }
