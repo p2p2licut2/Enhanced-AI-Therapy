@@ -17,7 +17,8 @@ export default function JournalModal() {
     journalTemplates,
     updateJournal,
     deleteJournal,
-    markJournalAsAnalyzed
+    markJournalAsAnalyzed,
+    setCurrentJournal
   } = useApp();
   
   const [isEditing, setIsEditing] = useState(true);
@@ -94,7 +95,9 @@ export default function JournalModal() {
       updateJournal(currentJournal.id, content);
     }
     
+    // Doar închidem modalul, fără a naviga către chat
     setIsJournalModalOpen(false);
+    setCurrentJournal(null);
   };
   
   // Handle delete
@@ -102,6 +105,7 @@ export default function JournalModal() {
     if (currentJournal) {
       deleteJournal(currentJournal.id);
       setIsJournalModalOpen(false);
+      setCurrentJournal(null);
     }
   };
   

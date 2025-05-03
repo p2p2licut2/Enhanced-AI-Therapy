@@ -49,6 +49,15 @@
   justify-content: space-between;
 }
 
+.logoText {
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.logoText:hover {
+  color: var(--color-primary);
+}
+
 .closeButton {
   cursor: pointer;
   width: 24px;

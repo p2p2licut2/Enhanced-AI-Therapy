@@ -20,14 +20,14 @@
   margin-bottom: var(--spacing-md);
 }
 
-.therapistButtonsContainer {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+.actionsContainer {
+  display: flex;
+  flex-direction: column;
   gap: var(--spacing-md);
   margin-bottom: var(--spacing-lg);
 }
 
-.therapistButton {
+.quickActionButton {
   border: none;
   background-color: white;
   border-radius: var(--border-radius-md);
@@ -36,89 +36,52 @@
   text-align: left;
   overflow: hidden;
   display: flex;
-  flex-direction: column;
-  height: 100%;
+  align-items: center;
+  padding: var(--spacing-md);
   box-shadow: var(--shadow-sm);
   position: relative;
+  border-left: 4px solid var(--color-primary);
 }
 
-.therapistButton::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  transition: all var(--transition-standard);
-}
-
-.therapistMaria::before {
-  background-color: var(--color-primary);
-}
-
-.therapistAlin::before {
-  background-color: var(--color-accent);
-}
-
-.therapistAna::before {
-  background-color: var(--color-secondary-dark);
-}
-
-.therapistTeodora::before {
-  background-color: var(--color-primary-dark);
-}
-
-.therapistButton:hover {
+.quickActionButton:hover {
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);
+  background-color: var(--color-gray-50);
 }
 
-.buttonContent {
-  padding: var(--spacing-sm);
-  display: flex;
-  align-items: center;
-}
-
-.therapistAvatar {
+.buttonIcon {
   width: 40px;
   height: 40px;
-  border-radius: var(--border-radius-circle);
-  overflow: hidden;
-  margin-right: var(--spacing-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: var(--spacing-md);
+  color: var(--color-primary);
   flex-shrink: 0;
-  box-shadow: var(--shadow-sm);
-  border: 2px solid white;
 }
 
-.avatarImage {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+.buttonIcon svg {
+  width: 24px;
+  height: 24px;
 }
 
-.therapistInfo {
+.buttonInfo {
   flex: 1;
   min-width: 0;
 }
 
-.therapistName {
+.buttonTitle {
   display: block;
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-md);
   font-weight: var(--font-weight-semibold);
   color: var(--color-heading);
   margin-bottom: 2px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
-.therapistDescription {
+.buttonDescription {
   display: block;
-  font-size: var(--font-size-xs);
+  font-size: var(--font-size-sm);
   color: var(--color-text-light);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .actionsFooter {
@@ -135,17 +98,36 @@
 
 /* Media queries */
 @media (max-width: 768px) {
-  .therapistButtonsContainer {
-    grid-template-columns: 1fr;
-  }
-  
   .sectionTitle {
     font-size: var(--font-size-md);
+  }
+  
+  .buttonTitle {
+    font-size: var(--font-size-sm);
+  }
+  
+  .buttonDescription {
+    font-size: var(--font-size-xs);
   }
 }
 
 @media (max-width: 480px) {
   .quickActionsContainer {
     padding: var(--spacing-md);
+  }
+  
+  .quickActionButton {
+    padding: var(--spacing-sm);
+  }
+  
+  .buttonIcon {
+    width: 32px;
+    height: 32px;
+    margin-right: var(--spacing-sm);
+  }
+  
+  .buttonIcon svg {
+    width: 20px;
+    height: 20px;
   }
 }

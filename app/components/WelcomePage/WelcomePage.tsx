@@ -4,9 +4,11 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useApp } from '@/app/contexts/AppContext';
-import { TherapistId } from '@/app/types';
+import { TherapistId, JournalTemplateId } from '@/app/types';
 import MoodTracker from '../MoodTracker/MoodTracker';
 import TherapeuticExercise from '../TherapeuticExercises/TherapeuticExercise';
+import JournalTemplateSelector from '../Journaling/JournalTemplateSelector';
+import RecentJournals from '../Journaling/RecentJournals';
 import styles from './WelcomePage.module.css';
 
 // Define therapists data - matches what's in TherapistSelector
@@ -41,29 +43,7 @@ const therapists = [
   },
 ];
 
-// Journal types
-const journalTypes = [
-  {
-    id: 'gratitude',
-    title: 'Jurnal de Recunoștință',
-    description: 'Notează lucrurile pentru care ești recunoscător',
-    icon: (
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className={styles.journalIcon}>
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-      </svg>
-    ),
-  },
-  {
-    id: 'reflection',
-    title: 'Jurnal de Reflecție',
-    description: 'Reflectează asupra gândurilor și emoțiilor tale',
-    icon: (
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className={styles.journalIcon}>
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-      </svg>
-    ),
-  },
-];
+// Journal types nu mai sunt necesare aici deoarece le luăm din AppContext prin JournalTemplateSelector
 
 // Exercise types
 const exerciseTypes = [
@@ -110,7 +90,7 @@ const exerciseTypes = [
 ];
 
 export default function WelcomePage() {
-  const { createNewConversation, setShowWelcomePage } = useApp();
+  const { createNewConversation, setShowWelcomePage, createNewJournal, recentJournals, setCurrentJournal } = useApp();
   const [activeSection, setActiveSection] = useState<string | null>(null);
   const [selectedTherapist, setSelectedTherapist] = useState<TherapistId | null>(null);
   const [selectedJournalType, setSelectedJournalType] = useState<string | null>(null);
@@ -146,8 +126,36 @@ export default function WelcomePage() {
   // Handle journal type selection
   const handleSelectJournalType = (journalTypeId: string) => {
     setSelectedJournalType(journalTypeId);
-    // Here you would implement the navigation to the journal page
-    // For now, we'll just highlight the selection
+    
+    // If the user wants to view past journals
+    if (journalTypeId === 'past') {
+      // Pentru acum, doar animăm fereastra și apoi creăm un jurnal nou
+      setTimeout(() => {
+        setIsAnimating(true);
+        
+        setTimeout(() => {
+          // În viitor, aici putem implementa navigarea către o pagină dedicată cu toate jurnalele
+          // Pentru moment, creăm un jurnal nou de tip "daily" ca soluție temporară
+          console.log('Navigating to all journals view');
+          createNewJournal('daily' as JournalTemplateId);
+          setIsAnimating(false); // Resetăm animația
+        }, 600);
+      }, 200);
+      return;
+    }
+    
+    // Pentru crearea unui jurnal nou, transmitem ID-ul șablonului la context
+    if (['daily', 'gratitude', 'affirmation', 'reflection'].includes(journalTypeId)) {
+      setTimeout(() => {
+        setIsAnimating(true);
+        
+        setTimeout(() => {
+          // Creăm un jurnal nou cu șablonul selectat
+          createNewJournal(journalTypeId as JournalTemplateId);
+          setIsAnimating(false); // Resetăm animația
+        }, 600);
+      }, 200);
+    }
   };
 
   // Handle exercise type selection
@@ -272,34 +280,34 @@ export default function WelcomePage() {
             {/* Journal Type Options (shown when active) */}
             <div className={`${styles.expandedOptions} ${activeSection === 'journaling' ? styles.show : ''}`}>
               <h4>Alege tipul de jurnal</h4>
-              <div className={styles.journalGrid}>
-                {journalTypes.map((journalType) => (
-                  <div
-                    key={journalType.id}
-                    className={`${styles.journalCard} ${selectedJournalType === journalType.id ? styles.selected : ''}`}
-                    onClick={() => handleSelectJournalType(journalType.id)}
-                  >
-                    <div className={styles.journalIcon}>
-                      {journalType.icon}
-                    </div>
-                    <div className={styles.journalInfo}>
-                      <h5 className={styles.journalTitle}>{journalType.title}</h5>
-                      <p className={styles.journalDescription}>{journalType.description}</p>
-                    </div>
-                  </div>
-                ))}
-                <div className={styles.journalCard} onClick={() => handleSelectJournalType('past')}>
-                  <div className={styles.journalIcon}>
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className={styles.journalIcon}>
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                  </div>
-                  <div className={styles.journalInfo}>
-                    <h5 className={styles.journalTitle}>Jurnalele Mele</h5>
-                    <p className={styles.journalDescription}>Accesează jurnalele tale anterioare</p>
-                  </div>
-                </div>
+              
+              {/* Înlocuim grid-ul existent cu JournalTemplateSelector */}
+              <div className={styles.journalSelectorContainer}>
+                <JournalTemplateSelector onSelectTemplate={handleSelectJournalType} />
               </div>
+              
+              {/* Adăugăm secțiunea de jurnale recente */}
+              {recentJournals.length > 0 && (
+                <div className={styles.recentJournalsSection}>
+                  <h4>Jurnalele tale recente</h4>
+                  <RecentJournals 
+                    journals={recentJournals.slice(0, 3)} 
+                    onJournalSelect={(journalId) => {
+                      setCurrentJournal(journalId);
+                      setShowWelcomePage(false);
+                    }} 
+                  />
+                  
+                  {recentJournals.length > 3 && (
+                    <button 
+                      className={styles.viewAllButton}
+                      onClick={() => handleSelectJournalType('past')}
+                    >
+                      Vezi toate jurnalele ({recentJournals.length})
+                    </button>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </div>

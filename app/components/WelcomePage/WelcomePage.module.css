@@ -251,65 +251,50 @@
   color: var(--color-text-light);
 }
 
-/* Grid de journaling */
-.journalGrid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1rem;
+/* Stiluri pentru JournalTemplateSelector integrat */
+.journalSelectorContainer {
+  margin-bottom: 1.5rem;
+  width: 100%;
+  max-height: 400px;
+  overflow-y: auto;
+  padding-right: 10px;
 }
 
-.journalCard {
-  background-color: var(--color-background);
-  border-radius: 12px;
-  padding: 1rem;
+/* Stiluri pentru secțiunea de jurnale recente */
+.recentJournalsSection {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--color-gray-200);
+  width: 100%;
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.recentJournalsSection h4 {
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+.viewAllButton {
+  display: inline-block;
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  background-color: transparent;
+  color: var(--color-primary);
+  border: 1px solid var(--color-primary);
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  display: flex;
-  align-items: flex-start;
-  border: 2px solid transparent;
 }
 
-.journalCard:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.05);
-}
-
-.journalCard.selected {
-  border-color: var(--color-primary);
-  background-color: rgba(210, 163, 138, 0.1);
-}
-
-.journalIcon {
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-right: 1rem;
-  color: var(--color-primary);
-  flex-shrink: 0;
-}
-
-.journalIcon svg {
-  width: 24px;
-  height: 24px;
-}
-
-.journalInfo {
-  flex: 1;
-}
-
-.journalTitle {
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--color-heading);
-  margin-bottom: 0.25rem;
-}
-
-.journalDescription {
-  font-size: 0.8rem;
-  color: var(--color-text-light);
-  line-height: 1.4;
+.viewAllButton:hover {
+  background-color: var(--color-primary-light);
+  color: var(--color-primary-dark);
+  transform: translateY(-2px);
 }
 
 /* Grid de ejercicios */
@@ -460,6 +445,21 @@
   .expandedOptions.show {
     max-height: 800px;
   }
+  
+  /* Stiluri responsive pentru componentele Journaling */
+  .journalSelectorContainer {
+    max-height: 300px;
+  }
+  
+  .recentJournalsSection {
+    max-height: 400px;
+  }
+  
+  .viewAllButton {
+    width: 100%;
+    text-align: center;
+    padding: 0.75rem;
+  }
 }
 
 @media (max-width: 480px) {
@@ -480,5 +480,24 @@
   .exerciseIcon {
     margin-right: 0;
     margin-bottom: 0.5rem;
+  }
+  
+  /* Stiluri responsive pentru mobile */
+  .journalSelectorContainer {
+    max-height: 250px;
+    padding-right: 0;
+  }
+  
+  .recentJournalsSection {
+    max-height: 350px;
+  }
+  
+  .expandedOptions.show {
+    padding-bottom: 1rem;
+  }
+  
+  .viewAllButton {
+    margin-top: 0.5rem;
+    font-size: 0.8rem;
   }
 }

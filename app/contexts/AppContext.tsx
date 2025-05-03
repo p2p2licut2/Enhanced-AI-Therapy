@@ -489,6 +489,9 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     setCurrentJournalId(newJournal.id);
     setIsJournalModalOpen(true);
     
+    // Nu mai schimbăm showWelcomePage, ca să nu intre în fereastra de conversație
+    // Modalul va fi afișat peste WelcomePage
+    
     return newJournal.id;
   };
   
@@ -572,53 +575,24 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     );
   };
   
-  // Start a conversation from a journal entry
+  // Start a conversation from a journal entry - acum dezactivat, returnează doar ID-ul jurnalului
   const startConversationFromJournal = (journalId: string, therapistId: TherapistId): string => {
-    const journal = journals.find(j => j.id === journalId);
-    if (!journal) {
-      throw new Error('Journal not found');
-    }
+    // Această funcționalitate a fost dezactivată
+    // Acum doar închide modalul de jurnal și returnează ID-ul jurnalului
     
-    const template = journalTemplates.find(t => t.id === journal.templateId);
-    
-    // Create initial messages
-    const initialMessages: Message[] = [
-      {
-        role: 'user',
-        content: `Bună, mi-am scris jurnalul despre ${template?.name.toLowerCase() || 'ziua mea'} și aș dori să discut despre asta:\n\n${journal.content}`,
-        displayed: true,
-        timestamp: Date.now()
-      }
-    ];
-    
-    // Create the conversation
-    const newConversation: Conversation = {
-      id: uuidv4(),
-      title: `Discuție despre: ${journal.title}`,
-      therapistId,
-      messages: initialMessages,
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
-      isFavorite: false,
-      journalEntryId: journalId
-    };
-    
-    // Add the conversation to the list
-    setConversations(prev => [...prev, newConversation]);
-    
-    // Set the current conversation
-    setCurrentConversationId(newConversation.id);
-    setCurrentTherapistId(therapistId);
-    setMessages(initialMessages);
-    setPendingConversationTitle(null);
-    setIsMenuOpen(false);
     setIsJournalModalOpen(false);
     
-    return newConversation.id;
+    // Afișăm un mesaj în consolă pentru debugging
+    console.log('Funcționalitatea de conversație din jurnal a fost dezactivată');
+    
+    return journalId;
   };
   
-  // Start a conversation from an exploration point
+  // Start a conversation from an exploration point - acum dezactivat
   const startConversationFromPoint = (journalId: string, pointId: string, therapistId: TherapistId): string => {
+    // Această funcționalitate a fost dezactivată
+    // Acum doar închide modalul de jurnal și returnează ID-ul jurnalului
+    
     const journal = journals.find(j => j.id === journalId);
     if (!journal) {
       throw new Error('Journal not found');
@@ -629,47 +603,17 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       throw new Error('Exploration point not found');
     }
     
-    // Create initial messages
-    const initialMessages: Message[] = [
-      {
-        role: 'user',
-        content: `În jurnalul meu am menționat următorul aspect pe care aș vrea să-l explorez mai mult:\n\n${point.content}\n\nContextul din jurnal a fost:\n\n${journal.content}`,
-        displayed: true,
-        timestamp: Date.now()
-      }
-    ];
-    
-    // Create the conversation
-    const newConversation: Conversation = {
-      id: uuidv4(),
-      title: `Explorare: ${point.content.substring(0, 30)}...`,
-      therapistId,
-      messages: initialMessages,
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
-      isFavorite: false,
-      journalEntryId: journalId,
-      explorationPointId: pointId
-    };
-    
-    // Add the conversation to the list
-    setConversations(prev => [...prev, newConversation]);
-    
-    // Mark the exploration point as explored
+    // Marcăm punctul ca explorat pentru a nu confuza utilizatorul
     updateExplorationPoint(journalId, pointId, { 
-      isExplored: true,
-      conversationId: newConversation.id
+      isExplored: true
     });
     
-    // Set the current conversation
-    setCurrentConversationId(newConversation.id);
-    setCurrentTherapistId(therapistId);
-    setMessages(initialMessages);
-    setPendingConversationTitle(null);
-    setIsMenuOpen(false);
     setIsJournalModalOpen(false);
     
-    return newConversation.id;
+    // Afișăm un mesaj în consolă pentru debugging
+    console.log('Funcționalitatea de conversație din punct de explorare a fost dezactivată');
+    
+    return journalId;
   };
   
   // Set current journal

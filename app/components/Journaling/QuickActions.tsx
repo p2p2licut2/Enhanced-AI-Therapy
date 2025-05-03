@@ -13,7 +13,6 @@ interface QuickActionsProps {
 export default function QuickActions({ journalId }: QuickActionsProps) {
   const { 
     journals, 
-    startConversationFromJournal,
     setIsJournalModalOpen
   } = useApp();
   
@@ -24,87 +23,33 @@ export default function QuickActions({ journalId }: QuickActionsProps) {
     return null;
   }
   
-  // Handle start conversation with therapist
-  const handleStartConversation = (therapistId: TherapistId) => {
-    // Start conversation
-    startConversationFromJournal(journalId, therapistId);
-    
-    // Close modal
-    setIsJournalModalOpen(false);
-  };
-  
   return (
     <div className={styles.quickActionsContainer}>
-      <h3 className={styles.sectionTitle}>Discută despre acest jurnal</h3>
+      <h3 className={styles.sectionTitle}>Acțiuni pentru acest jurnal</h3>
       <p className={styles.sectionDescription}>
-        Începe o conversație cu un terapeut pentru a explora mai profund gândurile tale din acest jurnal.
+        Explorează singur gândurile și emoțiile tale prin journaling regulat.
       </p>
       
-      <div className={styles.therapistButtonsContainer}>
+      <div className={styles.actionsContainer}>
         <button 
-          className={`${styles.therapistButton} ${styles.therapistMaria}`}
-          onClick={() => handleStartConversation('maria')}
+          className={styles.quickActionButton}
+          onClick={() => setIsJournalModalOpen(false)}
         >
-          <div className={styles.buttonContent}>
-            <div className={styles.therapistAvatar}>
-              <img src="/maria-avatar.png" alt="Maria" className={styles.avatarImage} />
-            </div>
-            <div className={styles.therapistInfo}>
-              <span className={styles.therapistName}>Discută cu Maria</span>
-              <span className={styles.therapistDescription}>Abordare empatică și calmă</span>
-            </div>
+          <div className={styles.buttonIcon}>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            </svg>
           </div>
-        </button>
-        
-        <button 
-          className={`${styles.therapistButton} ${styles.therapistAlin}`}
-          onClick={() => handleStartConversation('alin')}
-        >
-          <div className={styles.buttonContent}>
-            <div className={styles.therapistAvatar}>
-              <img src="/alin-avatar.png" alt="Alin" className={styles.avatarImage} />
-            </div>
-            <div className={styles.therapistInfo}>
-              <span className={styles.therapistName}>Discută cu Alin</span>
-              <span className={styles.therapistDescription}>Abordare provocatoare pentru dezvoltare</span>
-            </div>
-          </div>
-        </button>
-        
-        <button 
-          className={`${styles.therapistButton} ${styles.therapistAna}`}
-          onClick={() => handleStartConversation('ana')}
-        >
-          <div className={styles.buttonContent}>
-            <div className={styles.therapistAvatar}>
-              <img src="/ana-avatar.png" alt="Ana" className={styles.avatarImage} />
-            </div>
-            <div className={styles.therapistInfo}>
-              <span className={styles.therapistName}>Discută cu Ana</span>
-              <span className={styles.therapistDescription}>Ghid pentru descoperire personală</span>
-            </div>
-          </div>
-        </button>
-        
-        <button 
-          className={`${styles.therapistButton} ${styles.therapistTeodora}`}
-          onClick={() => handleStartConversation('teodora')}
-        >
-          <div className={styles.buttonContent}>
-            <div className={styles.therapistAvatar}>
-              <img src="/teodora-avatar.png" alt="Teodora" className={styles.avatarImage} />
-            </div>
-            <div className={styles.therapistInfo}>
-              <span className={styles.therapistName}>Discută cu Teodora</span>
-              <span className={styles.therapistDescription}>Abordare imparțială și directă</span>
-            </div>
+          <div className={styles.buttonInfo}>
+            <span className={styles.buttonTitle}>Creează un alt jurnal</span>
+            <span className={styles.buttonDescription}>Întoarce-te la pagina principală pentru a crea un alt jurnal</span>
           </div>
         </button>
       </div>
       
       <div className={styles.actionsFooter}>
         <p className={styles.footerNote}>
-          Fiecare terapeut are o abordare unică și poate oferi perspective diferite asupra jurnalului tău.
+          Practică journaling regulat pentru a-ți îmbunătăți starea de bine și pentru a explora gândurile și emoțiile.
         </p>
       </div>
     </div>

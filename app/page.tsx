@@ -9,7 +9,6 @@ import LeftMenu from './components/LeftMenu/LeftMenu';
 import TherapistSelector from './components/TherapistSelector/TherapistSelector';
 import InstallPrompt from './components/InstallPrompt/InstallPrompt';
 import WelcomePage from './components/WelcomePage/WelcomePage';
-import JournalingSection from './components/Journaling/JournalingSection';
 import JournalModal from './components/Journaling/JournalModal';
 import { useApp } from './contexts/AppContext';
 import styles from './page.module.css';
@@ -42,6 +41,7 @@ function AppContent() {
       {showWelcomePage ? (
         <div className={styles.welcomePageContainer}>
           <WelcomePage />
+          <JournalModal /> {/* JournalModal se va afișa peste WelcomePage */}
         </div>
       ) : (
         <main className={styles.mainContainer}>
@@ -50,12 +50,10 @@ function AppContent() {
           <div className={styles.appContainer}>
             <Header />
             <div className={styles.contentContainer}>
-              <JournalingSection />
               <Chat />
             </div>
           </div>
           <InstallPrompt />
-          <JournalModal />
         </main>
       )}
     </>

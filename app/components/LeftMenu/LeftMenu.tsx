@@ -18,7 +18,8 @@ export default function LeftMenu() {
     loadConversation,
     currentConversation,
     renameConversation,
-    deleteConversation
+    deleteConversation,
+    setShowWelcomePage
   } = useApp();
 
   const [showOptionsFor, setShowOptionsFor] = useState<string | null>(null);
@@ -283,7 +284,15 @@ export default function LeftMenu() {
       {/* Side menu panel */}
       <div className={`${styles.sideMenu} ${isMenuOpen ? styles.open : ''}`}>
         <div className={styles.menuHeader}>
-          <span>Terapie AI</span>
+          <span 
+            className={styles.logoText}
+            onClick={() => {
+              setShowWelcomePage(true);
+              handleCloseMenu();
+            }}
+          >
+            Terapie AI
+          </span>
           <button
             className={styles.menuClose}
             onClick={handleCloseMenu}
