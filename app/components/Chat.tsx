@@ -9,6 +9,7 @@ export default function Chat() {
   const {
     messages,
     addMessage,
+    setMessages,
     currentTherapist,
     currentConversation
   } = useApp();
@@ -20,6 +21,7 @@ export default function Chat() {
   const [isAnimating, setIsAnimating] = useState<boolean>(false);
   const [hasStartedConversation, setHasStartedConversation] = useState<boolean>(false);
   const [inputHeight, setInputHeight] = useState<number>(0);
+  const [isTransitioningFromLoading, setIsTransitioningFromLoading] = useState<boolean>(false);
 
   // Refs
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -98,19 +100,93 @@ export default function Chat() {
     }
   }, [messages, isLoading, scrollToBottom]);
 
-  // Animate assistant messages - simplified for CSS animation
+  // Animate assistant messages with smooth, therapeutic incremental display
   useEffect(() => {
     if (isAnimating && messages.length > 0) {
-      // Set a timeout to mark animation as complete after a reasonable time
-      const timeoutId = setTimeout(() => {
-        if (isMountedRef.current) {
-          setIsAnimating(false);
-        }
-      }, 2000); // Adjust based on your animation duration
+      // Get the last message (which should be the one animating)
+      const lastMessage = messages[messages.length - 1];
       
-      return () => clearTimeout(timeoutId);
+      if (lastMessage?.role === 'assistant' && !lastMessage.displayed) {
+        // Faster typing speed but still with a therapeutic feel (characters per second)
+        const baseSpeed = 25; // Base characters per second (faster)
+        const charactersPerSecond = Math.min(35, Math.max(baseSpeed, baseSpeed + lastMessage.content.length / 150));
+        
+        // Split message into words to allow for more natural typing behavior
+        const words = lastMessage.content.split(/(\s+)/); // Split by whitespace but keep separators
+        let currentContent = '';
+        let wordIndex = 0;
+        let charIndexInWord = 0;
+        let currentIntervalId: NodeJS.Timeout | null = null;
+        
+        // Setup the typing animation function
+        const processNextCharacter = () => {
+          if (!isMountedRef.current) {
+            if (currentIntervalId) clearInterval(currentIntervalId);
+            return;
+          }
+          
+          if (wordIndex < words.length) {
+            const currentWord = words[wordIndex];
+            
+            // Add character by character within the current word
+            if (charIndexInWord < currentWord.length) {
+              // Add one character at a time
+              currentContent += currentWord[charIndexInWord];
+              charIndexInWord++;
+              
+              // Safely update displayed text
+              if (isMountedRef.current) {
+                setDisplayedText(currentContent);
+              }
+              
+              // Add a brief pause at punctuation for more natural reading
+              if (/[.,;:?!]/.test(currentWord[charIndexInWord - 1])) {
+                // Briefly pause after punctuation
+                if (currentIntervalId) clearInterval(currentIntervalId);
+                
+                setTimeout(() => {
+                  if (isMountedRef.current) {
+                    // Resume typing after pause
+                    currentIntervalId = setInterval(processNextCharacter, 1000 / charactersPerSecond);
+                  }
+                }, 200); // Shorter pause after punctuation
+              }
+            } else {
+              // Move to next word
+              wordIndex++;
+              charIndexInWord = 0;
+            }
+          } else {
+            // We've reached the end
+            if (currentIntervalId) clearInterval(currentIntervalId);
+            
+            // Small delay before marking as complete
+            setTimeout(() => {
+              if (isMountedRef.current) {
+                setIsAnimating(false);
+                
+                // Update the message's displayed status in the context
+                const updatedMessages = [...messages];
+                updatedMessages[messages.length - 1] = {
+                  ...lastMessage,
+                  displayed: true
+                };
+                setMessages(updatedMessages);
+              }
+            }, 300); // Shorter pause at the end
+          }
+        };
+        
+        // Start the typing animation
+        currentIntervalId = setInterval(processNextCharacter, 1000 / charactersPerSecond);
+        
+        // Clean up on unmount or when animation stops
+        return () => {
+          if (currentIntervalId) clearInterval(currentIntervalId);
+        };
+      }
     }
-  }, [isAnimating, messages]);
+  }, [isAnimating, messages, setMessages]);
 
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -123,11 +199,12 @@ export default function Chat() {
       setHasStartedConversation(true);
     }
 
-    // Create user message
+    // Create user message with timestamp
     const userMessage: Message = {
       role: 'user',
       content: input.trim(),
-      displayed: true
+      displayed: true,
+      timestamp: Date.now()
     };
 
     // Clear input and set loading state
@@ -180,20 +257,49 @@ export default function Chat() {
       // Check again if component is still mounted
       if (!isMountedRef.current) return;
 
+      // Start transition from loading state to message
+      setIsTransitioningFromLoading(true);
+      
+      // Short delay to allow loading animation to transition out
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
       // Add assistant response and animate
       const assistantMessage: Message = {
         role: 'assistant',
         content: data.content,
-        displayed: false // Initially not fully displayed
+        displayed: false, // Initially not fully displayed
+        timestamp: Date.now()
       };
 
-      // Add the message and start animation
-      addMessage(assistantMessage);
-      setIsAnimating(true);
-      setDisplayedText(data.content);
-
-      // Scroll to the bottom
-      scrollToBottom();
+      // Prepare to start animation
+      setDisplayedText(''); // Initialize with empty text to prevent flash
+      
+      // Add the message first with empty displayed content
+      const messageForAnimation = {
+        ...assistantMessage,
+        content: assistantMessage.content, // Store full content
+        _originalContent: assistantMessage.content // Keep original content for reference
+      };
+      
+      addMessage(messageForAnimation);
+      
+      // Small delay before starting animation to prevent visual glitches
+      setTimeout(() => {
+        if (isMountedRef.current) {
+          // Start animation
+          setIsAnimating(true);
+          
+          // Reset transition flag after animation starts
+          setTimeout(() => {
+            if (isMountedRef.current) {
+              setIsTransitioningFromLoading(false);
+            }
+          }, 300);
+          
+          // Scroll to the bottom
+          scrollToBottom();
+        }
+      }, 50);
 
     } catch (error) {
       console.error('Error:', error);
@@ -217,7 +323,8 @@ export default function Chat() {
         const errorResponse: Message = {
           role: 'assistant',
           content: errorMessage,
-          displayed: true
+          displayed: true,
+          timestamp: Date.now()
         };
 
         addMessage(errorResponse);
@@ -298,12 +405,16 @@ export default function Chat() {
                 aria-label={`${message.role === 'user' ? 'Tu' : currentTherapist.name} a spus`}
               >
                 <div 
-                  className={`message-bubble ${message.role === 'user' ? 'message-user' : 'message-assistant'}`}
+                  className={`message-bubble ${message.role === 'user' ? 'message-user' : 'message-assistant'} ${
+                    message.role === 'assistant' && index === messages.length - 1 && isTransitioningFromLoading 
+                    ? 'transition-from-loading' 
+                    : ''
+                  }`}
                 >
                   {isLastAssistantMessage ? (
                     // If it's the last assistant message and it's animating
                     <div className="typing-animation-container">
-                      <div className="typing-animation">
+                      <div className="typing-animation" key={displayedText.length}>
                         {formatMessage(displayedText)}
                       </div>
                     </div>

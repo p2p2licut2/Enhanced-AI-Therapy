@@ -359,7 +359,7 @@ export default function Header() {
                   {/* Fix: Folosim două elemente diferite cu referințe separate */}
                   <div
                     ref={titleRef}
-                    onClick={handleTitleClick}
+                    onClick={currentConversation ? handleTitleClick : undefined}
                     className="overflow-x-auto whitespace-nowrap no-scrollbar cursor-pointer"
                   >
                     {/* Elementul interior care are referința pentru scroll */}

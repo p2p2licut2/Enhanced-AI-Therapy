@@ -114,32 +114,76 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
   // Load conversations from localStorage on initial load
   useEffect(() => {
-    const savedConversations = localStorage.getItem('conversations');
-    if (savedConversations) {
-      // Încărcăm doar conversațiile care au cel puțin un mesaj
-      const parsedConversations = JSON.parse(savedConversations);
-      const validConversations = parsedConversations.filter(
-        (conv: Conversation) => conv.messages && conv.messages.length > 0
-      );
-      
-      // Dacă am eliminat conversații, actualizăm localStorage
-      if (validConversations.length !== parsedConversations.length) {
-        localStorage.setItem('conversations', JSON.stringify(validConversations));
+    try {
+      const savedConversations = localStorage.getItem('conversations');
+      if (savedConversations) {
+        // Încărcăm doar conversațiile care au cel puțin un mesaj
+        const parsedConversations = JSON.parse(savedConversations);
+        const validConversations = parsedConversations.filter(
+          (conv: Conversation) => conv.messages && conv.messages.length > 0
+        );
+        
+        // Validate conversation data structure
+        const properlyFormattedConversations = validConversations.map((conv: Conversation) => {
+          // Ensure all required properties exist
+          if (!conv.id || !conv.therapistId || !conv.title) {
+            return null;
+          }
+          
+          // Ensure timestamps exist
+          const now = Date.now();
+          return {
+            ...conv,
+            createdAt: conv.createdAt || now,
+            updatedAt: conv.updatedAt || now,
+            isFavorite: Boolean(conv.isFavorite),
+            // Ensure all messages have proper structure
+            messages: Array.isArray(conv.messages) ? conv.messages.map((msg): Message => ({
+              role: msg.role === 'assistant' || msg.role === 'user' ? msg.role : 'user',
+              content: msg.content || '',
+              displayed: msg.displayed === false ? false : true,
+              timestamp: msg.timestamp || now
+            })) : []
+          };
+        });
+        
+        // Filter out any null values with proper typing
+        const filteredConversations: Conversation[] = properlyFormattedConversations.filter(
+          (conv: Conversation | null): conv is Conversation => conv !== null
+        );
+        
+        // Dacă am eliminat conversații, actualizăm localStorage
+        if (filteredConversations.length !== parsedConversations.length) {
+          localStorage.setItem('conversations', JSON.stringify(filteredConversations));
+        }
+        
+        setConversations(filteredConversations);
       }
       
-      setConversations(validConversations);
-    }
-    
-    // Check if there was a current conversation
-    const savedCurrentConversationId = localStorage.getItem('currentConversationId');
-    if (savedCurrentConversationId) {
-      setCurrentConversationId(savedCurrentConversationId);
+      // Check if there was a current conversation
+      const savedCurrentConversationId = localStorage.getItem('currentConversationId');
+      if (savedCurrentConversationId) {
+        setCurrentConversationId(savedCurrentConversationId);
+      }
+    } catch (error) {
+      console.error('Error loading conversations from localStorage:', error);
+      // In case of error, reset to empty state
+      setConversations([]);
+      localStorage.removeItem('conversations');
+      localStorage.removeItem('currentConversationId');
     }
   }, []);
 
   // Update localStorage when conversations change
   useEffect(() => {
-    localStorage.setItem('conversations', JSON.stringify(conversations));
+    try {
+      // Don't save if conversations array is empty
+      if (conversations.length > 0) {
+        localStorage.setItem('conversations', JSON.stringify(conversations));
+      }
+    } catch (error) {
+      console.error('Error saving conversations to localStorage:', error);
+    }
   }, [conversations]);
 
   // Update localStorage when current conversation changes

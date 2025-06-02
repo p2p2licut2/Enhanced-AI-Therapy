@@ -80,11 +80,11 @@ export default function InstallPrompt() {
     <div className="install-prompt">
       <div className="install-prompt-content">
         <div className="install-prompt-text">
-          <h3>Instalează Terapie AI</h3>
+          <h3>Instalează Soulberry</h3>
           <p>
             {isIOS 
               ? 'Adaugă această aplicație pe ecranul tău de pornire pentru acces rapid și offline.' 
-              : 'Instalează aplicația pentru o experiență mai bună și acces offline.'}
+              : 'Instalează aplicația pentru o experiență mai bună și acces instant.'}
           </p>
         </div>
         
